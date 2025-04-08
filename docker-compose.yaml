@@ -1,0 +1,11 @@
+services:
+  snowhite-frontend:
+    image: localhost/frontend:latest
+    ports:
+      - 9080:80
+    networks:
+      - snowhite-network
+
+networks:
+  snowhite-network:
+    external: true

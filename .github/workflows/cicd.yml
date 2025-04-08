@@ -13,16 +13,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          linux/arm64
-
-      - name: Build Docker Image
-        run: docker buildx build --platform linux/arm64 -t snowhite/frontend:latest .
+          platforms: linux/arm64
 
       - name: Docker Login
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lheesoo1020 --password-stdin
 
-      - name: Push Docker Image
-        run: docker push snowhite/frontend:latest
+      - name: Build Docker Image
+        run: docker buildx build --push --platform linux/arm64 -t docker.io/lheesoo1020/frontend:latest .
+
+      - name: Copy file to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docker-compose.yaml"
+          target: ${{ secrets.SERVER_PROJECT_PATH_CLIENT }}
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
@@ -32,8 +38,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             systemctl --user start podman
+            cd ${{ secrets.SERVER_PROJECT_PATH_CLIENT }}
             echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lheesoo1020 --password-stdin
             docker compose down
-            docker pull snowhite/frontend:latest
-            docker tag snowhite/frontend:latest frontend:latest
+            docker pull docker.io/lheesoo1020/frontend:latest
+            docker tag docker.io/lheesoo1020/frontend:latest frontend:latest
             docker compose up -d
