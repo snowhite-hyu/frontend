@@ -2,10 +2,10 @@
 	auto_https off
 }
 
-server.snowhite-hyu.duckdns.org:80 {
+server.snowhite-hyu.duckdns.org {
 	reverse_proxy snowhite-container:8080
 }
 
-client.snowhite-hyu.duckdns.org:80 {
+client.snowhite-hyu.duckdns.org {
 	file_server
 }
