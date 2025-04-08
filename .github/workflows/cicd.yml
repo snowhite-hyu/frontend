@@ -1,0 +1,35 @@
+name: Dev CI/CD
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  dev-deployment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker buildx build --platform linux/arm64 -t snowhite/frontend:latest .
+
+      - name: Docker Login
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lheesoo1020 --password-stdin
+
+      - name: Push Docker Image
+        run: docker push snowhite/frontend:latest
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            systemctl --user start podman
+            echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lheesoo1020 --password-stdin
+            docker compose down
+            docker pull snowhite/frontend:latest
+            docker tag snowhite/frontend:latest frontend:latest
+            docker compose up -d
