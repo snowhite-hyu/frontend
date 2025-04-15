@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bunx vite",
-    "build": "bunx vite build",
-    "lint": "bunx @biomejs/biome lint --write ./src",
-    "format": "bunx @biomejs/biome format --write ./src",
-    "check": "bunx @biomejs/biome check --write ./src",
-    "preview": "bunx vite preview"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "@biomejs/biome lint --write ./src",
+    "format": "@biomejs/biome format --write ./src",
+    "check": "@biomejs/biome check --write ./src",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.3",
