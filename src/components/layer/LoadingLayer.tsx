@@ -10,9 +10,7 @@ const LoadingLayer: React.FC<LoadingLayerProps> = ({ children }) => {
 	const isLoading = useIsLoading();
 
 	useEffect(() => {
-		const helathCheckInterval = setInterval(() => {
-			
-		}, 1000);
+		const helathCheckInterval = setInterval(() => {}, 1000);
 
 		return () => clearInterval(helathCheckInterval);
 	}, []);
