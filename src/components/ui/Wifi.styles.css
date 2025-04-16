@@ -1,0 +1,105 @@
+.wifi-icon {
+  --icon-color: #ffd200;
+  --error-color: #f40082;
+  margin: 15px 5px;
+}
+
+.inverse .wifi-icon {
+  --icon-color: #3452a5;
+  --error-color: #26c9c3;
+}
+
+.wifi-icon path {
+  display: none;
+  fill: var(--icon-color);
+}
+
+.wifi-icon.poor-connection .level-1 {
+  display: block;
+}
+
+.wifi-icon.fair-connection .level-1,
+.wifi-icon.fair-connection .level-2 {
+  display: block;
+}
+
+.wifi-icon.good-connection .level-1,
+.wifi-icon.good-connection .level-2,
+.wifi-icon.good-connection .level-3 {
+  display: block;
+}
+
+.wifi-icon.excellent-connection .level-1,
+.wifi-icon.excellent-connection .level-2,
+.wifi-icon.excellent-connection .level-3,
+.wifi-icon.excellent-connection .level-4 {
+  display: block;
+}
+
+.wifi-icon.wifi-off .wifi-off {
+  display: block;
+}
+
+.wifi-icon.error .level-1,
+.wifi-icon.error .level-2,
+.wifi-icon.error .level-3,
+.wifi-icon.error .level-4 {
+  display: block;
+  opacity: 0.2;
+}
+
+.wifi-icon.error .error {
+  display: block;
+  fill: var(--error-color);
+}
+
+.search {
+  --anim-transition: 2s ease infinite;
+  --anim-delay-L2: 0.25s;
+  --anim-delay-L3: 0.5s;
+  --anim-delay-L4: 0.75s;
+}
+
+.wifi-icon.search .level-1,
+.wifi-icon.search .level-2,
+.wifi-icon.search .level-3,
+.wifi-icon.search .level-4 {
+  display: block;
+}
+
+@keyframes searching {
+  0% {
+    opacity: 0.2;
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.wifi-icon.search .level-1 {
+  animation: searching var(--anim-transition);
+}
+
+.wifi-icon.search .level-2 {
+  animation: searching var(--anim-transition);
+  animation-delay: var(--anim-delay-L2);
+}
+
+.wifi-icon.search .level-3 {
+  animation: searching var(--anim-transition);
+  animation-delay: var(--anim-delay-L3);
+}
+
+.wifi-icon.search .level-4 {
+  animation: searching var(--anim-transition);
+  animation-delay: var(--anim-delay-L4);
+}
