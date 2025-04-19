@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "vite --mode dev",
+    "build": "tsc -b && vite build --mode build",
     "lint": "biome lint --write ./src",
     "format": "biome format --write ./src",
     "check": "biome check --write ./src",
