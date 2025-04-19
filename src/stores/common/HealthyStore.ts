@@ -1,3 +1,4 @@
+import restService from "@/apis/common/RestClient";
 import { create } from "zustand";
 
 interface HealthyState {
@@ -12,12 +13,19 @@ const HealthyStore = create<HealthyState>((set, get) => {
 		lastHandShake: Date.now(),
 		actions: {
 			checkHealth: () => {
-				// Not implemented yet
 				const oldState = get();
 				const now = Date.now();
 				if (now - oldState.lastHandShake > 1) {
 					console.log("Tring to check health...");
-					set({ lastHandShake: Date.now() });
+					restService({method: 'get', url: '/health'})
+						.then((response) => {
+							if (response.code === '200') {
+								set({ lastHandShake: Date.now() });
+							}
+						})
+					  .catch((error) => {
+					  	console.log(error);
+					  });
 				}
 			},
 		},

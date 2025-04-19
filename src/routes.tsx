@@ -37,9 +37,9 @@ const Router: React.FC = () => {
 	];
 
 	return (
-		<Routes {...{ location, key: location.pathname }}>
+		<Routes key={location.pathname} location={location}>
 			{routes.map((route) =>
-				<Route key={route.path} path={route.path} element={<Layout>{route.element}</Layout>} />
+				<Route key={route.path.split('?')[0]} path={route.path} element={<Layout>{route.element}</Layout>} />
 			)}
 		</Routes>
 	);
