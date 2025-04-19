@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const service = axios.create({
-  baseURL: import.meta.env.BASE_URL,
+  baseURL: import.meta.env.API_BASE_URL,
   headers: {
     "Cache-Control": "no-cache",
   }
