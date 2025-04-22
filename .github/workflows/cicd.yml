@@ -16,31 +16,7 @@ jobs:
           platforms: linux/arm64
 
       - name: Docker Login
-        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lheesoo1020 --password-stdin
+        run: echo "${{ secrets.GITLAB_PASSWORD }}" | docker login -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: docker buildx build --push --platform linux/arm64 -t docker.io/lheesoo1020/frontend:latest .
-
-      - name: Copy file to Server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "docker-compose.yaml"
-          target: ${{ secrets.SERVER_PROJECT_PATH_CLIENT }}
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            systemctl --user start podman
-            cd ${{ secrets.SERVER_PROJECT_PATH_CLIENT }}
-            echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u lheesoo1020 --password-stdin
-            docker compose down
-            docker pull docker.io/lheesoo1020/frontend:latest
-            docker tag docker.io/lheesoo1020/frontend:latest frontend:latest
-            docker compose up -d
+        run: docker buildx build --push --platform linux/arm64 -t registry.ryuuga.duckdns.org/snowhite/frontend:latest .
