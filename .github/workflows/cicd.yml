@@ -17,7 +17,7 @@ jobs:
         run: echo "${{ secrets.GITLAB_PASSWORD }}" | docker login registry.ryuuga.duckdns.org -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: docker build ---load -platform linux/arm64 -t snowhite/frontend:latest .
+        run: docker build --platform linux/arm64 -t snowhite/frontend:latest .
 
       - name: Tag Docker Image
         run: docker image tag snowhite/frontend:latest registry.ryuuga.duckdns.org/snowhite/frontend:latest
