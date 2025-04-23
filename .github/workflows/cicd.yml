@@ -10,9 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Docker update
-        run: sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
-
       - name: Docker Login
         run: echo "${{ secrets.GITLAB_PASSWORD }}" | docker login registry.ryuuga.duckdns.org -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
 
