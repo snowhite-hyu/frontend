@@ -1,23 +1,27 @@
-import axios from "axios";
+import axios, { type AxiosHeaders } from "axios";
 
 type ServiceType = "api" | "asset";
 
 const service = (type: ServiceType) => {
 	let baseURL: string;
+	let headers: Partial<AxiosHeaders>;
+
 	switch (type) {
 		case "api":
-			baseURL = `${import.meta.env.API_BASE_URL}`;
+			baseURL = `${import.meta.env.VITE_API_BASE_URL}`;
+			headers = {
+				"Cache-Control": "no-cache",
+			};
 			break;
 		case "asset":
-			baseURL = `${import.meta.env.ASSET_BASE_URL}`;
+			baseURL = `${import.meta.env.VITE_ASSET_BASE_URL}`;
+			headers = {};
 			break;
 	}
 
 	return axios.create({
 		baseURL: baseURL,
-		headers: {
-			"Cache-Control": "no-cache",
-		},
+		headers: headers,
 	});
 };
 
