@@ -7,13 +7,13 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = ({ children }) => {
 	return (
-		<div className="min-h-screen bg-gray-900 text-white">
-			<div className="relative min-h-screen bg-cover bg-no-repeat bg-center">
+		<div className="min-h-screen bg-gray-900 text-white w-screen h-screen">
+			<div className="relative min-h-screen bg-cover bg-no-repeat bg-center w-full h-full">
 				<div
 					className="absolute inset-0 bg-black opacity-50"
 					style={{ backgroundImage: `url('img/background.jpg')` }}
 				/>
-				<div className="relative z-10 flex flex-col items-center justify-center min-h-screen">
+				<div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
 					{children}
 				</div>
 			</div>

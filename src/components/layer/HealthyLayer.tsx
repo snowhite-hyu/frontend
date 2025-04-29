@@ -19,18 +19,16 @@ const HealthyLayer: React.FC<HealthyLayerProps> = ({ children }) => {
 		return () => clearInterval(checkHealthInterval);
 	}, [healthyActions]);
 
-	return (
-		<div>
-			<div className="fixed top-0 left-0 w-full flex justify-end-safe items-end-safe py-2 px-2">
-				<WifiUI
-					status={isHealthy ? "search" : "poor-connection"}
-					width={50}
-					height={50}
-				/>
-			</div>
-			<div className="content mt-12 p-4">{children}</div>
+	return <>
+		<div className="fixed top-0 left-0 w-full flex justify-end-safe items-end-safe py-2 px-2">
+			<WifiUI
+				status={isHealthy ? "search" : "poor-connection"}
+				width={50}
+				height={50}
+			/>
 		</div>
-	);
+		<div className="mt-12 p-10 w-full h-full">{children}</div>
+	</>;
 };
 
 export default HealthyLayer;

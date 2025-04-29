@@ -1,14 +1,14 @@
-type Method = 'get' | 'post' | 'delete' | 'patch'
+type Method = "get" | "post" | "delete" | "patch";
 
 export interface RestReqest<T> {
-  method: Method,
-  url: string,
-  data?: T,
+	method: Method;
+	url: string;
+	data?: T;
 }
 
 export interface RestResponse<T> {
-  method: Method,
-  code: string,
-  message: string,
-  data: T | null,
+	method: Method;
+	code: string;
+	message: string;
+	data: T | null;
 }
