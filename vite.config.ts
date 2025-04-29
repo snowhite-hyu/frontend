@@ -15,4 +15,18 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes("axios")) {
+            return "@network";
+          }
+          if (id.includes("node_modules")) {
+            return "@vendor";
+          }
+        },
+      },
+    },
+  },
 })

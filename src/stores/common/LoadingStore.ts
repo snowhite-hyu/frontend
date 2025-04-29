@@ -9,7 +9,7 @@ interface LoadingState {
 
 const LoadingStore = create<LoadingState>((set) => {
 	return {
-		isLoading: true,
+		isLoading: false,
 		actions: {
 			setIsLoading: (value: boolean) => set({ isLoading: value }),
 		},

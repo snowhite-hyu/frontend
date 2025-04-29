@@ -17,15 +17,15 @@ const HealthyStore = create<HealthyState>((set, get) => {
 				const now = Date.now();
 				if (now - oldState.lastHandShake > 1) {
 					console.log("Tring to check health...");
-					restService({method: 'get', url: '/health'})
+					restService({ method: "get", url: "/health" })
 						.then((response) => {
-							if (response.code === '200') {
+							if (response.code === "200") {
 								set({ lastHandShake: Date.now() });
 							}
 						})
-					  .catch((error) => {
-					  	console.log(error);
-					  });
+						.catch((error) => {
+							console.log(error);
+						});
 				}
 			},
 		},

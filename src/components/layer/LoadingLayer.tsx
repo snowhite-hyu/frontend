@@ -15,7 +15,7 @@ const LoadingLayer: React.FC<LoadingLayerProps> = ({ children }) => {
 		return () => clearInterval(helathCheckInterval);
 	}, []);
 
-	return <div>{isLoading && <LoadingUI />}{children}</div>;
+	return <div className="w-full h-full">{isLoading && <LoadingUI />}{children}</div>;
 };
 
 export default LoadingLayer;

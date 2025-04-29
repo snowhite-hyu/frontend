@@ -1,8 +1,9 @@
 import Background from "@/components/common/Background";
 import type React from "react";
+import { Toaster } from "sonner";
+import HealthyLayer from "./components/layer/HealthyLayer";
 import LoadingLayer from "./components/layer/LoadingLayer";
 import Router from "./routes";
-import HealthyLayer from "./components/layer/HealthyLayer";
 
 const App: React.FC = () => {
 	return (
@@ -10,6 +11,7 @@ const App: React.FC = () => {
 			<HealthyLayer>
 				<LoadingLayer>
 					<Router />
+					<Toaster />
 				</LoadingLayer>
 			</HealthyLayer>
 		</Background>

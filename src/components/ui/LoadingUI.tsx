@@ -1,7 +1,7 @@
+import { useIsLoading } from "@/stores/common/LoadingStore";
 import type React from "react";
 import type { CSSProperties } from "react";
 import { SyncLoader } from "react-spinners";
-import { useIsLoading } from "@/stores/common/LoadingStore";
 
 const override: CSSProperties = {
 	display: "block",
