@@ -6,10 +6,10 @@ const service = (type: ServiceType) => {
 	let baseURL: string;
 	switch (type) {
 		case "api":
-			baseURL = `${import.meta.env.API_BASE_URL}/api`;
+			baseURL = `${import.meta.env.API_BASE_URL}`;
 			break;
 		case "asset":
-			baseURL = `${import.meta.env.API_BASE_URL}`;
+			baseURL = `${import.meta.env.ASSET_BASE_URL}`;
 			break;
 	}
 
