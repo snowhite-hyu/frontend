@@ -1,10 +1,25 @@
 import axios from "axios";
 
-const service = axios.create({
-	baseURL: import.meta.env.API_BASE_URL,
-	headers: {
-		"Cache-Control": "no-cache",
-	},
-});
+type ServiceType = "api" | "asset";
 
-export default service;
+const service = (type: ServiceType) => {
+	let baseURL: string;
+	switch (type) {
+		case "api":
+			baseURL = `${import.meta.env.API_BASE_URL}/api`;
+			break;
+		case "asset":
+			baseURL = `${import.meta.env.API_BASE_URL}`;
+			break;
+	}
+
+	return axios.create({
+		baseURL: baseURL,
+		headers: {
+			"Cache-Control": "no-cache",
+		},
+	});
+};
+
+export const apiSerivce = service("api");
+export const assetService = service("asset");
