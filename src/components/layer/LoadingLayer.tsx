@@ -1,5 +1,5 @@
 import { useIsLoading } from "@/stores/common/LoadingStore";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import LoadingUI from "../ui/LoadingUI";
 
 interface LoadingLayerProps {
@@ -15,7 +15,12 @@ const LoadingLayer: React.FC<LoadingLayerProps> = ({ children }) => {
 		return () => clearInterval(helathCheckInterval);
 	}, []);
 
-	return <div className="w-full h-full">{isLoading && <LoadingUI />}{children}</div>;
+	return (
+		<div className="w-full h-full">
+			{isLoading && <LoadingUI />}
+			{children}
+		</div>
+	);
 };
 
 export default LoadingLayer;
