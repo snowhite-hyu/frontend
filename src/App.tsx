@@ -1,6 +1,6 @@
-import Background from "@/components/common/Background";
 import type React from "react";
 import { Toaster } from "sonner";
+import Background from "./components/layer/Background";
 import HealthyLayer from "./components/layer/HealthyLayer";
 import LoadingLayer from "./components/layer/LoadingLayer";
 import Router from "./routes";

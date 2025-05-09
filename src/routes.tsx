@@ -1,9 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
+import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import LoginPage from "./pages/Login";
-import WelcomPage from "./pages/Welcome";
+import { useBackgroundActions } from "./stores/common/BackgroundStore";
+import WelcomPage from "@/pages/Welcome";
+import MainPage from "@/pages/Main";
+import LoginPage from "@/pages/Login";
+import RegisterPage from "@/pages/Register";
 
 interface MyRoute {
 	path: string;
@@ -32,10 +36,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 const Router: React.FC = () => {
+	const location = useLocation();
 	const routes: MyRoute[] = [
 		{ path: "/", element: <WelcomPage /> },
+		{ path: "/main", element: <MainPage /> },
 		{ path: "/login", element: <LoginPage /> },
+		{ path: "/register", element: <RegisterPage /> },
 	];
+
+	const backgroundActions = useBackgroundActions();
+	if (location.pathname !== "/") {
+		backgroundActions.setIsVisible(true);
+	}
 
 	return (
 		<Routes key={location.pathname} location={location}>
@@ -43,7 +55,11 @@ const Router: React.FC = () => {
 				<Route
 					key={route.path.split("?")[0]}
 					path={route.path}
-					element={<Layout>{route.element}</Layout>}
+					element={
+						<Suspense fallback={<WelcomPage />}>
+							<Layout>{route.element}</Layout>
+						</Suspense>
+					}
 				/>
 			))}
 		</Routes>
