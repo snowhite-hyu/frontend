@@ -31,7 +31,7 @@ const RegisterPage: React.FC = () => {
 					<Input
 						variant="sabotuer"
 						placeholder="이메일을 입력해주세요."
-						type="text"
+						type="email"
 						required
 						value={form.email}
 						onChange={(e) =>
