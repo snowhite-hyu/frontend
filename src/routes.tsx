@@ -1,13 +1,13 @@
+import LoginPage from "@/pages/Login";
+import MainPage from "@/pages/Main";
+import RegisterPage from "@/pages/Register";
+import WelcomPage from "@/pages/Welcome";
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useBackgroundActions } from "./stores/common/BackgroundStore";
-import WelcomPage from "@/pages/Welcome";
-import MainPage from "@/pages/Main";
-import LoginPage from "@/pages/Login";
-import RegisterPage from "@/pages/Register";
 
 interface MyRoute {
 	path: string;

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useLogin from "@/hooks/useLogin";
 import type { LoginRequest } from "@/models/common/Login";
-import { useSessionActions } from "@/stores/common/SessionStore";
 import update from "immutability-helper";
 import type React from "react";
 import { type FormEvent, useState } from "react";
@@ -11,11 +11,12 @@ const LoginPage: React.FC = () => {
 		id: "",
 		password: "",
 	});
-	const sessionActions = useSessionActions();
+
+	const { login } = useLogin();
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		sessionActions.login(form);
+		login(form);
 	};
 
 	return (

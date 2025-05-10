@@ -1,26 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useLogin from "@/hooks/useLogin";
 import type { RegisterRequest } from "@/models/common/Login";
-import { useSessionActions } from "@/stores/common/SessionStore";
 import update from "immutability-helper";
 import type React from "react";
 import { type FormEvent, useState } from "react";
 
 const RegisterPage: React.FC = () => {
 	const [form, setForm] = useState<RegisterRequest>({
-		id: "",
+		email: "",
 		password: "",
 		username: "",
-		email: "",
-		phone: "",
 	});
 	const [checkPassword, setCheckPassword] =
 		useState<RegisterRequest["password"]>("");
-	const sessionActions = useSessionActions();
+	const { register } = useLogin();
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		sessionActions.login(form);
+		register(form);
 	};
 
 	return (
@@ -32,12 +30,12 @@ const RegisterPage: React.FC = () => {
 				<div className="flex space-x-2">
 					<Input
 						variant="sabotuer"
-						placeholder="아이디를 입력해주세요."
+						placeholder="이메일을 입력해주세요."
 						type="text"
 						required
-						value={form.id}
+						value={form.email}
 						onChange={(e) =>
-							setForm(update(form, { id: { $set: e.target.value } }))
+							setForm(update(form, { email: { $set: e.target.value } }))
 						}
 					/>
 					<Button variant={"saboteurCheck"} size={"fill"} type="button">

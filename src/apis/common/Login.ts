@@ -5,6 +5,7 @@ import type {
 	RegisterResponse,
 } from "@/models/common/Login";
 import { apiSerivce } from "./ApiClient";
+import restService from "./RestClient";
 
 export async function Login(request: LoginRequest): Promise<LoginResponse> {
 	try {
@@ -19,17 +20,4 @@ export async function Login(request: LoginRequest): Promise<LoginResponse> {
 	}
 }
 
-export async function Register(
-	request: RegisterRequest,
-): Promise<RegisterResponse> {
-	try {
-		const result = await apiSerivce.post<LoginResponse>("/register", request);
-		return result.data;
-	} catch (error) {
-		console.log(error);
-		return {
-			user: undefined,
-			reason: "Failed to Reigster!",
-		};
-	}
-}
+export const Register = restService<RegisterRequest, RegisterResponse>;
