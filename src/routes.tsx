@@ -2,6 +2,7 @@ import LoginPage from "@/pages/Login";
 import MainPage from "@/pages/Main";
 import RegisterPage from "@/pages/Register";
 import WelcomPage from "@/pages/Welcome";
+import CreateRoomPage from "@/pages/CreateRoom";
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import { Suspense } from "react";
@@ -42,6 +43,7 @@ const Router: React.FC = () => {
 		{ path: "/main", element: <MainPage /> },
 		{ path: "/login", element: <LoginPage /> },
 		{ path: "/register", element: <RegisterPage /> },
+		{ path: "/create-room", element: <CreateRoomPage /> },
 	];
 
 	const backgroundActions = useBackgroundActions();
