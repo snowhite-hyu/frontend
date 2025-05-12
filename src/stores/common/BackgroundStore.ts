@@ -7,7 +7,9 @@ interface BackgroundState {
 	actions: {
 		setIsVisible: (value: boolean) => void;
 		setImage: (value: string) => void;
+		setUseLayout: (value: boolean) =>void;
 	};
+	useLayout: boolean;
 }
 
 const BackgroundStore = create<BackgroundState>((set) => {
@@ -17,7 +19,9 @@ const BackgroundStore = create<BackgroundState>((set) => {
 		actions: {
 			setIsVisible: (value: boolean) => set({ isVisible: value }),
 			setImage: (value: string) => set({ image: value }),
+			setUseLayout: (value: boolean) => set({ useLayout: value }),
 		},
+		useLayout: true,
 	};
 });
 
@@ -26,3 +30,5 @@ export const useBackgroundIsVisible = () =>
 export const useBackgroundImage = () => BackgroundStore((state) => state.image);
 export const useBackgroundActions = () =>
 	BackgroundStore((state) => state.actions);
+export const useBackgroundLayout = () =>
+	BackgroundStore((state) => state.useLayout);

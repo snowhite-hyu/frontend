@@ -5,6 +5,7 @@ import Text from "@/components/ui/text";
 import {
 	useBackgroundImage,
 	useBackgroundIsVisible,
+	useBackgroundLayout,
 } from "@/stores/common/BackgroundStore";
 import type React from "react";
 import { type ReactNode, useMemo, useState } from "react";
@@ -29,6 +30,7 @@ const useRefTop: () => [number | null, (node: HTMLElement | null) => void] =
 const Background: React.FC<BackgroundProps> = ({ children }) => {
 	const isVisible = useBackgroundIsVisible();
 	const image = useBackgroundImage();
+	const useLayout = useBackgroundLayout();
 	const location = useLocation();
 	const basename: string = useMemo(() => {
 		const index = location.pathname.lastIndexOf("/");
@@ -43,14 +45,14 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 				<div className="absolute inset-0 bg-[#000232]">
 					<img
 						src={image}
-						className={`${isVisible ? "" : "hidden"} h-full object-contain object-left`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "w-screen h-screen object-cover"} h-full object-contain object-left`}
 						aria-hidden={true}
 					/>
 				</div>
 				<div className="absolute inset-0 w-full">
 					<img
 						src={ageNoticeImage}
-						className={`${isVisible ? "" : "hidden"} w-full h-fit object-contain object-top-right`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} w-full h-fit object-contain object-top-right`}
 						aria-hidden={true}
 					/>
 				</div>
@@ -58,7 +60,7 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 					<img
 						ref={ref}
 						src={bottomBarImage}
-						className={`${isVisible ? "" : "hidden"} w-full h-fit object-fill object-bottom`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} w-full h-fit object-fill object-bottom`}
 						aria-hidden={true}
 					/>
 				</div>
@@ -68,11 +70,11 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 						style={{ top: `${top}px` }}
 					>
 						<img
-							className={`${isVisible ? "" : "hidden"} absolute`}
+							className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} absolute`}
 							src={bottomBubbleImage}
 							aria-hidden={true}
 						/>
-						<Text className={`${isVisible ? "" : "hidden"} absolute`}>
+						<Text className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} absolute`}>
 							{basename}
 						</Text>
 					</div>
