@@ -7,7 +7,7 @@ interface BackgroundState {
 	actions: {
 		setIsVisible: (value: boolean) => void;
 		setImage: (value: string) => void;
-		setUseLayout: (value: boolean) =>void;
+		setUseLayout: (value: boolean) => void;
 	};
 	useLayout: boolean;
 }

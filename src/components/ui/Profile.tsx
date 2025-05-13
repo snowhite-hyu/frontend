@@ -10,24 +10,34 @@ import member6 from "@/assets/profile/member6.png";
 import member7 from "@/assets/profile/member7.png";
 
 interface ProfileProps {
-    nickname: string;
+	nickname: string;
 }
 
 const Profile: React.FC<ProfileProps> = ({ nickname }) => {
-    const imageUrls = [member1, member2, member3, member4, member5, member6, member7];
-    const [randomImage] = useState<string>(() => {
-        const index = Math.floor(Math.random() * imageUrls.length);
-        return imageUrls[index];
-    });
+	const imageUrls = [
+		member1,
+		member2,
+		member3,
+		member4,
+		member5,
+		member6,
+		member7,
+	];
+	const [randomImage] = useState<string>(() => {
+		const index = Math.floor(Math.random() * imageUrls.length);
+		return imageUrls[index];
+	});
 
-    return (
-        <div
-        className="relative w-[200px] h-[200px] bg-cover bg-center text-white"
-        style={{ backgroundImage: `url(${randomImage})` }}
-        >
-            <p className="absolute bottom-0 pl-[16px] pb-[13px] text-[21px]">{nickname}</p>
-        </div>
-    )
+	return (
+		<div
+			className="relative w-[200px] h-[200px] bg-cover bg-center text-white"
+			style={{ backgroundImage: `url(${randomImage})` }}
+		>
+			<p className="absolute bottom-0 pl-[16px] pb-[13px] text-[21px]">
+				{nickname}
+			</p>
+		</div>
+	);
 };
 
 export default Profile;

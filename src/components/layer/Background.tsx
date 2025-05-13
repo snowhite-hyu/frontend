@@ -45,14 +45,14 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 				<div className="absolute inset-0 bg-[#000232]">
 					<img
 						src={image}
-						className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "w-screen h-screen object-cover"} h-full object-contain object-left`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "w-screen h-screen object-cover"} h-full object-contain object-left`}
 						aria-hidden={true}
 					/>
 				</div>
 				<div className="absolute inset-0 w-full">
 					<img
 						src={ageNoticeImage}
-						className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} w-full h-fit object-contain object-top-right`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} w-full h-fit object-contain object-top-right`}
 						aria-hidden={true}
 					/>
 				</div>
@@ -60,7 +60,7 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 					<img
 						ref={ref}
 						src={bottomBarImage}
-						className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} w-full h-fit object-fill object-bottom`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} w-full h-fit object-fill object-bottom`}
 						aria-hidden={true}
 					/>
 				</div>
@@ -70,11 +70,13 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 						style={{ top: `${top}px` }}
 					>
 						<img
-							className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} absolute`}
+							className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} absolute`}
 							src={bottomBubbleImage}
 							aria-hidden={true}
 						/>
-						<Text className={`${isVisible ? "" : "hidden"} ${useLayout ? "": "hidden"} absolute`}>
+						<Text
+							className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} absolute`}
+						>
 							{basename}
 						</Text>
 					</div>
