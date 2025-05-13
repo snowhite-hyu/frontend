@@ -30,6 +30,7 @@ const WaitingPage: React.FC = () => {
 		{ id: "엘사" },
 		{ id: "자스민" },
 		{ id: "뮬란" },
+		{ id: "애리얼" },
 	];
 
 	const [currentPage, setCurrentPage] = useState(0);
@@ -70,13 +71,14 @@ const WaitingPage: React.FC = () => {
 			</div>
 			{/* 중앙부 */}
 			<div className="w-full flex flex-col items-center mt-[40px]">
-				<div className="grid grid-cols-4 grid-rows-2 gap-10 w-[80%] h-[400px]">
+				<div className="grid grid-cols-4 grid-rows-2 gap-10 w-[80%] h-[450px]">
 					{currentMembers.map((member) => (
 						<Profile key={member.id} nickname={member.id} />
 					))}
 				</div>
 				{/* 페이지 버튼 */}
-				<div className="flex mt-[50px] gap-2 ">
+				{totalPages > 1 && (
+					<div className="flex mt-[50px] gap-2 ">
 					{Array.from({ length: totalPages }).map((_, i) => (
 						<button
 							type="button"
@@ -87,7 +89,8 @@ const WaitingPage: React.FC = () => {
 							}`}
 						/>
 					))}
-				</div>
+					</div>
+				)}
 			</div>
 			{/* 하단부 */}
 			<div className="absolute bottom-0 w-full flex justify-between px-[3%]">
