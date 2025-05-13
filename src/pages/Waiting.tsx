@@ -30,8 +30,6 @@ const WaitingPage: React.FC = () => {
 		{ id: "엘사" },
 		{ id: "자스민" },
 		{ id: "뮬란" },
-		{ id: "안녕" },
-		{ id: "hi" },
 	];
 
 	const [currentPage, setCurrentPage] = useState(0);
