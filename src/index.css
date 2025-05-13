@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@font-face {
+	font-family: "Holtwood One SC";
+	font-style: regular;
+	font-weight: 400;
+	font-display: swap;
+	src: url("/fonts/HoltwoodOneSC-Regular.ttf");
+}
+
+@theme {
+	--font-holtwood: "Holtwood One SC", serif;
+	--text-shadow-sabotuer: 0 2.92px 3.64px #000000, 0 3.64px 0.73px #ffffffcc
+		inset;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

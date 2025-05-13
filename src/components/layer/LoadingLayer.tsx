@@ -17,7 +17,7 @@ const LoadingLayer: React.FC<LoadingLayerProps> = ({ children }) => {
 
 	return (
 		<div className="w-full h-full">
-			{isLoading && <LoadingUI />}
+			<div className="absolute">{isLoading && <LoadingUI />}</div>
 			{children}
 		</div>
 	);

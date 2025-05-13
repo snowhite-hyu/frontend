@@ -1,6 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
 import type * as React from "react";
+import Text from "./text";
 
 import { cn } from "@/lib/utils";
 
@@ -20,12 +21,21 @@ const buttonVariants = cva(
 				ghost:
 					"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
 				link: "text-primary underline-offset-4 hover:underline",
+				sabotuer:
+					"bg-[#FAEC72] rounded-[50%] shadow-[inset_-7.29px_-7.29px_2.92px_#706628] text-shadow-[0_2.92px_2.92px_#00000080] \
+					active:bg-[#FAEC72] active:shadow-[inset_-3.64px_-3.64px_2.92px_#FFFFFF80,inset_0_2.92px_2.19px_#00000080] \
+					transition-shadow duration-150",
+				saboteurCheck:
+					"bg-[#DF1E34] rounded-lg shadow-[inset_-3.64px_-3.64px_2.92px_#00000080,inset_0_2.92px_2.19px_#FFFFFF80] text-shadow-[0_2.92px_2.92px_#00000080] \
+					active:bg-[#B71A2A] active:shadow-[inset_-3.64px_-3.64px_2.92px_#FFFFFF80,inset_0_2.92px_2.19px_#00000080] \
+					transition-shadow duration-150",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",
 				sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
 				lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
 				icon: "size-9",
+				fill: "min-w-10",
 			},
 		},
 		defaultVariants: {
@@ -46,6 +56,9 @@ function Button({
 		asChild?: boolean;
 	}) {
 	const Comp = asChild ? Slot : "button";
+	if (variant === "sabotuer") {
+		props.children = <Text className="m-5">{props.children}</Text>;
+	}
 
 	return (
 		<Comp
