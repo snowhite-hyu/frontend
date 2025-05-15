@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import member1 from "@/assets/profile/member1.png";
 import member2 from "@/assets/profile/member2.png";
