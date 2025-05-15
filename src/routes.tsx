@@ -1,14 +1,16 @@
+import LoginPage from "@/pages/Login";
+import MainPage from "@/pages/Main";
+import RegisterPage from "@/pages/Register";
+import WelcomPage from "@/pages/Welcome";
+import WaitingPage from "@/pages/Waiting";
+import CreateRoomPage from "@/pages/CreateRoom";
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useBackgroundActions } from "./stores/common/BackgroundStore";
-import WelcomPage from "@/pages/Welcome";
-import MainPage from "@/pages/Main";
-import LoginPage from "@/pages/Login";
-import RegisterPage from "@/pages/Register";
-import WaitingPage from "@/pages/Waiting";
+
 
 interface MyRoute {
 	path: string;
@@ -44,6 +46,7 @@ const Router: React.FC = () => {
 		{ path: "/login", element: <LoginPage /> },
 		{ path: "/register", element: <RegisterPage /> },
 		{ path: "/waiting", element: <WaitingPage /> },
+		{ path: "/create-room", element: <CreateRoomPage /> },
 	];
 
 	const backgroundActions = useBackgroundActions();

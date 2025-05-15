@@ -8,7 +8,7 @@ const service = (type: ServiceType) => {
 
 	switch (type) {
 		case "api":
-			baseURL = `${import.meta.env.VITE_API_BASE_URL}`;
+			baseURL = "/api";
 			headers = {
 				"Cache-Control": "no-cache",
 			};
@@ -22,6 +22,7 @@ const service = (type: ServiceType) => {
 	return axios.create({
 		baseURL: baseURL,
 		headers: headers,
+		withCredentials: true,
 	});
 };
 

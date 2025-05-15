@@ -16,6 +16,7 @@ const HealthyStore = create<HealthyState>((set, get) => {
 				const oldState = get();
 				const now = Date.now();
 				if (now - oldState.lastHandShake > 1) {
+					return;
 					console.log("Tring to check health...");
 					restService({ method: "get", url: "/health" })
 						.then((response) => {

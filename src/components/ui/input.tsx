@@ -18,7 +18,7 @@ function Input({
 			aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive";
 			break;
 		case "sabotuer":
-			variantClass = "bg-white text-black rounded-lg h-10 w-full";
+			variantClass = "bg-white text-black rounded-2xl h-16 w-full";
 			break;
 	}
 

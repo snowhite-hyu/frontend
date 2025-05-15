@@ -1,21 +1,29 @@
 import type { RestReqest, RestResponse } from "@/models/common/RestModel";
 import { apiSerivce } from "./ApiClient";
+import type { AxiosResponse } from "axios";
 
 async function restService<REQ, RES>(
 	request: RestReqest<REQ>,
 ): Promise<RestResponse<RES>> {
+	let response: AxiosResponse<RestResponse<RES>>;
 	switch (request.method) {
 		case "get":
-			return await apiSerivce.get(request.url, {});
+			response = await apiSerivce.get(request.url, {});
+			break;
 		case "post":
-			return await apiSerivce.post(request.url, request.data, {});
+			response = await apiSerivce.post(request.url, request.data, {});
+			break;
 		case "delete":
-			return await apiSerivce.delete(request.url, {});
+			response = await apiSerivce.delete(request.url, {});
+			break;
 		case "patch":
-			return await apiSerivce.patch(request.url, request.data, {});
+			response = await apiSerivce.patch(request.url, request.data, {});
+			break;
 		default:
-			return await apiSerivce.get(request.url, {});
+			response = await apiSerivce.get(request.url, {});
 	}
+
+	return response.data;
 }
 
 export default restService;
