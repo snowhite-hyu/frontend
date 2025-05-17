@@ -4,14 +4,17 @@ import Profile from "@/components/ui/Profile";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const WaitingPage: React.FC = () => {
-	const { setImage, setIsVisible, setUseLayout } = useBackgroundActions();
+	const navigate = useNavigate();
+
+	const { setImage, setUseLayout } = useBackgroundActions();
+	
 	useEffect(() => {
 		setImage(roomBackground);
-		setIsVisible(true);
 		setUseLayout(false);
-	}, [setImage, setIsVisible, setUseLayout]);
+	}, [setImage, setUseLayout]);
 
 	const options: { key: string; title: string; setting: string }[] = [
 		{ key: "people", title: "최대 인원", setting: "10명" },
@@ -102,7 +105,7 @@ const WaitingPage: React.FC = () => {
 				</div>
 				{/* 나가기 & 시작 버튼 */}
 				<div className="gap-[50px]">
-					<Button key="exit" variant={"exit"} className="h-fit mr-[50px]">
+					<Button key="exit" variant={"exit"} className="h-fit mr-[50px]" onClick={() => navigate("/room")}>
 						나가기
 					</Button>
 					<Button
