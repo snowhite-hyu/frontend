@@ -1,10 +1,10 @@
-import {
-	type CheckEmailRequest,
-	type CheckEmailResponse,
-	type LoginRequest,
-	type LoginResponse,
-	type RegisterRequest,
-	type RegisterResponse,
+import type {
+	CheckEmailRequest,
+	CheckEmailResponse,
+	LoginRequest,
+	LoginResponse,
+	RegisterRequest,
+	RegisterResponse,
 } from "@/models/common/Login";
 import restService from "./RestClient";
 
