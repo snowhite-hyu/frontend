@@ -17,8 +17,8 @@ interface DialogProps {
 }
 
 const widthMap = {
-  big: 'w-[1000px]',
-  small: 'w-[600px]',
+  big: 'w-5xl',
+  small: 'w-xl',
 };
 
 const Dialog: React.FC<DialogProps> = ({ size = 'big', children, isOpen, setIsOpen }) => {
