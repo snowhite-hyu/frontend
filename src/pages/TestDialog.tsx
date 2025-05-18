@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import Dialog from "@/components/ui/Dialog";
 
 const TestDialog: React.FC = () => {
-    const [isRoundEnd, setIsRoundEnd] = useState(false);
-    const [isGameEnd, setIsGameEnd] = useState(false);
+	const [isRoundEnd, setIsRoundEnd] = useState(false);
+	const [isGameEnd, setIsGameEnd] = useState(false);
 
 	const { setImage, setIsVisible, setUseLayout } = useBackgroundActions();
 	useEffect(() => {
@@ -17,21 +17,29 @@ const TestDialog: React.FC = () => {
 
 	return (
 		<div>
-            <button type="button" onClick={() => setIsRoundEnd(true)} className="px-4 py-2 bg-red-500 rounded">
+			<button
+				type="button"
+				onClick={() => setIsRoundEnd(true)}
+				className="px-4 py-2 bg-red-500 rounded"
+			>
 				라운드 끝내기
 			</button>
-            <Dialog isOpen={isRoundEnd} setIsOpen={setIsRoundEnd}> 
+			<Dialog isOpen={isRoundEnd} setIsOpen={setIsRoundEnd}>
 				<h2 className="text-4xl font-bold text-red-500">타이틀</h2>
 				<p className="mt-2 text-white">설명</p>
-			</Dialog>	
+			</Dialog>
 
-			<button type="button" onClick={() => setIsGameEnd(true)} className="m-4 px-4 py-2 bg-blue-500 rounded">
+			<button
+				type="button"
+				onClick={() => setIsGameEnd(true)}
+				className="m-4 px-4 py-2 bg-blue-500 rounded"
+			>
 				게임 끝내기
 			</button>
-			<Dialog isOpen={isGameEnd} setIsOpen={setIsGameEnd} size="small"> 
+			<Dialog isOpen={isGameEnd} setIsOpen={setIsGameEnd} size="small">
 				<h2 className="text-4xl font-bold text-red-500">타이틀</h2>
 				<p className="mt-2 text-white">설명</p>
-			</Dialog>		
+			</Dialog>
 		</div>
 	);
 };
