@@ -37,5 +37,6 @@ const SessionStore = create<SessionState>()(
 	),
 );
 
+export const useSessionToken = () => SessionStore((state) => state.token);
 export const useSessionUser = () => SessionStore((state) => state.user);
 export const useSessionActions = () => SessionStore((state) => state.actions);
