@@ -17,7 +17,7 @@ const TestDialog: React.FC = () => {
 
 	return (
 		<div>
-            <button onClick={() => setIsRoundEnd(true)} className="px-4 py-2 bg-red-500 rounded">
+            <button type="button" onClick={() => setIsRoundEnd(true)} className="px-4 py-2 bg-red-500 rounded">
 				라운드 끝내기
 			</button>
             <Dialog isOpen={isRoundEnd} setIsOpen={setIsRoundEnd}> 
@@ -25,7 +25,7 @@ const TestDialog: React.FC = () => {
 				<p className="mt-2 text-white">설명</p>
 			</Dialog>	
 
-			<button onClick={() => setIsGameEnd(true)} className="m-4 px-4 py-2 bg-blue-500 rounded">
+			<button type="button" onClick={() => setIsGameEnd(true)} className="m-4 px-4 py-2 bg-blue-500 rounded">
 				게임 끝내기
 			</button>
 			<Dialog isOpen={isGameEnd} setIsOpen={setIsGameEnd} size="small"> 
