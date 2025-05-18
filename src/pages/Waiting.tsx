@@ -79,16 +79,16 @@ const WaitingPage: React.FC = () => {
 				{/* 페이지 버튼 */}
 				{totalPages > 1 && (
 					<div className="flex mt-[50px] gap-2 ">
-					{Array.from({ length: totalPages }).map((_, i) => (
-						<button
-							type="button"
-							key={`page-${i}`}
-							onClick={() => setCurrentPage(i)}
-							className={`w-2 h-2 rounded-full ${
-								i === currentPage ? "bg-black" : "bg-gray-200"
-							}`}
-						/>
-					))}
+						{Array.from({ length: totalPages }).map((_, i) => (
+							<button
+								type="button"
+								key={`page-${i}`}
+								onClick={() => setCurrentPage(i)}
+								className={`w-2 h-2 rounded-full ${
+									i === currentPage ? "bg-black" : "bg-gray-200"
+								}`}
+							/>
+						))}
 					</div>
 				)}
 			</div>
