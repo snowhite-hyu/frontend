@@ -20,11 +20,12 @@ const SessionStore = create<SessionState>()(
 			actions: {
 				setToken: (value) => {
 					if (value) {
-						apiSerivce.defaults.headers.common['Authorization'] = `Bearer ${value}`;
+						apiSerivce.defaults.headers.common["Authorization"] =
+							`Bearer ${value}`;
 					} else {
-						delete apiSerivce.defaults.headers.common['Authorization'];
+						delete apiSerivce.defaults.headers.common["Authorization"];
 					}
-					set({ token: value })
+					set({ token: value });
 				},
 				setUser: (value) => set({ user: value }),
 			},
