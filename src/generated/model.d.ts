@@ -23,6 +23,11 @@ export interface ApiResponseString {
 	result?: string;
 }
 
+export interface LoginRequestDto {
+	email?: string;
+	password?: string;
+}
+
 export interface EmailDto {
 	email?: string;
 }

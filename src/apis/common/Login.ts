@@ -1,23 +1,13 @@
-import type {
-	LoginRequest,
-	LoginResponse,
-	RegisterRequest,
-	RegisterResponse,
+import {
+	type CheckEmailRequest,
+	type CheckEmailResponse,
+	type LoginRequest,
+	type LoginResponse,
+	type RegisterRequest,
+	type RegisterResponse,
 } from "@/models/common/Login";
-import { apiSerivce } from "./ApiClient";
 import restService from "./RestClient";
 
-export async function Login(request: LoginRequest): Promise<LoginResponse> {
-	try {
-		const result = await apiSerivce.post<LoginResponse>("/login", request);
-		return result.data;
-	} catch (error) {
-		console.log(error);
-		return {
-			user: undefined,
-			reason: "Failed to Login!",
-		};
-	}
-}
-
+export const Login = restService<LoginRequest, LoginResponse>;
 export const Register = restService<RegisterRequest, RegisterResponse>;
+export const CheckEmail = restService<CheckEmailRequest, CheckEmailResponse>;
