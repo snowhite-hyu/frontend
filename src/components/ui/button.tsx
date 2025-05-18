@@ -29,8 +29,7 @@ const buttonVariants = cva(
 					"bg-[#DF1E34] rounded-[21px] shadow-[inset_-3.64px_-3.64px_2.92px_#00000080,inset_0_2.92px_2.19px_#FFFFFF80] text-shadow-[0_2.92px_2.92px_#00000080] \
 					active:bg-[#B71A2A] active:shadow-[inset_-3.64px_-3.64px_2.92px_#FFFFFF80,inset_0_2.92px_2.19px_#00000080] \
 					transition-shadow duration-150",
-				exit: 
-					"bg-[#E0E0E0] rounded-[50%] w-[212px] h-[88px] shadow-[inset_-7.29px_-7.29px_2.92px_#747474] \
+				exit: "bg-[#E0E0E0] rounded-[50%] w-[212px] h-[88px] shadow-[inset_-7.29px_-7.29px_2.92px_#747474] \
 					active:bg-[#E0E0E0] active:shadow-[inset_-3.64px_-3.64px_2.92px_#FFFFFF80,inset_0_2.92px_2.19px_#00000080] \
 						transition-shadow duration-150",
 			},

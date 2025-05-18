@@ -11,7 +11,6 @@ import type { ReactNode } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useBackgroundActions } from "./stores/common/BackgroundStore";
 
-
 interface MyRoute {
 	path: string;
 	element: ReactNode;

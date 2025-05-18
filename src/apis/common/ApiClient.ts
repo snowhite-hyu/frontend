@@ -8,7 +8,7 @@ const service = (type: ServiceType) => {
 
 	switch (type) {
 		case "api":
-			baseURL = "/api";
+			baseURL = `${import.meta.env.VITE_API_BASE_URL}`;
 			headers = {
 				"Cache-Control": "no-cache",
 			};
@@ -23,6 +23,9 @@ const service = (type: ServiceType) => {
 		baseURL: baseURL,
 		headers: headers,
 		withCredentials: true,
+		validateStatus: (status) => {
+			return status < 500;
+		},
 	});
 };
 
