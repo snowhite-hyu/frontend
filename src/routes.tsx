@@ -48,7 +48,7 @@ const Router: React.FC = () => {
 		{ path: "/main", element: <MainPage /> },
 		{ path: "/login", element: <LoginPage /> },
 		{ path: "/register", element: <RegisterPage /> },
-	]
+	];
 
 	const backgroundActions = useBackgroundActions();
 	if (location.pathname !== "/") {
@@ -59,29 +59,35 @@ const Router: React.FC = () => {
 	return (
 		<Routes key={location.pathname} location={location}>
 			<Route key={"/"} path={"/"} element=<WelcomPage /> />;
-			{isLogined && routes.map((route) => (
-				<Route
-					key={route.path.split("?")[0]}
-					path={route.path}
-					element={
-						<Suspense fallback={<WelcomPage />}>
-							<Layout>{route.element}</Layout>
-						</Suspense>
-					}
-				/>
-			))}
-			{isLogined || openRoutes.map((route) => (
-				<Route
-					key={route.path.split("?")[0]}
-					path={route.path}
-					element={
-						<Suspense fallback={<WelcomPage />}>
-							<Layout>{route.element}</Layout>
-						</Suspense>
-					}
-				/>
-			))}
-			<Route key={"*"} path={"*"} element={<Navigate to={isLogined ? "/waiting" : "/main"} />} />
+			{isLogined &&
+				routes.map((route) => (
+					<Route
+						key={route.path.split("?")[0]}
+						path={route.path}
+						element={
+							<Suspense fallback={<WelcomPage />}>
+								<Layout>{route.element}</Layout>
+							</Suspense>
+						}
+					/>
+				))}
+			{isLogined ||
+				openRoutes.map((route) => (
+					<Route
+						key={route.path.split("?")[0]}
+						path={route.path}
+						element={
+							<Suspense fallback={<WelcomPage />}>
+								<Layout>{route.element}</Layout>
+							</Suspense>
+						}
+					/>
+				))}
+			<Route
+				key={"*"}
+				path={"*"}
+				element={<Navigate to={isLogined ? "/waiting" : "/main"} />}
+			/>
 		</Routes>
 	);
 };
