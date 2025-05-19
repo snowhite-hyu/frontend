@@ -4,6 +4,7 @@ import RegisterPage from "@/pages/Register";
 import WelcomPage from "@/pages/Welcome";
 import WaitingPage from "@/pages/Waiting";
 import CreateRoomPage from "@/pages/CreateRoom";
+import TestDialog from "@/pages/TestDialog";
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import { Suspense } from "react";
@@ -48,6 +49,7 @@ const Router: React.FC = () => {
 		{ path: "/main", element: <MainPage /> },
 		{ path: "/login", element: <LoginPage /> },
 		{ path: "/register", element: <RegisterPage /> },
+		{ path: "/dialog", element: <TestDialog /> }, // 테스트용 페이지. 추후 삭제 요망
 	];
 
 	const backgroundActions = useBackgroundActions();
