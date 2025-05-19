@@ -2,8 +2,10 @@ import type React from "react";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import gameEndImage from "@/assets/gameEnd.svg";
+import replayImage from "@/assets/replay.svg";
 import { useState, useEffect } from "react";
 import Dialog from "@/components/ui/Dialog";
+import { Button } from "@/components/ui/button";
 
 const TestDialog: React.FC = () => {
 	const [isRoundEnd, setIsRoundEnd] = useState(false);
@@ -47,6 +49,24 @@ const TestDialog: React.FC = () => {
 				</div>
 				<p className="font-semibold text-4xl">코딩정령</p>
 				<p className="font-semibold text-3xl">총 금덩이 개수 100개</p>
+			</Dialog>
+			<Dialog isOpen={isGameEnd} setIsOpen={setIsGameEnd} size="small">
+				<div className="w-fit mb-5">
+					<img
+						src={replayImage}
+						className="w-full h-fit object-fill object-bottom"
+						aria-hidden={true}
+					/>
+				</div>
+				<p className="font-semibold text-4xl mb-5">재밌으셨나요?</p>
+				<div className="flex gap-7">
+					<Button variant={"replay"} className="w-fit h-fit opacity-50" type="submit">
+						나가기
+					</Button>
+					<Button variant={"replay"} className="w-fit h-fit opacity-90" type="submit">
+						다시하기
+					</Button>
+				</div>
 			</Dialog>
 		</div>
 	);
