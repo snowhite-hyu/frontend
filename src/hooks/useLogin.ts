@@ -23,7 +23,7 @@ const useLogin = () => {
 
 		if (response.isSuccess) {
 			// API 수정 필요
-			const token = (response.result as string).split("access token: ")[1];
+			const token = ((response.result as unknown) as string).split("access token: ")[1];
 			sessionActions.setToken(token);
 			navigate("/waiting");
 			return true;
@@ -72,7 +72,7 @@ const useLogin = () => {
 		// API 수정 필요
 		toast(`${response.result}`);
 
-		return !(response.result as string).startsWith("사용 중");
+		return !((response.result as unknown) as string).startsWith("사용 중");
 	};
 
 	return {
