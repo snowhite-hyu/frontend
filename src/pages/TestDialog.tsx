@@ -30,7 +30,7 @@ const TestDialog: React.FC = () => {
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [dialogStep, setDialogStep]);
+	}, [dialogStep]);
 
 	return (
 		<div>
