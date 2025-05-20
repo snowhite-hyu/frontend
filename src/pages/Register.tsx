@@ -16,7 +16,7 @@ const RegisterPage: React.FC = () => {
 	const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
 	useEffect(() => {
 		setIsEmailValid(false);
-	}, [form.password]);
+	}, [form.email]);
 
 	const [checkPassword, setCheckPassword] =
 		useState<RegisterRequest["password"]>("");
