@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useBackgroundActions } from "./stores/common/BackgroundStore";
 import { useSessionToken } from "./stores/common/SessionStore";
+import TestPage from "./pages/TestPage";
 
 interface MyRoute {
 	path: string;
@@ -50,6 +51,8 @@ const Router: React.FC = () => {
 		{ path: "/main", element: <MainPage /> },
 		{ path: "/login", element: <LoginPage /> },
 		{ path: "/register", element: <RegisterPage /> },
+		{ path: "/dialog", element: <TestDialog /> }, // 테스트용 페이지. 추후 삭제 요망
+		{ path: "/component", element: <TestPage /> }, // 테스트용 페이지. 추후 삭제 요망
 	];
 
 	const backgroundActions = useBackgroundActions();
@@ -58,40 +61,38 @@ const Router: React.FC = () => {
 	}
 
 	const isLogined = useSessionToken() !== null;
-	return (
-		<Routes key={location.pathname} location={location}>
-			<Route key={"/"} path={"/"} element=<WelcomPage /> />;
-			{isLogined &&
-				routes.map((route) => (
-					<Route
-						key={route.path.split("?")[0]}
-						path={route.path}
-						element={
-							<Suspense fallback={<WelcomPage />}>
-								<Layout>{route.element}</Layout>
-							</Suspense>
-						}
-					/>
-				))}
-			{isLogined ||
-				openRoutes.map((route) => (
-					<Route
-						key={route.path.split("?")[0]}
-						path={route.path}
-						element={
-							<Suspense fallback={<WelcomPage />}>
-								<Layout>{route.element}</Layout>
-							</Suspense>
-						}
-					/>
-				))}
-			<Route
-				key={"*"}
-				path={"*"}
-				element={<Navigate to={isLogined ? "/waiting" : "/main"} />}
-			/>
-		</Routes>
-	);
+	return <Routes key={location.pathname} location={location}>
+		<Route key={"/"} path={"/"} element=<WelcomPage /> />
+		{isLogined &&
+			routes.map((route) => (
+				<Route
+					key={route.path.split("?")[0]}
+					path={route.path}
+					element={
+						<Suspense fallback={<WelcomPage />}>
+							<Layout>{route.element}</Layout>
+						</Suspense>
+					}
+				/>
+			))}
+		{isLogined ||
+			openRoutes.map((route) => (
+				<Route
+					key={route.path.split("?")[0]}
+					path={route.path}
+					element={
+						<Suspense fallback={<WelcomPage />}>
+							<Layout>{route.element}</Layout>
+						</Suspense>
+					}
+				/>
+			))}
+		<Route
+			key={"*"}
+			path={"*"}
+			element={<Navigate to={isLogined ? "/waiting" : "/main"} />}
+		/>
+	</Routes>;
 };
 
 export default Router;
