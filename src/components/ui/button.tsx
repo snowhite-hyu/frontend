@@ -32,7 +32,8 @@ const buttonVariants = cva(
 				exit: "bg-[#E0E0E0] rounded-[50%] w-[212px] h-[88px] shadow-[inset_-7.29px_-7.29px_2.92px_#747474] \
 					active:bg-[#E0E0E0] active:shadow-[inset_-3.64px_-3.64px_2.92px_#FFFFFF80,inset_0_2.92px_2.19px_#00000080] \
 						transition-shadow duration-150",
-				replay: "bg-[#D9D9D9] text-secondary-foreground shadow-xs hover:bg-[#D9D9D9]/90 min-w-48 min-h-15 font-semibold text-2xl rounded-2xl",
+				replay:
+					"bg-[#D9D9D9] text-secondary-foreground shadow-xs hover:bg-[#D9D9D9]/90 min-w-48 min-h-15 font-semibold text-2xl rounded-2xl",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",
