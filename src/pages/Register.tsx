@@ -4,7 +4,8 @@ import useLogin from "@/hooks/useLogin";
 import type { RegisterRequest } from "@/models/common/Login";
 import update from "immutability-helper";
 import type React from "react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const RegisterPage: React.FC = () => {
 	const [form, setForm] = useState<RegisterRequest>({
@@ -12,13 +13,29 @@ const RegisterPage: React.FC = () => {
 		password: "",
 		username: "",
 	});
+	const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
+	useEffect(() => {
+		setIsEmailValid(false);
+	}, [form.password]);
+
 	const [checkPassword, setCheckPassword] =
 		useState<RegisterRequest["password"]>("");
-	const { register } = useLogin();
+	const { register, checkEmail } = useLogin();
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		register(form);
+
+		const passwordChecked = form.password === checkPassword;
+		if (isEmailValid && passwordChecked) {
+			register(form);
+		} else {
+			if (isEmailValid == false) {
+				toast(`${form.email} - 이메일을 중복을 체크해주세요`);
+			}
+			if (passwordChecked == false) {
+				toast(`입력한 비밀번호와 똑같이 입력해주세요.`);
+			}
+		}
 	};
 
 	return (
@@ -38,7 +55,14 @@ const RegisterPage: React.FC = () => {
 							setForm(update(form, { email: { $set: e.target.value } }))
 						}
 					/>
-					<Button variant={"saboteurCheck"} size={"fill"} type="button">
+					<Button
+						variant={"saboteurCheck"}
+						size={"fill"}
+						type="button"
+						onClick={async () => {
+							setIsEmailValid(await checkEmail({ email: form.email }));
+						}}
+					>
 						확인
 					</Button>
 				</div>
