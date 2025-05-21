@@ -6,8 +6,8 @@ import Dialog from "@/components/ui/Dialog";
 import GameEndDialog from "@/components/ui/GameEndDialog";
 
 const TestDialog: React.FC = () => {
-	const [isGameEnd, setIsGameEnd] = useState(false);
 	const [isRoundEnd, setIsRoundEnd] = useState(false);
+	const [isGameEnd, setIsGameEnd] = useState(false);
 
 	const { setImage, setIsVisible, setUseLayout } = useBackgroundActions();
 
@@ -36,7 +36,7 @@ const TestDialog: React.FC = () => {
 				onClick={() => setIsGameEnd(!isGameEnd)}
 				className="m-4 px-4 py-2 bg-blue-500 rounded"
 			>
-				{isGameEnd ? "게임 시작하기" : "게임 끝내기"}
+				{isGameEnd ? "리셋" : "게임 끝내기"}
 			</button>
 			{isGameEnd && (
 				<GameEndDialog

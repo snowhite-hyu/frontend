@@ -16,14 +16,22 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (dialogStep === 1 && e.key === "Enter") {
-				setDialogStep(2);
+			if (e.key !== "Enter") return;
+
+			switch (dialogStep) {
+				case 1:
+					setDialogStep(2);
+					break;
+				case 2:
+					e.preventDefault();
+					navigate("/waiting");
+					break;
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [dialogStep, setDialogStep]);
+	}, [dialogStep, navigate]);
 
 	if (dialogStep === 0) return null;
 
