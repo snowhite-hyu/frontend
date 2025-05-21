@@ -5,7 +5,12 @@ import gameEndImage from "@/assets/gameEnd.svg";
 import replayImage from "@/assets/replay.svg";
 import { useEffect, useState } from "react";
 
-const GameEndDialog: React.FC = () => {
+interface GameEndDialogProps {
+	winner: string;
+	gold: number;
+}
+
+const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 	const [dialogStep, setDialogStep] = useState(1);
 	const navigate = useNavigate();
 
@@ -36,8 +41,8 @@ const GameEndDialog: React.FC = () => {
 						aria-hidden={true}
 					/>
 				</div>
-				<p className="font-semibold text-4xl">코딩정령</p>
-				<p className="font-semibold text-3xl">총 금덩이 개수 100개</p>
+				<p className="font-semibold text-4xl">{winner}</p>
+				<p className="font-semibold text-3xl">총 금덩이 개수 {gold}개</p>
 			</Dialog>
 			<Dialog
 				isOpen={dialogStep === 2}

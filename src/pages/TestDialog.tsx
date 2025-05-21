@@ -38,7 +38,12 @@ const TestDialog: React.FC = () => {
 			>
 				{isGameEnd ? "게임 시작하기" : "게임 끝내기"}
 			</button>
-			{isGameEnd && <GameEndDialog />}
+			{isGameEnd && (
+				<GameEndDialog
+					winner={"코딩정령"}
+					gold={Math.floor(Math.random() * 101)}
+				/>
+			)}
 		</div>
 	);
 };
