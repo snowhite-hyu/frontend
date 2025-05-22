@@ -8,7 +8,7 @@ import { type FormEvent, useState } from "react";
 
 const LoginPage: React.FC = () => {
 	const [form, setForm] = useState<LoginRequest>({
-		id: "",
+		email: "",
 		password: "",
 	});
 
@@ -27,12 +27,12 @@ const LoginPage: React.FC = () => {
 			>
 				<Input
 					variant="sabotuer"
-					placeholder="아이디를 입력해주세요."
-					type="text"
+					placeholder="이메일을 입력해주세요."
+					type="email"
 					required
-					value={form.id}
+					value={form.email}
 					onChange={(e) =>
-						setForm(update(form, { id: { $set: e.target.value } }))
+						setForm(update(form, { email: { $set: e.target.value } }))
 					}
 				/>
 				<Input
