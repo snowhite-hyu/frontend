@@ -38,7 +38,7 @@ const TestDialog: React.FC = () => {
 				onClick={() => setIsRoundEnd(!isRoundEnd)}
 				className="px-4 py-2 bg-red-500 rounded"
 			>
-				{isRoundEnd ? "리셋" : "게임 끝내기"}
+				{isRoundEnd ? "리셋" : "라운드 끝내기"}
 			</button>
 			{isRoundEnd && (
 				<RoundEndDialog
