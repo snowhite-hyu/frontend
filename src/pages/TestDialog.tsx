@@ -3,12 +3,14 @@ import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import { useState, useEffect } from "react";
 import Dialog from "@/components/ui/Dialog";
+import GameEndDialog from "@/components/ui/GameEndDialog";
 
 const TestDialog: React.FC = () => {
 	const [isRoundEnd, setIsRoundEnd] = useState(false);
 	const [isGameEnd, setIsGameEnd] = useState(false);
 
 	const { setImage, setIsVisible, setUseLayout } = useBackgroundActions();
+
 	useEffect(() => {
 		setImage(roomBackground);
 		setIsVisible(true);
@@ -31,15 +33,17 @@ const TestDialog: React.FC = () => {
 
 			<button
 				type="button"
-				onClick={() => setIsGameEnd(true)}
+				onClick={() => setIsGameEnd(!isGameEnd)}
 				className="m-4 px-4 py-2 bg-blue-500 rounded"
 			>
-				게임 끝내기
+				{isGameEnd ? "리셋" : "게임 끝내기"}
 			</button>
-			<Dialog isOpen={isGameEnd} setIsOpen={setIsGameEnd} size="small">
-				<h2 className="text-4xl font-bold text-red-500">타이틀</h2>
-				<p className="mt-2 text-white">설명</p>
-			</Dialog>
+			{isGameEnd && (
+				<GameEndDialog
+					winner={"코딩정령"}
+					gold={Math.floor(Math.random() * 101)}
+				/>
+			)}
 		</div>
 	);
 };

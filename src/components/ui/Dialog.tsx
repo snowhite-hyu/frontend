@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
 	useFloating,
 	useDismiss,
@@ -54,7 +54,7 @@ const Dialog: React.FC<DialogProps> = ({
 								animate={{ scale: 1, opacity: 1 }}
 								exit={{ scale: 0.96, opacity: 0 }}
 								transition={{ duration: 0.22 }}
-								className={`${widthMap[size]} bg-black/70 place-items-center m-4 p-4 rounded-4xl h-[600px] flex flex-col items-center text-center`}
+								className={`${widthMap[size]} bg-black/70 place-items-center m-4 p-4 rounded-4xl h-[600px] flex flex-col items-center justify-center text-center`}
 								ref={refs.setFloating}
 								aria-labelledby={labelId}
 								aria-describedby={descriptionId}

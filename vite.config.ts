@@ -15,6 +15,9 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  server: {
+    allowedHosts: ["server.snowhite-hyu.local"],
+  },
   build: {
     rollupOptions: {
       output: {
