@@ -18,8 +18,12 @@ export class RoomSocket extends BaseSocket {
         this.socket.on("joined-room", callback);
     } 
 
-    public onRoomusers(callback: (payload: any) =>void) {
+    public onRoomusers(callback: (payload: any) => void) {
         this.socket.on("room-users", callback);
+    }
+
+    public offRoomusers(callback: (payload: any) => void) {
+        this.socket.off("room-users", callback)
     }
 
     public quitRoom(data: { roomId: number; }) {

@@ -36,6 +36,10 @@ export abstract class BaseSocket {
     public isConntected() {
         return this.socket.connected;
     }
+
+    public getSocket() {
+		return this.socket;
+	}
     
     public disconnect() {
         this.socket.removeAllListeners(); // disconnect 전에 이벤트 정리

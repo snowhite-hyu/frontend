@@ -7,6 +7,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 
 const RoomListPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -15,7 +16,7 @@ const RoomListPage: React.FC = () => {
 
 	const [rooms, setRooms] = useState<ListResponse>([]);
 
-	const { socket, connect, disconnect } = useRoomSocketStore();
+	const { connect} = useRoomSocketStore();
 
 	useEffect(() => {
 		setImage(background);
@@ -38,13 +39,15 @@ const RoomListPage: React.FC = () => {
 		}
 
 		connect(jwtToken);
-
 		const roomSocket = useRoomSocketStore.getState().socket;
 		if (roomSocket) {
+			roomSocket.onJoinedRoom((payload) => {
+				useRoomInfoStore.getState().setRoom(payload);
+				navigate("/waiting");
+			})
+
 			roomSocket.joinRoom({roomId});
 		}
-
-		navigate("/waiting");
 	}
 
 	return (

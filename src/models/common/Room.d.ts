@@ -17,7 +17,7 @@ export interface CreateRoomResponse {
 export interface RoomItem {
 	roomId: number;
 	masterPlayer: RoomUserModel;
-	users: RoomUserModel[];
+	users: WsRoomUserModel[];
 	capacity: number;
 	turnTime: number;
 	isPlaying: boolean;
