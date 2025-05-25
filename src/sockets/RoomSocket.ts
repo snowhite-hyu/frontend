@@ -6,15 +6,23 @@ export class RoomSocket extends BaseSocket {
         super("/room", { token: jwtToken });
     }
 
-    public createRoom(data: { capacity: string, turnTime: string; }) {
+    public createRoom(data: { capacity: number, turnTime: number; }) {
         this.emit("create", data);
     }
 
-    public joinRoom(data: { roomId: string; }) {
+    public joinRoom(data: { roomId: number; }) {
         this.emit("join", data);
     }
 
-    public quitRoom(data: { roomId: string; }) {
+    public onJoinedRoom(callback: (payload: any) => void) {
+        this.socket.on("joined-room", callback);
+    } 
+
+    public onRoomusers(callback: (payload: any) =>void) {
+        this.socket.on("room-users", callback);
+    }
+
+    public quitRoom(data: { roomId: number; }) {
         this.emit("quit", data);
     }
 

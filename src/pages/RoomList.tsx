@@ -6,6 +6,7 @@ import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 
 const RoomListPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -13,6 +14,8 @@ const RoomListPage: React.FC = () => {
 	const { list } = useRoom();
 
 	const [rooms, setRooms] = useState<ListResponse>([]);
+
+	const { socket, connect, disconnect } = useRoomSocketStore();
 
 	useEffect(() => {
 		setImage(background);
@@ -26,6 +29,23 @@ const RoomListPage: React.FC = () => {
 			setRooms(result);
 		}
 	};
+
+	const handleJoinRoom = (roomId: number) => {
+		const jwtToken = localStorage.getItem("jwtToken");
+		if (!jwtToken) {
+			alert("로그인이 필요합니다.");
+			return;
+		}
+
+		connect(jwtToken);
+
+		const roomSocket = useRoomSocketStore.getState().socket;
+		if (roomSocket) {
+			roomSocket.joinRoom({roomId});
+		}
+
+		navigate("/waiting");
+	}
 
 	return (
 		<div className="flex flex-inline w-full h-full items-start">
@@ -47,7 +67,7 @@ const RoomListPage: React.FC = () => {
 							<Button
 								variant={"saboteurCheck"}
 								className="h-fit mr-[0%] ml-auto text-[21px]"
-								onClick={() => navigate("/waiting")}
+								onClick={() => handleJoinRoom(room.roomId)}
 							>
 								참가
 							</Button>
