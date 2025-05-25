@@ -27,11 +27,11 @@ const GamePage: React.FC = () => {
 	};
 
     const players: Player[] = [
-        { id: 1, name: "name", card: 1, gold: 1, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
-        { id: 2, name: "앨리스", card: 2, gold: 2, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
+        { id: 1, name: "신데렐라", card: 1, gold: 1, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
+        { id: 2, name: "앨리스", card: 2, gold: 2, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
         { id: 3, name: "백설공주", card: 3, gold: 3, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
-        { id: 4, name: "오로라", card: 4, gold: 4, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
-        // { id: 5, name: "벨", card: 5, gold: 5 },
+        { id: 4, name: "오로라", card: 4, gold: 4, tools: {lantern: "normal", cart: "broken", pickaxe: "broken"} },
+        { id: 5, name: "벨", card: 5, gold: 5, tools: {lantern: "normal", cart: "broken", pickaxe: "broken"} },
         // { id: 6, name: "엘사", card: 6, gold: 6 },
         // { id: 7, name: "자스민", card: 7, gold: 7 },
         // { id: 8, name: "뮬란", card: 8, gold: 8 },
