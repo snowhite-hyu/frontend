@@ -14,7 +14,6 @@ export interface CreateRoomResponse {
 	turnTimeLimit?: number;
 }
 
-// 각 속성 타입 확인 필요
 export interface RoomItem {
 	roomId: number;
 	masterPlayer: RoomUserModel;

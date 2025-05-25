@@ -30,8 +30,13 @@ const RoomListPage: React.FC = () => {
 	return (
 		<div className="flex flex-inline w-full h-full items-start">
 			<div className="flex flex-col w-full mt-[10%] mr-[10%] ml-auto">
-				<div className="w-full max-w-[500px] min-w-[300px] h-[339px] rounded-[21.87px] bg-[#ffffff] mr-0 ml-auto pt-[26px] pl-[34px] pr-[26px]">
-					{rooms.map((room) => (
+				<div className="w-full max-w-[500px] min-w-[300px] h-[339px] rounded-[21.87px] bg-[#ffffff] mr-0 ml-auto p-[30px]">
+					{rooms.length === 0 ? (
+						<div className="w-full h-full flex justify-center items-center">
+							<p className="text-[#999999] text-[20px] text-center">방이 없습니다.</p>
+						</div>
+					) : (
+					rooms.map((room) => (
 						<div
 							key={room.roomId}
 							className="w-full flex flex-inline mb-[10px] items-center "
@@ -47,7 +52,8 @@ const RoomListPage: React.FC = () => {
 								참가
 							</Button>
 						</div>
-					))}
+					))
+					)}
 				</div>
 				<Button
 					variant={"sabotuer"}
