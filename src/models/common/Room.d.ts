@@ -1,3 +1,5 @@
+import type { RoomUserModel } from "./User";
+
 export interface CreateRoomRequest {
 	roomName: string;
 	maxPlayers: number;
@@ -11,3 +13,14 @@ export interface CreateRoomResponse {
 	maxPlayers?: number;
 	turnTimeLimit?: number;
 }
+
+export interface RoomItem {
+	roomId: number;
+	masterPlayer: RoomUserModel;
+	users: RoomUserModel[];
+	capacity: number;
+	turnTime: number;
+	isPlaying: boolean;
+}
+
+export type ListResponse = RoomItem[];

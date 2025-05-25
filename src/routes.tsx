@@ -52,7 +52,7 @@ const Router: React.FC = () => {
 		{ path: "/register", element: <RegisterPage /> },
 		{ path: "/waiting", element: <WaitingPage /> },
 		{ path: "/create-room", element: <CreateRoomPage /> },
-		{ path: "/room", element: <RoomListPage />},
+		{ path: "/room", element: <RoomListPage /> },
 		{ path: "/dialog", element: <TestDialog /> }, // 테스트용 페이지. 추후 삭제 요망
 	];
 
