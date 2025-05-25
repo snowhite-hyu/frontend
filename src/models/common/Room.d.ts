@@ -1,3 +1,5 @@
+import type { RoomUserModel } from "./User";
+
 export interface CreateRoomRequest {
 	roomName: string;
 	maxPlayers: number;
@@ -14,9 +16,9 @@ export interface CreateRoomResponse {
 
 // 각 속성 타입 확인 필요
 export interface RoomItem {
-	roomId: string;
-	masterPlayer: string;
-	users: string;
+	roomId: number;
+	masterPlayer: RoomUserModel;
+	users: RoomUserModel[];
 	capacity: number;
 	turnTime: number;
 	isPlaying: boolean;
