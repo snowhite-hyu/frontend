@@ -30,41 +30,28 @@ interface PlayerPanelProps {
 const PlayerPanel: React.FC<PlayerPanelProps> = ({ player, position }) => {
 	return (
 		<div
-			className={`h-24 w-48 bg-white/60 p-3 flex flex-col justify-between ${position === "left" ? "rounded-tr-lg rounded-br-lg" : "rounded-tl-lg rounded-bl-lg"}`}
+			className={`h-24 w-50 bg-white/60 p-3 flex flex-col justify-between ${position === "left" ? "rounded-tr-lg rounded-br-lg" : "rounded-tl-lg rounded-bl-lg"}`}
 		>
+			{/* 이름 + 골드 */}
 			<div className="flex justify-between">
 				<p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34]">
 					{player.name}
 				</p>
 				<div className="flex gap-2 items-center">
-					<img
-						src={goldIcon}
-						className="w-auto h-6"
-					/>
+					<img src={goldIcon} className="w-auto h-6" />
 					<p className="text-lg font-holtwood text-black">{player.gold}</p>
 				</div>
 			</div>
+			{/* 카드 수 + 도구 */}
 			<div className="flex justify-between">
 				<div className="flex gap-2 items-center">
-					<img
-						src={cardIcon}
-						className="w-auto h-8"
-					/>
+					<img src={cardIcon} className="w-auto h-8" />
 					<p className="text-lg font-holtwood text-black">{player.card}</p>
 				</div>
-				<div className="flex gap-2 items-center">
-					<img
-						src={player.tools.lantern === "normal" ? lanternIconA : lanternIconB}
-						className="w-auto h-8"
-					/>
-					<img
-						src={player.tools.cart === "normal" ? cartIconA : cartIconB}
-						className="w-auto h-8"
-					/>
-					<img
-						src={player.tools.pickaxe === "normal" ? pickaxeIconA : pickaxeIconB}
-						className="w-auto h-8"
-					/>
+				<div className="flex gap-1.5 items-center [&>img]:w-auto [&>img]:h-8">
+					<img src={player.tools.lantern === "normal" ? lanternIconA : lanternIconB} />
+					<img src={player.tools.cart === "normal" ? cartIconA : cartIconB} />
+					<img src={player.tools.pickaxe === "normal" ? pickaxeIconA : pickaxeIconB} />
 				</div>
 			</div>
 		</div>
