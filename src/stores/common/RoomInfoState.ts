@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { RoomUserModel } from "@/models/common/User";
+import { WsRoomUserModel } from "@/models/common/User";
 import { RoomItem } from "@/models/common/Room";
 
 interface RoomInfoState {
     room: RoomItem | null;
     setRoom: (room: any) => void;
-    updateUsers: (users: RoomUserModel[]) => void;
+    updateUsers: (users: WsRoomUserModel[]) => void;
     clearRoom: () => void;
 }
 
