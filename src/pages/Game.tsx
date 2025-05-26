@@ -5,8 +5,9 @@ import roomBackground from "@/assets/room.png";
 import PlayerPanel from "@/components/ui/PlayerPanel";
 import remainCard from "@/assets/card/routeH1.png";
 import transhCan from "@/assets/trash.png";
+import rotateIcon from "@/assets/rotate.png";
 
-import routeCard from "@/assets/card/routeTRBL1.png"
+import routeCard from "@/assets/card/routeTRBL1.png";
 import roleCard from "@/assets/roleCard/saboteur.png";
 
 const GamePage: React.FC = () => {
@@ -73,17 +74,23 @@ const GamePage: React.FC = () => {
             {/* 남은 카드 */}
             <div className="absolute bottom-2 left-75">
                 <img src={remainCard} className="w-18" />
-                <p className="absolute top-1 left-1/2 -translate-x-1/2 text-white text-lg font-holtwood ">64</p>
+                <p className="absolute top-1 left-1/2 -translate-x-1/2 text-white text-lg font-holtwood">64</p>
             </div>
             {/* 카드 덱 */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2"> 
-                <div className="flex gap-5 w-146 h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-11 px-6 pb-2">
+                <div className="flex gap-5 w-[580px] h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-hidden">
                     {Array(6).fill(0).map((_, i) => (
-                        <img
-                            key={i}
-                            src={routeCard}
-                            className="w-16 flex-1 object-contain rounded-sm border border-1 border-white"
-                        />
+                        <div key={i} className="group flex flex-col justify-between items-center shrink-0 w-[72px]">
+                            <img
+                                src={rotateIcon}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => {}} // 카드 회전 기능 추가 필요
+                            />
+                            <img
+                                src={routeCard}
+                                className="w-full h-auto object-contain rounded-sm border border-white self-end"
+                            />
+                        </div>
                     ))}
                 </div>
             </div>
