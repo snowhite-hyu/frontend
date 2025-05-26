@@ -3,6 +3,11 @@ import { useEffect } from "react";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import PlayerPanel from "@/components/ui/PlayerPanel";
+import remainCard from "@/assets/card/routeH1.png";
+import transhCan from "@/assets/trash.png";
+
+import routeCard from "@/assets/card/routeTRBL1.png"
+import roleCard from "@/assets/roleCard/saboteur.png";
 
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
@@ -32,10 +37,11 @@ const GamePage: React.FC = () => {
         { id: 3, name: "백설공주", card: 3, gold: 3, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
         { id: 4, name: "오로라", card: 4, gold: 4, tools: {lantern: "normal", cart: "broken", pickaxe: "broken"} },
         { id: 5, name: "벨", card: 5, gold: 5, tools: {lantern: "normal", cart: "broken", pickaxe: "broken"} },
-        // { id: 6, name: "엘사", card: 6, gold: 6 },
-        // { id: 7, name: "자스민", card: 7, gold: 7 },
-        // { id: 8, name: "뮬란", card: 8, gold: 8 },
-        // { id: 9, name: "애리얼", card: 9, gold: 9 },
+        { id: 6, name: "엘사", card: 6, gold: 6, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
+        { id: 7, name: "자스민", card: 7, gold: 7, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
+        { id: 8, name: "뮬란", card: 8, gold: 8, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
+        { id: 9, name: "애리얼", card: 9, gold: 9, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
+        { id: 10, name: "NAME", card: 10, gold: 10, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
     ];
 
 	const leftPlayers: Player[] = [];
@@ -50,20 +56,51 @@ const GamePage: React.FC = () => {
 	});
 
 	return (
-		<div>
+		<div className="relative h-screen">
 			{/* 플레이어 패널 */}
-			<div className="flex justify-between pt-16">
-				<div className="flex flex-col gap-5">
+			<div className="flex justify-between pt-10">
+				<div className="flex flex-col gap-3">
 					{leftPlayers.map((player) => (
 						<PlayerPanel key={player.id} player={player} position="left" />
 					))}
 				</div>
-				<div className="flex flex-col gap-5 items-end">
+				<div className="flex flex-col gap-3 items-end">
 					{rightPlayers.map((player) => (
 						<PlayerPanel key={player.id} player={player} position="right" />
 					))}
 				</div>
 			</div>
+            {/* 남은 카드 */}
+            <div className="absolute bottom-2 left-75">
+                <img src={remainCard} className="w-18" />
+                <p className="absolute top-1 left-1/2 -translate-x-1/2 text-white text-lg font-holtwood ">64</p>
+            </div>
+            {/* 카드 덱 */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2"> 
+                <div className="flex gap-5 w-146 h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-11 px-6 pb-2">
+                    {Array(6).fill(0).map((_, i) => (
+                        <img
+                            key={i}
+                            src={routeCard}
+                            className="w-16 flex-1 object-contain rounded-sm border border-1 border-white"
+                        />
+                    ))}
+                </div>
+            </div>
+            {/* 버리기 */}
+            <div className="absolute bottom-2 right-75 h-28">
+                <div className="h-28 flex flex-col justify-between items-center">
+                    <p className="text-white text-xl font-holtwood font-bold">버리기</p>
+                    <img src={transhCan} className="w-19" />
+                </div>
+            </div>
+            {/* 역할 카드 */}
+            <div className="absolute bottom-0 right-13"> 
+                <div className="w-37 h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 flex flex-col gap-1">
+                    <p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34] text-shadow-[0_-1.46px_0.73px_#FFFFFFCC,0_1.46px_2.19px_#000000]">ROLE</p>
+                    <img src={roleCard} className="w-18 flex-1 object-contain mx-auto" />
+                </div>
+            </div>
 		</div>
 	);
 };
