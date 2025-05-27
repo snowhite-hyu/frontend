@@ -5,6 +5,7 @@ import WelcomPage from "@/pages/Welcome";
 import WaitingPage from "@/pages/Waiting";
 import CreateRoomPage from "@/pages/CreateRoom";
 import RoomListPage from "./pages/RoomList";
+import GamePage from "@/pages/Game";
 import TestDialog from "@/pages/TestDialog";
 import TestPage from "./pages/TestPage";
 import { AnimatePresence, motion } from "framer-motion";
@@ -47,6 +48,7 @@ const Router: React.FC = () => {
 		{ path: "/waiting", element: <WaitingPage /> },
 		{ path: "/create-room", element: <CreateRoomPage /> },
 		{ path: "/room", element: <RoomListPage /> },
+		{ path: "/game", element: <GamePage /> },
 		{ path: "/dialog", element: <TestDialog /> }, // 테스트용 페이지. 추후 삭제 요망
 	];
 	const openRoutes: MyRoute[] = [
