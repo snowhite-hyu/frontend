@@ -1,4 +1,3 @@
-import restService from "@/apis/common/RestClient";
 import { create } from "zustand";
 
 interface HealthyState {
@@ -8,7 +7,7 @@ interface HealthyState {
 	};
 }
 
-const HealthyStore = create<HealthyState>((set, get) => {
+const HealthyStore = create<HealthyState>((_, get) => {
 	return {
 		lastHandShake: Date.now(),
 		actions: {
