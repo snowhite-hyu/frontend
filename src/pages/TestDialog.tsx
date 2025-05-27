@@ -2,44 +2,55 @@ import type React from "react";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import { useState, useEffect } from "react";
-import Dialog from "@/components/ui/Dialog";
+
+import GameEndDialog from "@/components/ui/GameEndDialog";
+import RoundEndDialog from "@/components/ui/RoundEndDialog";
 
 const TestDialog: React.FC = () => {
 	const [isRoundEnd, setIsRoundEnd] = useState(false);
 	const [isGameEnd, setIsGameEnd] = useState(false);
 
 	const { setImage, setIsVisible, setUseLayout } = useBackgroundActions();
+
 	useEffect(() => {
 		setImage(roomBackground);
 		setIsVisible(true);
 		setUseLayout(false);
 	}, [setImage, setIsVisible, setUseLayout]);
 
+	const miners: string[] = ["광부 1", "광부 2", "광부 3", "광부 4", "광부 5"];
+
+	const saboteurs: string[] = ["방해꾼 1", "방해꾼 2"];
+
 	return (
 		<div>
 			<button
 				type="button"
-				onClick={() => setIsRoundEnd(true)}
+				onClick={() => setIsRoundEnd(!isRoundEnd)}
 				className="px-4 py-2 bg-red-500 rounded"
 			>
-				라운드 끝내기
+				{isRoundEnd ? "리셋" : "라운드 끝내기"}
 			</button>
-			<Dialog isOpen={isRoundEnd} setIsOpen={setIsRoundEnd}>
-				<h2 className="text-4xl font-bold text-red-500">타이틀</h2>
-				<p className="mt-2 text-white">설명</p>
-			</Dialog>
-
+			{isRoundEnd && (
+				<RoundEndDialog
+					saboteurs={saboteurs}
+					miners={miners}
+					winner={"광부들"} // "광부들" 또는 "방해꾼들"
+				/>
+			)}
 			<button
 				type="button"
-				onClick={() => setIsGameEnd(true)}
+				onClick={() => setIsGameEnd(!isGameEnd)}
 				className="m-4 px-4 py-2 bg-blue-500 rounded"
 			>
-				게임 끝내기
+				{isGameEnd ? "리셋" : "게임 끝내기"}
 			</button>
-			<Dialog isOpen={isGameEnd} setIsOpen={setIsGameEnd} size="small">
-				<h2 className="text-4xl font-bold text-red-500">타이틀</h2>
-				<p className="mt-2 text-white">설명</p>
-			</Dialog>
+			{isGameEnd && (
+				<GameEndDialog
+					winner={"코딩정령"}
+					gold={Math.floor(Math.random() * 101)}
+				/>
+			)}
 		</div>
 	);
 };
