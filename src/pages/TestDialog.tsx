@@ -18,18 +18,9 @@ const TestDialog: React.FC = () => {
 		setUseLayout(false);
 	}, [setImage, setIsVisible, setUseLayout]);
 
-	const miners: string[] = [
-		"광부 1",
-		"광부 2",
-		"광부 3",
-		"광부 4",
-		"광부 5",
-	];
+	const miners: string[] = ["광부 1", "광부 2", "광부 3", "광부 4", "광부 5"];
 
-	const saboteurs: string[] = [
-		"방해꾼 1",
-		"방해꾼 2",
-	];
+	const saboteurs: string[] = ["방해꾼 1", "방해꾼 2"];
 
 	return (
 		<div>

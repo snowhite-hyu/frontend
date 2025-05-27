@@ -10,7 +10,7 @@ const WaitingPage: React.FC = () => {
 	const navigate = useNavigate();
 
 	const { setImage, setUseLayout } = useBackgroundActions();
-	
+
 	useEffect(() => {
 		setImage(roomBackground);
 		setUseLayout(false);
@@ -105,7 +105,12 @@ const WaitingPage: React.FC = () => {
 				</div>
 				{/* 나가기 & 시작 버튼 */}
 				<div className="gap-[50px]">
-					<Button key="exit" variant={"exit"} className="h-fit mr-[50px]" onClick={() => navigate("/room")}>
+					<Button
+						key="exit"
+						variant={"exit"}
+						className="h-fit mr-[50px]"
+						onClick={() => navigate("/room")}
+					>
 						나가기
 					</Button>
 					<Button
