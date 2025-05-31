@@ -23,11 +23,15 @@ export class RoomSocket extends BaseSocket {
     }
 
     public offRoomusers(callback: (payload: any) => void) {
-        this.socket.off("room-users", callback)
+        this.socket.off("room-users", callback);
     }
 
     public quitRoom(data: { roomId: number; }) {
         this.emit("quit", data);
+    }
+
+    public onCreateRoom(callback: (payload: any) => void) {
+        this.socket.on("created-room", callback);
     }
 
 }

@@ -6,6 +6,9 @@ import type { CreateRoomRequest } from "@/models/common/Room";
 import update from "immutability-helper";
 import type React from "react";
 import { type FormEvent, useState } from "react";
+import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { useNavigate } from "react-router-dom";
 
 const CreateRoomPage: React.FC = () => {
 	const [form, setForm] = useState<CreateRoomRequest>({
@@ -14,10 +17,33 @@ const CreateRoomPage: React.FC = () => {
 		turnTimeLimit: 15,
 	});
 	// const { register } = useLogin();
+	const { connect } = useRoomSocketStore();
+	const navigate = useNavigate();
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		// register(form);
+	};
+
+	const handleCreateRoom = ( capacity: number, turnTime: number ) => {
+		const jwtToken = localStorage.getItem("jwtToken");
+		if (!jwtToken) {
+			alert("로그인이 필요합니다.");
+			return;
+		}
+
+		connect(jwtToken);
+		
+		const roomSocket = useRoomSocketStore.getState().socket;
+
+		if (roomSocket) {
+			roomSocket.createRoom({ capacity, turnTime });
+
+			roomSocket.onCreateRoom((payload) => {
+				useRoomInfoStore.getState().setRoom(payload);
+				navigate("/waiting");
+			});
+		}
 	};
 
 	return (
@@ -56,7 +82,7 @@ const CreateRoomPage: React.FC = () => {
 					className="min-w-[147px]"
 					optionSuffix="초"
 				/>
-				<Button variant={"sabotuer"} className="w-fit h-fit" type="submit">
+				<Button variant={"sabotuer"} className="w-fit h-fit" type="submit" onClick={() => handleCreateRoom(form.maxPlayers, form.turnTimeLimit)}>
 					Create
 				</Button>
 			</form>

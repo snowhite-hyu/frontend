@@ -16,7 +16,7 @@ const RoomListPage: React.FC = () => {
 
 	const [rooms, setRooms] = useState<ListResponse>([]);
 
-	const { connect} = useRoomSocketStore();
+	const { connect } = useRoomSocketStore();
 
 	useEffect(() => {
 		setImage(background);
