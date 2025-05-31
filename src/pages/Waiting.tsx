@@ -14,13 +14,12 @@ const WaitingPage: React.FC = () => {
 
 	const navigate = useNavigate();
 	const { setImage, setUseLayout } = useBackgroundActions();
+	const socket = useRoomSocketStore.getState().socket;
+	const updateUsers = useRoomInfoStore.getState().updateUsers;
 	
 	useEffect(() => {
 		setImage(roomBackground);
 		setUseLayout(false);
-
-		const socket = useRoomSocketStore.getState().socket;
-		const updateUsers = useRoomInfoStore.getState().updateUsers;
 		
 		if (!socket) return;
 		
@@ -46,6 +45,13 @@ const WaitingPage: React.FC = () => {
 	const start = currentPage * membersPerPage;
 	const currentMembers = room.users.slice(start, start + membersPerPage);
 
+	const handleQuitRoom = ( roomId:number ) => {
+		const roomSocket = useRoomSocketStore.getState().socket;
+		if (roomSocket) {
+			roomSocket.quitRoom({roomId});
+		}
+	};
+
 	return (
 		<div className="overflow-hidden">
 			{/* 상단부 */}
@@ -58,12 +64,12 @@ const WaitingPage: React.FC = () => {
 				<div className="flex justify-center items-center">
 					{options.map((option) => (
 						<div
-							key="options"
+							key={option.key}
 							className="flex justify-center items-center mr-[28px]"
 						>
 							<Button
 								key={option.key}
-								variant={"saboteurCheck"}
+								variant="saboteurCheck"
 								size="custom"
 								className="font-semibold text-[25.51px] px-[15px] py-[18px] mr-[16px]"
 							>
@@ -107,12 +113,17 @@ const WaitingPage: React.FC = () => {
 				</div>
 				{/* 나가기 & 시작 버튼 */}
 				<div className="gap-[50px]">
-					<Button key="exit" variant={"exit"} className="h-fit mr-[50px]" onClick={() => navigate("/room")}>
+					<Button 
+						key="exit" 
+						variant="exit"
+						className="h-fit mr-[50px]" 
+						onClick={() => { handleQuitRoom(room.roomId); navigate("/room");  }}
+					>
 						나가기
 					</Button>
 					<Button
 						key="start"
-						variant={"sabotuer"}
+						variant="sabotuer"
 						size="custom"
 						className="w-[160px] h-[88px]"
 					>
