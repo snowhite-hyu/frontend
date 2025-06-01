@@ -16,7 +16,7 @@ const RegisterPage: React.FC = () => {
 	const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
 	useEffect(() => {
 		setIsEmailValid(false);
-	}, [form.password]);
+	}, [form.email]);
 
 	const [checkPassword, setCheckPassword] =
 		useState<RegisterRequest["password"]>("");
@@ -29,11 +29,11 @@ const RegisterPage: React.FC = () => {
 		if (isEmailValid && passwordChecked) {
 			register(form);
 		} else {
-			if (isEmailValid == false) {
+			if (isEmailValid === false) {
 				toast(`${form.email} - 이메일을 중복을 체크해주세요`);
 			}
-			if (passwordChecked == false) {
-				toast(`입력한 비밀번호와 똑같이 입력해주세요.`);
+			if (passwordChecked === false) {
+				toast("입력한 비밀번호와 똑같이 입력해주세요.");
 			}
 		}
 	};
