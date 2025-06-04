@@ -71,10 +71,11 @@ const useLogin = () => {
 			data: request,
 		});
 
+		console.log(response);
+
 		if (response.isSuccess) {
 			if (response.result.isExisting) {
 				toast(response.result.message);
-			} else {
 				return true;
 			}
 		} else {
