@@ -22,11 +22,7 @@ const useLogin = () => {
 		});
 
 		if (response.isSuccess) {
-			// API 수정 필요
-			const token = (response.result as unknown as string).split(
-				"access token: ",
-			)[1];
-			sessionActions.setToken(token);
+			sessionActions.setToken(response.result.token);
 			navigate("/waiting");
 			return true;
 		}
@@ -45,19 +41,23 @@ const useLogin = () => {
 		});
 
 		if (response.isSuccess) {
-			const loginResult = await login({
-				email: request.email,
-				password: request.password,
-			});
-			if (loginResult) {
-				navigate("/waiting");
-			} else {
-				navigate("/login");
+			if (response.result.isSuccess) {
+				const loginResult = await login({
+					email: request.email,
+					password: request.password,
+				});
+				if (loginResult) {
+					navigate("/waiting");
+				} else {
+					navigate("/login");
+				}
+				return loginResult;
 			}
-			return loginResult;
-		}
 
-		toast(`${response.message}`);
+			toast(`${response.result.message}`);
+		} else {
+			toast(`${response.message}`);
+		}
 
 		return false;
 	};
@@ -71,10 +71,16 @@ const useLogin = () => {
 			data: request,
 		});
 
-		// API 수정 필요
-		toast(`${response.result}`);
+		console.log(response);
 
-		return !(response.result as unknown as string).startsWith("사용 중");
+		if (response.isSuccess) {
+			toast(response.result.message);
+			return response.result.isExisting;
+		} else {
+			toast(response.message);
+		}
+
+		return false;
 	};
 
 	return {
