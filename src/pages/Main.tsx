@@ -21,20 +21,15 @@ const MainPage: React.FC = () => {
 						key={link.link}
 						variant={"sabotuer"}
 						className="h-fit"
-						onClick={() => link.title === "manual"
-							? setIsManual(true)
-							: navigate(link.link)}
+						onClick={() =>
+							link.title === "manual" ? setIsManual(true) : navigate(link.link)
+						}
 					>
 						{link.title}
 					</Button>
 				))}
 			</div>
-			{isManual && (
-				<ManualDialog
-					isOpen={isManual}
-					setIsOpen={setIsManual}
-				/>
-			)}
+			{isManual && <ManualDialog isOpen={isManual} setIsOpen={setIsManual} />}
 		</div>
 	);
 };
