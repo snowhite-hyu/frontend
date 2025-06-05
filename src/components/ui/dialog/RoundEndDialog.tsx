@@ -1,4 +1,4 @@
-import Dialog from "@/components/ui/Dialog";
+import Dialog from "@/components/ui/dialog/Dialog";
 import { useEffect, useState } from "react";
 
 import Text from "@/components/ui/text";

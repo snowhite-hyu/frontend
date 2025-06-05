@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Dialog from "@/components/ui/Dialog";
+import Dialog from "@/components/ui/dialog/Dialog";
 import Text from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import manualImage1 from "@/assets/manual/manual1.svg"
@@ -15,7 +15,7 @@ interface ManualDialogProps {
 const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 
     const images = [
-        manualImage1, manualImage2, manualImage3, manualImage4,
+        manualImage1, manualImage2, manualImage3, manualImage4
     ];
 
 	const [currentPage, setCurrentPage] = useState(0);
