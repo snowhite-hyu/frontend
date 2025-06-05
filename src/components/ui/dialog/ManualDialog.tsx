@@ -24,7 +24,7 @@ const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 		<>
 			<Dialog isOpen={isOpen} setIsOpen={setIsOpen} size="big">
 				<Text className="text-9xl">Manual</Text>
-				<div className="relative w-fit mt-5 flex gap-5">
+				<div className="relative w-fit mt-3 flex gap-5">
 					{currentImages.map((src, index) => (
 						<img key={index} src={src} />
 					))}
