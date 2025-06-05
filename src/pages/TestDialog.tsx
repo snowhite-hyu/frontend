@@ -3,8 +3,8 @@ import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import { useState, useEffect } from "react";
 
-import GameEndDialog from "@/components/ui/GameEndDialog";
-import RoundEndDialog from "@/components/ui/RoundEndDialog";
+import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
+import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
 
 const TestDialog: React.FC = () => {
 	const [isRoundEnd, setIsRoundEnd] = useState(false);

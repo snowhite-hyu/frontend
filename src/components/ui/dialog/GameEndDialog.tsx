@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Dialog from "@/components/ui/Dialog";
+import Dialog from "@/components/ui/dialog/Dialog";
 import { Button } from "@/components/ui/button";
 import gameEndImage from "@/assets/gameEnd.svg";
 import replayImage from "@/assets/replay.svg";
