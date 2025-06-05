@@ -6,6 +6,8 @@ import manualImage1 from "@/assets/manual/manual1.svg";
 import manualImage2 from "@/assets/manual/manual2.svg";
 import manualImage3 from "@/assets/manual/manual3.svg";
 import manualImage4 from "@/assets/manual/manual4.svg";
+import nextIcon from "@/assets/nextIcon.svg";
+import prevIcon from "@/assets/prevIcon.svg";
 
 interface ManualDialogProps {
 	isOpen: boolean;
@@ -31,10 +33,11 @@ const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 					{currentPage == 0 && (
 						<Button
 							variant="ghost"
+							size="custom"
 							className="text-3xl w-12 h-12"
 							onClick={() => setCurrentPage(1)}
 						>
-							{">"}
+							<img src={nextIcon} className="w-full h-full object-contain" />
 						</Button>
 					)}
 				</div>
@@ -42,10 +45,11 @@ const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 					{currentPage == 1 && (
 						<Button
 							variant="ghost"
+							size="custom"
 							className="text-3xl w-12 h-12"
 							onClick={() => setCurrentPage(0)}
 						>
-							{"<"}
+							<img src={prevIcon} className="w-full h-full object-contain" />
 						</Button>
 					)}
 				</div>
