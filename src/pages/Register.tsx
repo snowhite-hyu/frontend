@@ -4,7 +4,7 @@ import useLogin from "@/hooks/useLogin";
 import type { RegisterRequest } from "@/models/common/Login";
 import update from "immutability-helper";
 import type React from "react";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 
 const RegisterPage: React.FC = () => {
@@ -14,9 +14,10 @@ const RegisterPage: React.FC = () => {
 		username: "",
 	});
 	const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
-	useEffect(() => {
+	const setEmail = (value: string) => {
 		setIsEmailValid(false);
-	}, [form.email]);
+		setForm((prev) => update(prev, { email: { $set: value } }));
+	};
 
 	const [checkPassword, setCheckPassword] =
 		useState<RegisterRequest["password"]>("");
@@ -51,9 +52,7 @@ const RegisterPage: React.FC = () => {
 						type="email"
 						required
 						value={form.email}
-						onChange={(e) =>
-							setForm(update(form, { email: { $set: e.target.value } }))
-						}
+						onChange={(e) => setEmail(e.target.value)}
 					/>
 					<Button
 						variant={"saboteurCheck"}
