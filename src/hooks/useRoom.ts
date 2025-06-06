@@ -6,7 +6,7 @@ const useRoom = () => {
 	const list: () => Promise<ListResponse | false> = async () => {
 		const response = await List({
 			method: "get",
-			url: "/api/rooms",
+			url: "/rooms",
 		});
 
 		if (response.isSuccess) {

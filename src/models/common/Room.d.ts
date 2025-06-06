@@ -23,4 +23,6 @@ export interface RoomItem {
 	isPlaying: boolean;
 }
 
-export type ListResponse = RoomItem[];
+export type ListResponse = {
+	roomList: RoomItem[];
+}
