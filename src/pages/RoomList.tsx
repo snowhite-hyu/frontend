@@ -1,20 +1,22 @@
 import background from "@/assets/background.png";
 import { Button } from "@/components/ui/button";
 import useRoom from "@/hooks/useRoom";
-import type { ListResponse } from "@/models/common/Room";
+import type { RoomItem } from "@/models/common/Room";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { useSessionToken } from "@/stores/common/SessionStore";
 
 const RoomListPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const { list } = useRoom();
+	const token = useSessionToken();
 
-	const [rooms, setRooms] = useState<ListResponse>([]);
+	const [ rooms, setRooms ] = useState<RoomItem[]>([]);
 
 	const { connect } = useRoomSocketStore();
 
@@ -22,12 +24,18 @@ const RoomListPage: React.FC = () => {
 		setImage(background);
 		setUseLayout(true);
 		fetchRooms();
-	}, [setImage, setUseLayout]);
+		if (!token) {
+			alert("로그인이 필요합니다.");
+			return;
+		}
+		connect(token);
+		
+	}, []);
 
 	const fetchRooms = async () => {
 		const result = await list();
 		if (result) {
-			setRooms(result);
+			setRooms(result.roomList);
 		}
 	};
 

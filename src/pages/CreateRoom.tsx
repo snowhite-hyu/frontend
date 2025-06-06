@@ -5,10 +5,11 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import type { CreateRoomRequest } from "@/models/common/Room";
 import update from "immutability-helper";
 import type React from "react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useState, useEffect } from "react";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useNavigate } from "react-router-dom";
+import { useSessionToken } from "@/stores/common/SessionStore";
 
 const CreateRoomPage: React.FC = () => {
 	const [form, setForm] = useState<CreateRoomRequest>({
@@ -19,24 +20,27 @@ const CreateRoomPage: React.FC = () => {
 	// const { register } = useLogin();
 	const { connect } = useRoomSocketStore();
 	const navigate = useNavigate();
+	const token = useSessionToken();
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		// register(form);
 	};
 
-	const handleCreateRoom = ( capacity: number, turnTime: number ) => {
-		const jwtToken = localStorage.getItem("jwtToken");
-		if (!jwtToken) {
+	useEffect(() => {
+		if (!token) {
 			alert("로그인이 필요합니다.");
 			return;
 		}
+		connect(token);
+	}, []);
 
-		connect(jwtToken);
-		
+	const handleCreateRoom = ( capacity: number, turnTime: number ) => {
 		const roomSocket = useRoomSocketStore.getState().socket;
 
 		if (roomSocket) {
+			console.log("createRoom 진입");
+			console.log(token);
 			roomSocket.createRoom({ capacity, turnTime });
 
 			roomSocket.onCreateRoom((payload) => {
