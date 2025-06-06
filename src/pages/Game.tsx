@@ -1,14 +1,24 @@
 import type React from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import PlayerPanel from "@/components/ui/PlayerPanel";
 import remainCard from "@/assets/card/routeH1.png";
 import transhCan from "@/assets/trash.png";
 import rotateIcon from "@/assets/rotate.png";
-
-import routeCard from "@/assets/card/routeTRBL1.png";
 import roleCard from "@/assets/roleCard/saboteur.png";
+import {
+	DndContext,
+	type DragEndEvent,
+	type DragOverEvent,
+	type DragStartEvent,
+} from "@dnd-kit/core";
+import { toast } from "sonner";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import GameMap from "@/components/game/Map";
+import RouteCard from "@/components/asset/RouteCard";
+import { DroppableCell } from "@/components/game/DroppableCell";
+import update from "immutability-helper";
 
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
@@ -18,6 +28,7 @@ const GamePage: React.FC = () => {
 		setUseLayout(false);
 	}, [setImage, setUseLayout]);
 
+    // 플레이어 관련
 	type ToolState = "normal" | "broken";
 
 	type Player = {
@@ -56,58 +67,179 @@ const GamePage: React.FC = () => {
 		}
 	});
 
+    // 카드 관련
+    type CardData = {
+        id: string;
+        row: number;
+        col: number;
+        direction: Array<"top" | "right" | "bottom" | "left">;
+    };
+    const initialMyCards: CardData[] = [
+        { id: "mycard-1", direction: ["top", "right", "bottom", "left"], row: 0, col: 0 },
+        { id: "mycard-2", direction: ["top", "bottom"], row: 2, col: 1 },
+    ];
+    const initialCards: CardData[] = [
+        { id: "", direction: ["top", "right", "bottom", "left"], row: 0, col: 0 },
+        { id: "", direction: ["top", "bottom"], row: 2, col: 1 },
+    ];
+
+    const [myCards, setMyCards] = useState<CardData[]>(initialMyCards);
+	const [cards, setCards] = useState<CardData[]>(initialCards);
+
+    const cardAt = (row: number, col: number) => {
+		return cards.find((c) => c.row === row && c.col === col);
+	};
+
+    // 드래그 이벤트 핸들러
+    const handleDragStart = (e: DragStartEvent) => {
+		toast.info(`Drag Start: ${JSON.stringify(e)}`);
+	};
+
+	const handleDragOver = (e: DragOverEvent) => {
+		toast.info(`Drag Over on ${e.over?.id}`);
+	};
+
+	const handleDragEnd = (e: DragEndEvent) => {
+		const { active, over } = e;
+		if (!over) return;
+
+		toast.info(`Active: ${JSON.stringify(active)}`);
+		toast.info(`Over: ${JSON.stringify(over)}`);
+
+		// 게임보드에 카드 배치
+		if (
+			active.id.toString().startsWith("mycard") &&
+			over.id.toString().startsWith("cell")
+		) {
+			const activeIndex = myCards.findIndex((data) => data.id === active.id);
+
+			const [_, rowStr, colStr] = over.id.toString().split("-");
+			const row = Number.parseInt(rowStr, 10);
+			const col = Number.parseInt(colStr, 10);
+
+			setCards((prev) =>
+				update(prev, {
+					$push: [
+						{
+							id: "",
+							row: row,
+							col: col,
+							direction: myCards[activeIndex].direction,
+						},
+					],
+				}),
+			);
+		}
+
+		// 카드 덱 내 카드 순서 변경
+		if (
+			active.id.toString().startsWith("mycard") &&
+			over.id.toString().startsWith("mycard")
+		) {
+			const activeIndex = myCards.findIndex((data) => data.id === active.id);
+			const overIndex = myCards.findIndex((data) => data.id === over.id);
+			setMyCards((prev) =>
+				update(
+					update(prev, { $splice: [[activeIndex, 1, myCards[overIndex]]] }),
+					{ $splice: [[overIndex, 1, myCards[activeIndex]]] },
+				),
+			);
+		}
+	};
+
 	return (
 		<div className="relative h-screen">
-			{/* 플레이어 패널 */}
-			<div className="flex justify-between pt-10">
-				<div className="flex flex-col gap-3">
-					{leftPlayers.map((player) => (
-						<PlayerPanel key={player.id} player={player} position="left" />
-					))}
-				</div>
-				<div className="flex flex-col gap-3 items-end">
-					{rightPlayers.map((player) => (
-						<PlayerPanel key={player.id} player={player} position="right" />
-					))}
-				</div>
-			</div>
-            {/* 남은 카드 */}
-            <div className="absolute bottom-2 left-75">
-                <img src={remainCard} className="w-18" />
-                <p className="absolute top-1 left-1/2 -translate-x-1/2 text-white text-lg font-holtwood">64</p>
-            </div>
-            {/* 카드 덱 */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2"> 
-                <div className="flex gap-5 w-[580px] h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-hidden">
-                    {Array(6).fill(0).map((_, i) => (
-                        <div key={i} className="group flex flex-col justify-between items-center shrink-0 w-[72px]">
-                            <img
-                                src={rotateIcon}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => {}} // 카드 회전 기능 추가 필요
-                            />
-                            <img
-                                src={routeCard}
-                                className="w-full h-auto object-contain rounded-sm border border-white self-end"
-                            />
+            <DndContext
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+            >
+                {/* 플레이어 패널 */}
+                <div className="flex justify-between pt-10">
+                    <div className="flex flex-col gap-3">
+                        {leftPlayers.map((player) => (
+                            <PlayerPanel key={player.id} player={player} position="left" />
+                        ))}
+                    </div>
+                    <div className="flex flex-col gap-3 items-end">
+                        {rightPlayers.map((player) => (
+                            <PlayerPanel key={player.id} player={player} position="right" />
+                        ))}
+                    </div>
+                </div>
+
+                {/* 게임 보드 */}
+                <div className="absolute top-10 left-1/2 -translate-x-1/2">
+                    <GameMap
+                        width={9}
+                        height={5}
+                        renderCell={(row, col) => (
+                            <DroppableCell id={`cell-${row}-${col}`}>
+                                {cardAt(row, col) && (
+                                    <RouteCard
+                                        id={`card-${row}-${col}`}
+                                        isBlock={false}
+                                        isHidden={false}
+                                        direction={cardAt(row, col)!.direction}
+                                        isDraggable={false}
+                                    />
+                                )}
+                            </DroppableCell>
+                        )}
+                    />
+                </div>
+
+                {/* 남은 카드 */}
+                <div className="absolute bottom-2 left-75">
+                    <img src={remainCard} className="w-18" />
+                    <p className="absolute top-1 left-1/2 -translate-x-1/2 text-white text-lg font-holtwood">64</p>
+                </div>
+
+                {/* 카드 덱 */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
+                    <SortableContext
+                        items={myCards.map((data) => data.id)}
+                        strategy={horizontalListSortingStrategy}
+                    >
+                        <div className="flex gap-5 w-[580px] h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-hidden">
+                            {myCards.map((data) => (
+                                <div key={data.id} className="group flex flex-col justify-between items-center shrink-0 w-[72px]">
+                                    <img
+                                        src={rotateIcon}
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={() => {}} // 카드 회전 기능 추가 필요
+                                    />
+                                    <RouteCard
+                                        id={data.id}
+                                        isBlock={false}
+                                        isHidden={false}
+                                        direction={data.direction}
+                                        isDraggable={true}
+                                    />
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </SortableContext>
                 </div>
-            </div>
-            {/* 버리기 */}
-            <div className="absolute bottom-2 right-75 h-28">
-                <div className="h-28 flex flex-col justify-between items-center">
-                    <p className="text-white text-xl font-holtwood font-bold">버리기</p>
-                    <img src={transhCan} className="w-19" />
+
+                {/* 버리기 */}
+                <div className="absolute bottom-2 right-75 h-28">
+                    <DroppableCell id="trash">
+                        <div className="h-28 flex flex-col justify-between items-center">
+                            <p className="text-white text-xl font-holtwood font-bold">버리기</p>
+                            <img src={transhCan} className="w-19" />
+                        </div>
+                    </DroppableCell>
                 </div>
-            </div>
-            {/* 역할 카드 */}
-            <div className="absolute bottom-0 right-13"> 
-                <div className="w-37 h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 flex flex-col gap-1">
-                    <p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34] text-shadow-[0_-1.46px_0.73px_#FFFFFFCC,0_1.46px_2.19px_#000000]">ROLE</p>
-                    <img src={roleCard} className="w-18 flex-1 object-contain mx-auto" />
+
+                {/* 역할 카드 */}
+                <div className="absolute bottom-0 right-13"> 
+                    <div className="w-37 h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 flex flex-col gap-1">
+                        <p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34] text-shadow-[0_-1.46px_0.73px_#FFFFFFCC,0_1.46px_2.19px_#000000]">ROLE</p>
+                        <img src={roleCard} className="w-18 flex-1 object-contain mx-auto" />
+                    </div>
                 </div>
-            </div>
+            </DndContext>
 		</div>
 	);
 };
