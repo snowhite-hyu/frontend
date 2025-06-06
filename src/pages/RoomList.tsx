@@ -40,13 +40,6 @@ const RoomListPage: React.FC = () => {
 	};
 
 	const handleJoinRoom = (roomId: number) => {
-		const jwtToken = localStorage.getItem("jwtToken");
-		if (!jwtToken) {
-			alert("로그인이 필요합니다.");
-			return;
-		}
-
-		connect(jwtToken);
 		const roomSocket = useRoomSocketStore.getState().socket;
 		if (roomSocket) {
 			roomSocket.onJoinedRoom((payload) => {
