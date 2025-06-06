@@ -10,7 +10,7 @@ export class RoomSocket extends BaseSocket {
   private listeners: Record<string, ((payload: any) => void)[]> = {};
 
   constructor(jwtToken: string) {
-    super("/ws/room", { token: jwtToken });
+    super("/room", { token: jwtToken });
   }
 
   protected onMessage(data: string): void {
