@@ -5,44 +5,52 @@ import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 
 const WaitingPage: React.FC = () => {
+	const room = useRoomInfoStore((state) => state.room);
+	if (!room) return <p>로딩 중...</p>;
+
 	const navigate = useNavigate();
-
 	const { setImage, setUseLayout } = useBackgroundActions();
-
+	const socket = useRoomSocketStore.getState().socket;
+	const updateUsers = useRoomInfoStore.getState().updateUsers;
+	
 	useEffect(() => {
 		setImage(roomBackground);
 		setUseLayout(false);
+		
+		if (!socket) return;
+		
+		const handleMessage = (users: any) => {
+			updateUsers(users);
+		};
+
+		socket.onRoomusers(handleMessage);
+		return () => socket.offRoomusers(handleMessage);
+
 	}, [setImage, setUseLayout]);
 
 	const options: { key: string; title: string; setting: string }[] = [
-		{ key: "people", title: "최대 인원", setting: "10명" },
-		{ key: "time", title: "턴 시간 제한", setting: "30초" },
-	];
-
-	type User = {
-		id: string;
-	};
-	const members: User[] = [
-		{ id: "신데렐라" },
-		{ id: "앨리스" },
-		{ id: "백설공주" },
-		{ id: "오로라" },
-		{ id: "벨" },
-		{ id: "엘사" },
-		{ id: "자스민" },
-		{ id: "뮬란" },
-		{ id: "애리얼" },
+		{ key: "people", title: "최대 인원", setting: room.capacity+"명" },
+		{ key: "time", title: "턴 시간 제한", setting: room.turnTime+"초" },
 	];
 
 	const [currentPage, setCurrentPage] = useState(0);
 
 	const membersPerPage = 8;
-	const totalPages = Math.ceil(members.length / membersPerPage);
+	const totalPages = Math.ceil(room.users.length / membersPerPage);
 
 	const start = currentPage * membersPerPage;
-	const currentMembers = members.slice(start, start + membersPerPage);
+	const currentMembers = room.users.slice(start, start + membersPerPage);
+
+	const handleQuitRoom = ( roomId:number ) => {
+		const roomSocket = useRoomSocketStore.getState().socket;
+		if (roomSocket) {
+			roomSocket.quitRoom({roomId});
+		}
+	};
 
 	return (
 		<div className="overflow-hidden">
@@ -50,18 +58,18 @@ const WaitingPage: React.FC = () => {
 			<div className="flex w-full h-full justify-between items-center mt-[50px] px-[3%]">
 				{/* 방 제목 */}
 				<div className="rounded-[21px] bg-[#0000004D] w-[50%] h-[110px] pl-[40px] pt-[27px] mr-[38px]">
-					<p className="font-semibold text-[43px]">빨리 오세요~</p>
+					<p className="font-semibold text-[43px]">{room.roomName}</p>
 				</div>
 				{/* 옵션 설정 */}
 				<div className="flex justify-center items-center">
 					{options.map((option) => (
 						<div
-							key="options"
+							key={option.key}
 							className="flex justify-center items-center mr-[28px]"
 						>
 							<Button
 								key={option.key}
-								variant={"saboteurCheck"}
+								variant="saboteurCheck"
 								size="custom"
 								className="font-semibold text-[25.51px] px-[15px] py-[18px] mr-[16px]"
 							>
@@ -76,7 +84,7 @@ const WaitingPage: React.FC = () => {
 			<div className="w-full flex flex-col items-center mt-[40px]">
 				<div className="grid grid-cols-4 grid-rows-2 gap-10 w-[80%] h-[450px]">
 					{currentMembers.map((member) => (
-						<Profile key={member.id} nickname={member.id} />
+						<Profile key={member.id} nickname={member.username.toString()} />
 					))}
 				</div>
 				{/* 페이지 버튼 */}
@@ -105,17 +113,17 @@ const WaitingPage: React.FC = () => {
 				</div>
 				{/* 나가기 & 시작 버튼 */}
 				<div className="gap-[50px]">
-					<Button
-						key="exit"
-						variant={"exit"}
-						className="h-fit mr-[50px]"
-						onClick={() => navigate("/room")}
+					<Button 
+						key="exit" 
+						variant="exit"
+						className="h-fit mr-[50px]" 
+						onClick={() => { handleQuitRoom(room.roomId); navigate("/room");  }}
 					>
 						나가기
 					</Button>
 					<Button
 						key="start"
-						variant={"sabotuer"}
+						variant="sabotuer"
 						size="custom"
 						className="w-[160px] h-[88px]"
 					>

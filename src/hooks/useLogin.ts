@@ -23,7 +23,7 @@ const useLogin = () => {
 
 		if (response.isSuccess) {
 			sessionActions.setToken(response.result.token);
-			navigate("/waiting");
+			navigate("/room");
 			return true;
 		}
 
@@ -47,7 +47,7 @@ const useLogin = () => {
 					password: request.password,
 				});
 				if (loginResult) {
-					navigate("/waiting");
+					navigate("/room");
 				} else {
 					navigate("/login");
 				}
