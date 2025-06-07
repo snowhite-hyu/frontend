@@ -1,6 +1,7 @@
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dropdown } from "@/components/ui/Dropdown";
+import useRoom from "@/hooks/useRoom";
 // import useLogin from "@/hooks/useLogin";
 import type { CreateRoomRequest } from "@/models/common/Room";
 import update from "immutability-helper";
@@ -8,6 +9,8 @@ import type React from "react";
 import { type FormEvent, useState } from "react";
 
 const CreateRoomPage: React.FC = () => {
+	const { create } = useRoom();
+
 	const [form, setForm] = useState<CreateRoomRequest>({
 		roomName: "",
 		maxPlayers: 3,
@@ -56,7 +59,14 @@ const CreateRoomPage: React.FC = () => {
 					className="min-w-[147px]"
 					optionSuffix="초"
 				/>
-				<Button variant={"sabotuer"} className="w-fit h-fit" type="submit">
+				<Button
+					variant={"sabotuer"}
+					className="w-fit h-fit"
+					type="button"
+					onClick={async () => {
+						await create(form.roomName, form.maxPlayers, form.turnTimeLimit);
+					}}
+				>
 					Create
 				</Button>
 			</form>

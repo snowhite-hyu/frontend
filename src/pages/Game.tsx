@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import useGame from "@/hooks/useGame";
 import GameMap from "@/components/game/Map";
 import GoalCard from "@/components/asset/GoalCard";
+import { DroppableCell } from "@/components/game/DroppableCell";
 
 const PLAYER_PREFIX = "player:";
 const MAP_PREFIX = "map:";
@@ -217,7 +218,7 @@ const GamePage: React.FC = () => {
 								<img
 									src={rotateIcon}
 									className="opacity-0 group-hover:opacity-100 transition-opacity"
-									onClick={() => { }} // 카드 회전 기능 추가 필요
+									onClick={() => {}} // 카드 회전 기능 추가 필요
 								/>
 								{id === 0 && <Card id={`card:${id}`} assetName="card/start" />}
 								{id > 0 && id < 40 && (
@@ -261,15 +262,3 @@ const GamePage: React.FC = () => {
 };
 
 export default GamePage;
-
-interface DroppableCellProps {
-	id: string;
-	children: ReactNode;
-}
-
-const DroppableCell: React.FC<DroppableCellProps> = ({ id, children }) => {
-	const { setNodeRef } = useDroppable({
-		id,
-	});
-	return <div ref={setNodeRef}>{children}</div>;
-};

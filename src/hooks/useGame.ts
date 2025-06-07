@@ -13,10 +13,7 @@ import {
 } from "@/models/game/Player";
 import { useSessionToken } from "@/stores/common/SessionStore";
 import { useSocketActions } from "@/stores/common/SocketStore";
-import {
-	useGameActions,
-	useGameMyInfo,
-} from "@/stores/game/GameStore";
+import { useGameActions, useGameMyInfo } from "@/stores/game/GameStore";
 import { useRoomState } from "@/stores/room/RoomStore";
 import update from "immutability-helper";
 import { toast } from "sonner";
@@ -74,7 +71,7 @@ const useGame = () => {
 	};
 	type FieldUpdateOneRes = Payload<
 		string,
-		{ cardId: number; row: number; column: number, isFilpped?: number }
+		{ cardId: number; row: number; column: number; isFilpped?: number }
 	>;
 	const fieldUpdateOne = (msg: FieldUpdateOneRes) => {
 		setGameData((prev) =>
@@ -113,28 +110,28 @@ const useGame = () => {
 			return prev;
 		});
 	};
-	type PlayerInfoChanged = Payload<
-		"Player-Info-Changed",
-		OpenPlayerState
-	>;
+	type PlayerInfoChanged = Payload<"Player-Info-Changed", OpenPlayerState>;
 	const playerInfoUpdate = (msg: PlayerInfoChanged) => {
 		setGameData((prev) => {
 			const targetIdx = prev?.players.findIndex(
-				(player) => player.playerId === msg.payload.playerId
+				(player) => player.playerId === msg.payload.playerId,
 			);
 			if (targetIdx !== undefined) {
-				return update(prev, { players: { [targetIdx]: { $set: msg.payload } } });
+				return update(prev, {
+					players: { [targetIdx]: { $set: msg.payload } },
+				});
 			} else {
 				return update(prev, { players: { $push: [msg.payload] } });
 			}
 		});
-	}
-	type TurnChangedRes = Payload<
-		"Turn-Changed",
-		{ nextTurnPlayerId: number; }
-	>;
+	};
+	type TurnChangedRes = Payload<"Turn-Changed", { nextTurnPlayerId: number }>;
 	const turnUpdate = (msg: TurnChangedRes) => {
-		setGameData((prev) => update(prev, { currentTurnPlayerId: { $set: msg.payload.nextTurnPlayerId } }));
+		setGameData((prev) =>
+			update(prev, {
+				currentTurnPlayerId: { $set: msg.payload.nextTurnPlayerId },
+			}),
+		);
 	};
 
 	const init = async () => {
@@ -178,7 +175,7 @@ const useGame = () => {
 				"game",
 				"Player-Info-Changed",
 				playerInfoUpdate,
-			)
+			);
 			forceUpdate();
 		}
 	};
@@ -205,21 +202,9 @@ const useGame = () => {
 			"Broadcast: Repair-Card-use",
 			playerUpdateOne,
 		);
-		actions.unregisterHandler(
-			"game",
-			"Field-Changed",
-			fieldUpdateOne,
-		);
-		actions.unregisterHandler(
-			"game",
-			"Turn-Changed",
-			turnUpdate,
-		);
-		actions.unregisterHandler(
-			"game",
-			"Player-Info-Changed",
-			playerInfoUpdate,
-		);
+		actions.unregisterHandler("game", "Field-Changed", fieldUpdateOne);
+		actions.unregisterHandler("game", "Turn-Changed", turnUpdate);
+		actions.unregisterHandler("game", "Player-Info-Changed", playerInfoUpdate);
 	};
 
 	const forceUpdate = async () => {
@@ -275,11 +260,11 @@ const useGame = () => {
 		return true;
 	};
 
-	const getMyCards = () => { };
+	const getMyCards = () => {};
 
 	const drawNewCard = async () => {
 		if (!gameId) return;
-		if (!await checkMyTurn()) return;
+		if (!(await checkMyTurn())) return;
 
 		try {
 			type req = Payload<"get-card", { gameId: number }>;
@@ -334,12 +319,18 @@ const useGame = () => {
 		isFlipped: number,
 	) => {
 		if (!gameId) return;
-		if (!await checkMyTurn()) return;
+		if (!(await checkMyTurn())) return;
 
 		try {
 			type req = Payload<
 				"use-path-card",
-				{ gameId: number, cardId: number, row: number, column: number, isFlipped: number }
+				{
+					gameId: number;
+					cardId: number;
+					row: number;
+					column: number;
+					isFlipped: number;
+				}
 			>;
 
 			const promise = new Promise<void>((resolve, reject) => {
@@ -369,7 +360,7 @@ const useGame = () => {
 						row,
 						column,
 						isFlipped,
-					}
+					},
 				} as req);
 
 				timer = setTimeout(() => {
@@ -383,7 +374,7 @@ const useGame = () => {
 		} catch (e) {
 			console.log(e);
 		}
-	}
+	};
 
 	const useRockfallCard = async (
 		cardId: number,
@@ -391,7 +382,7 @@ const useGame = () => {
 		column: number,
 	) => {
 		if (!gameId) return;
-		if (!await checkMyTurn()) return;
+		if (!(await checkMyTurn())) return;
 
 		try {
 			type req = Payload<
@@ -424,7 +415,7 @@ const useGame = () => {
 
 	const useMapCard = async (cardId: number, row: 1 | 3 | 5, column: 8) => {
 		if (!gameId) return;
-		if (!await checkMyTurn()) return;
+		if (!(await checkMyTurn())) return;
 
 		try {
 			type req = Payload<
@@ -463,7 +454,7 @@ const useGame = () => {
 		targetState: PlayerState,
 	) => {
 		if (!gameId) return;
-		if (!await checkMyTurn()) return;
+		if (!(await checkMyTurn())) return;
 
 		try {
 			type req = Payload<
@@ -498,7 +489,7 @@ const useGame = () => {
 
 	const useBrokenCard = async (cardId: number, targetPlayerId: number) => {
 		if (!gameId) return;
-		if (!await checkMyTurn()) return;
+		if (!(await checkMyTurn())) return;
 
 		try {
 			type req = Payload<
