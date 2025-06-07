@@ -39,4 +39,5 @@ export const GameStore = create<GameState>((set) => ({
 
 export const useGameData = () => GameStore((state) => state.data);
 export const useGameMyInfo = () => GameStore((state) => state.myInfo);
+export const useGameRoundReview = () => GameStore((state) => state.roundReview);
 export const useGameActions = () => GameStore((state) => state.actions);

@@ -14,7 +14,7 @@ import {
 	DragOverlay,
 	DragStartEvent,
 } from "@dnd-kit/core";
-import { useGameData, useGameMyInfo } from "@/stores/game/GameStore";
+import { useGameData, useGameMyInfo, useGameRoundReview } from "@/stores/game/GameStore";
 import { OpenPlayerState } from "@/models/game/Game";
 import Card from "@/components/asset/Card";
 import RouteCard from "@/components/asset/RouteCard";
@@ -25,6 +25,7 @@ import GameMap from "@/components/game/Map";
 import GoalCard from "@/components/asset/GoalCard";
 import { DroppableCell } from "@/components/game/DroppableCell";
 import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
+import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
 
 const PLAYER_PREFIX = "player:";
 const MAP_PREFIX = "map:";
@@ -34,6 +35,7 @@ const TRASHBIN = "trashbin";
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const game = useGameData();
+	const roundReview = useGameRoundReview();
 	const myInfo = useGameMyInfo();
 
 	const {
@@ -150,6 +152,14 @@ const GamePage: React.FC = () => {
 		setActiveItem(null);
 	};
 
+	const endModal = useMemo(() => {
+		if (roundReview) {
+			return <RoundEndDialog roundReview={roundReview} />;
+		}
+
+		return <></>;
+	}, [roundReview])
+
 	return (
 		<div className="relative h-screen">
 			<DndContext onDragStart={dragStart} onDragEnd={dragEnd}>
@@ -235,6 +245,7 @@ const GamePage: React.FC = () => {
 				</div>
 				<DragOverlay>{activeOverlay}</DragOverlay>
 			</DndContext>
+			{endModal}
 		</div>
 	);
 };
