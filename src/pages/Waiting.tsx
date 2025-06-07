@@ -3,19 +3,19 @@ import { Button } from "@/components/ui/button";
 import Profile from "@/components/ui/Profile";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
+import { RoomItem } from "@/models/common/Room";
 
 const WaitingPage: React.FC = () => {
-	const room = useRoomInfoStore((state) => state.room);
+	const { room, isMaster, updateUsers } = useRoomInfoStore((state) => state);
+	const socket = useRoomSocketStore((state) => state.socket);
 	if (!room) return <p>로딩 중...</p>;
 
 	const navigate = useNavigate();
 	const { setImage, setUseLayout } = useBackgroundActions();
-	const socket = useRoomSocketStore.getState().socket;
-	const updateUsers = useRoomInfoStore.getState().updateUsers;
 
 	useEffect(() => {
 		setImage(roomBackground);
@@ -23,13 +23,14 @@ const WaitingPage: React.FC = () => {
 
 		if (!socket) return;
 
-		const handleMessage = (users: any) => {
+		const handleMessage = (users: RoomItem["users"]) => {
+			console.log("NEW USERS", users);
 			updateUsers(users);
 		};
 
 		socket.onRoomusers(handleMessage);
 		return () => socket.offRoomusers(handleMessage);
-	}, [setImage, setUseLayout]);
+	}, []);
 
 	const options: { key: string; title: string; setting: string }[] = [
 		{ key: "people", title: "최대 인원", setting: room.capacity + "명" },
@@ -40,16 +41,23 @@ const WaitingPage: React.FC = () => {
 
 	const membersPerPage = 8;
 	const totalPages = Math.ceil(room.users.length / membersPerPage);
-
-	const start = currentPage * membersPerPage;
-	const currentMembers = room.users.slice(start, start + membersPerPage);
+	const currentMembers = useMemo(() => {
+		const start = currentPage * membersPerPage;
+		return room.users.slice(start, start + membersPerPage)
+	}, [room.users]);
 
 	const handleQuitRoom = (roomId: number) => {
-		const roomSocket = useRoomSocketStore.getState().socket;
-		if (roomSocket) {
-			roomSocket.quitRoom({ roomId });
+		if (socket) {
+			socket.quitRoom({ roomId });
 		}
 	};
+
+	const handleStartGame = (roomId: number) => {
+		const roomSocket = useRoomSocketStore.getState().socket;
+		if (roomSocket) {
+
+		}
+	}
 
 	return (
 		<div className="overflow-hidden">
@@ -94,9 +102,8 @@ const WaitingPage: React.FC = () => {
 								type="button"
 								key={`page-${i}`}
 								onClick={() => setCurrentPage(i)}
-								className={`w-2 h-2 rounded-full ${
-									i === currentPage ? "bg-black" : "bg-gray-200"
-								}`}
+								className={`w-2 h-2 rounded-full ${i === currentPage ? "bg-black" : "bg-gray-200"
+									}`}
 							/>
 						))}
 					</div>
@@ -128,8 +135,9 @@ const WaitingPage: React.FC = () => {
 						variant="sabotuer"
 						size="custom"
 						className="w-[160px] h-[88px]"
+						onClick={() => handleStartGame(room.roomId)}
 					>
-						시작
+						{isMaster ? "시작" : "준비"}
 					</Button>
 				</div>
 			</div>
