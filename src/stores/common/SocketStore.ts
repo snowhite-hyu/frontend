@@ -94,10 +94,7 @@ const SocketStore = create<SocketState>((set, get) => ({
 			setSocketInState(set, type, null);
 
 			try {
-				const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-				const ws = new WebSocket(
-					`${protocol}://${window.location.host}/ws/${type}?token=${token}`,
-				);
+				const ws = new WebSocket(import.meta.env.VITE_WS_BASE_URL);
 
 				ws.onopen = () => setSocketInState(set, type, ws);
 				ws.onclose = () => setSocketInState(set, type, null);
