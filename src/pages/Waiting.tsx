@@ -8,13 +8,18 @@ import { useNavigate } from "react-router-dom";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 import { RoomItem } from "@/models/common/Room";
+import useGame from "@/hooks/useGame";
+import { useGameData } from "@/stores/game/GameStore";
 
 const WaitingPage: React.FC = () => {
 	const { room, isMaster, updateUsers } = useRoomInfoStore((state) => state);
 	const socket = useRoomSocketStore((state) => state.socket);
-	if (!room) return <p>로딩 중...</p>;
-
+	const { open, init, join } = useGame();
+	const game = useGameData();
 	const navigate = useNavigate();
+	if (!room) return <p>로딩 중...</p>;
+	if (game != null && game.deckSize > 0) navigate("/game");
+
 	const { setImage, setUseLayout } = useBackgroundActions();
 
 	useEffect(() => {
@@ -24,11 +29,11 @@ const WaitingPage: React.FC = () => {
 		if (!socket) return;
 
 		const handleMessage = (users: RoomItem["users"]) => {
-			console.log("NEW USERS", users);
 			updateUsers(users);
 		};
 
 		socket.onRoomusers(handleMessage);
+		open();
 		return () => socket.offRoomusers(handleMessage);
 	}, []);
 
@@ -53,9 +58,16 @@ const WaitingPage: React.FC = () => {
 	};
 
 	const handleStartGame = (roomId: number) => {
-		const roomSocket = useRoomSocketStore.getState().socket;
-		if (roomSocket) {
-
+		if (socket) {
+			if (isMaster) {
+				socket.startGame({ roomId });
+				setTimeout(() => {
+					join(roomId);
+				}, 500);
+			} else {
+				join(roomId);
+			}
+			init();
 		}
 	}
 

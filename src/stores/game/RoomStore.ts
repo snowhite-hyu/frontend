@@ -1,3 +1,0 @@
-interface RoomState {
-	roomId: number;
-}

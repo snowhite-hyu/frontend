@@ -14,12 +14,14 @@ interface PlayerPanelProps {
 	player: OpenPlayerState;
 	position: "left" | "right";
 	isPlayerTurn: boolean;
+	myInfo?: PlayerData;
 }
 
 const PlayerPanel: React.FC<PlayerPanelProps> = ({
 	player,
 	position,
 	isPlayerTurn,
+	myInfo,
 }) => {
 	return (
 		<div
@@ -28,7 +30,7 @@ const PlayerPanel: React.FC<PlayerPanelProps> = ({
 			{/* 이름 + 골드 */}
 			<div className="flex justify-between">
 				<p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34]">
-					{player.playerName}
+					{myInfo?.playerId === player.playerId ? "나: " : ""}{player.playerName}
 				</p>
 				<div className="flex gap-2 items-center">
 					<img src={goldIcon} className="w-auto h-6" />

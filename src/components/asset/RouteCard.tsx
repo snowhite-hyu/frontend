@@ -5,6 +5,7 @@ interface RouteCardProps {
 	isHidden: boolean;
 	assetId: number;
 	isDraggable?: boolean;
+	isFlipped?: boolean;
 }
 
 const RouteMap: Record<string, string> = {
@@ -56,13 +57,24 @@ const RouteCard: React.FC<RouteCardProps> = ({
 	isHidden,
 	assetId,
 	isDraggable = true,
+	isFlipped = false,
 }) => {
 	if (isHidden) {
 		assetId = 0;
 	}
 	let imgName = "card/route" + RouteMap[assetId];
 
-	return <Card id={id} assetName={imgName} isDraggable={isDraggable} />;
+	const containerClass = `
+    [perspective:1000px]
+    transition-transform
+    duration-500
+    [transform-style:preserve-3d]
+    ${isFlipped ? '[transform:rotateX(180deg)]' : ''}
+  `;
+
+	return <div className={containerClass.trim()}>
+		<Card id={id} assetName={imgName} isDraggable={isDraggable} />
+	</div>;
 };
 
 export default RouteCard;

@@ -94,7 +94,7 @@ const SocketStore = create<SocketState>((set, get) => ({
 			setSocketInState(set, type, null);
 
 			try {
-				const ws = new WebSocket(import.meta.env.VITE_WS_BASE_URL);
+				const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/${type}?token=${token}`);
 
 				ws.onopen = () => setSocketInState(set, type, ws);
 				ws.onclose = () => setSocketInState(set, type, null);

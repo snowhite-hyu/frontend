@@ -48,6 +48,10 @@ export class RoomSocket extends BaseSocket {
 		this.send({ type: "quit", payload: data });
 	}
 
+	public startGame(data: { roomId: number }) {
+		this.send({ type: "start-game", payload: data });
+	}
+
 	public on(event: string, callback: (payload: any) => void) {
 		if (!this.listeners[event]) {
 			this.listeners[event] = [];

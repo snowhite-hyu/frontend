@@ -1,6 +1,6 @@
 import type { Payload } from "../common/Payload";
 import { CardData, GoalCardData, RouteCardData } from "./Card";
-import { PlayerState } from "./Player";
+import { PlayerRole, PlayerState } from "./Player";
 
 export type JoinGameReq = Payload<
 	"join-game",
@@ -62,4 +62,17 @@ export type GetGameStateReq = Payload<
 export type GetGameStateRes = Payload<
 	"Game-State",
 	GameData,
+>;
+
+export type RoundFinishedRes = Payload<
+	"Round-Finished",
+	{
+		winnerRole: PlayerRole;
+		players: {
+			playerId: number;
+			playerName: string;
+			role: PlayerRole;
+			gainedGold: number;
+		}[];
+	}
 >;

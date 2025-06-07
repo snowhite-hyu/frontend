@@ -1,11 +1,10 @@
 import remainCard from "@/assets/card/routeH1.png";
 import roomBackground from "@/assets/room.png";
-import rotateIcon from "@/assets/rotate.png";
 import transhCan from "@/assets/trash.png";
 import PlayerPanel from "@/components/ui/PlayerPanel";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import type React from "react";
-import { ReactNode, useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import saboteur from "@/assets/role/saboteur.png";
 import worker from "@/assets/role/worker.png";
@@ -14,7 +13,6 @@ import {
 	DragEndEvent,
 	DragOverlay,
 	DragStartEvent,
-	useDroppable,
 } from "@dnd-kit/core";
 import { useGameData, useGameMyInfo } from "@/stores/game/GameStore";
 import { OpenPlayerState } from "@/models/game/Game";
@@ -41,17 +39,17 @@ const GamePage: React.FC = () => {
 		init,
 		deinit,
 		getMyCards,
-		drawNewCard,
 		dropMyCard,
 		usePathCard,
 		useBrokenCard,
 		useMapCard,
 		useRepairCard,
 		useRockfallCard,
+		forceUpdate,
 	} = useGame();
 
 	useEffect(() => {
-		init();
+		forceUpdate();
 		() => deinit();
 	}, []);
 
@@ -74,6 +72,8 @@ const GamePage: React.FC = () => {
 		return [leftPlayers, rightPlayers];
 	}, [game?.players]);
 
+	const [isFlipped, setIsFlipped] = useState<boolean>(false);
+	const flipIterval = useRef<NodeJS.Timeout>(null);
 	const [activeItem, setActiveItem] = useState<string | null>(null);
 	const activeOverlay = useMemo(() => {
 		if (activeItem) {
@@ -86,6 +86,7 @@ const GamePage: React.FC = () => {
 							assetId={assetId}
 							isDraggable={false}
 							isHidden={false}
+							isFlipped={isFlipped}
 						/>
 					);
 				} else if (100 < assetId && assetId < 120) {
@@ -96,14 +97,25 @@ const GamePage: React.FC = () => {
 			}
 		}
 		return <></>;
-	}, [activeItem]);
+	}, [activeItem, isFlipped]);
 	const dragStart = (e: DragStartEvent) => {
-		toast(`Drag start from ${e.active.id}`);
-		setActiveItem(e.active.id.toString());
+		const activeId = e.active.id.toString();
+		toast(`Drag start from ${activeId}`);
+		setActiveItem(activeId);
+		setIsFlipped(false);
+		if (activeId.startsWith(CARD_PREFIX) && flipIterval.current === null) {
+			flipIterval.current = setInterval(() => {
+				setIsFlipped((prev) => !prev);
+			}, 2000);
+		}
 	};
 	const dragEnd = (e: DragEndEvent) => {
 		const overId = e.over?.id.toString();
 		const activeId = e.active.id.toString();
+		if (flipIterval.current) {
+			clearInterval(flipIterval.current);
+			flipIterval.current = null;
+		}
 		if (overId === "trashbin" && activeId.startsWith(CARD_PREFIX)) {
 			const id = Number.parseInt(activeId.slice(CARD_PREFIX.length));
 			if (id) {
@@ -115,12 +127,12 @@ const GamePage: React.FC = () => {
 			activeId.startsWith(CARD_PREFIX)
 		) {
 			const mapcolrow = overId.split(":");
-			const col = Number.parseInt(mapcolrow[1]);
-			const row = Number.parseInt(mapcolrow[2]);
+			const row = Number.parseInt(mapcolrow[1]);
+			const col = Number.parseInt(mapcolrow[2]);
 
 			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
 			if (0 < cardId && cardId < 60) {
-				usePathCard(cardId, row, col, 0);
+				usePathCard(cardId, row, col, isFlipped ? 1 : 0);
 			} else if (cardId === 107) {
 				useRockfallCard(cardId, row, col);
 			}
@@ -150,6 +162,7 @@ const GamePage: React.FC = () => {
 									player={player}
 									position="left"
 									isPlayerTurn={game?.currentTurnPlayerId === player.playerId}
+									myInfo={myInfo ?? undefined}
 								/>
 							</DroppableCell>
 						))}
@@ -161,6 +174,7 @@ const GamePage: React.FC = () => {
 								player={player}
 								position="right"
 								isPlayerTurn={game?.currentTurnPlayerId === player.playerId}
+								myInfo={myInfo ?? undefined}
 							/>
 						))}
 					</div>
@@ -186,16 +200,17 @@ const GamePage: React.FC = () => {
 													assetId={field[0]}
 													isHidden={false}
 													isDraggable={false}
+													isFlipped={field[1] === 1}
 												/>
 											}
 										</DroppableCell>
 									);
 								} else if (60 < field[0] && field[0] < 70) {
 									return (
-										<GoalCard id={id} assetId={field[0]} isHidden={true} />
+										<GoalCard id={id} assetId={field[0]} isHidden={true} isDraggable={false} />
 									);
 								} else {
-									return <Card id="start-card" assetName="card/start" />;
+									return <Card id="start-card" assetName="card/start" isDraggable={false} />;
 								}
 							}
 							return <div className="w-full h-full">{id}</div>;
@@ -205,7 +220,7 @@ const GamePage: React.FC = () => {
 				{/* 카드 덱 */}
 				<div className="absolute flex bottom-0 left-1/2 -translate-x-1/2 items-end gap-4">
 					{/* 남은 카드 */}
-					<div onClick={drawNewCard}>
+					<div>
 						<img src={remainCard} className="w-18" />
 						<p className="text-white text-lg font-holtwood">{game?.deckSize}</p>
 					</div>
@@ -215,11 +230,6 @@ const GamePage: React.FC = () => {
 								key={id}
 								className="group flex flex-col justify-between items-center shrink-0 w-[72px]"
 							>
-								<img
-									src={rotateIcon}
-									className="opacity-0 group-hover:opacity-100 transition-opacity"
-									onClick={() => {}} // 카드 회전 기능 추가 필요
-								/>
 								{id === 0 && <Card id={`card:${id}`} assetName="card/start" />}
 								{id > 0 && id < 40 && (
 									<RouteCard id={`card:${id}`} isHidden={false} assetId={id} />
@@ -227,7 +237,6 @@ const GamePage: React.FC = () => {
 								{id > 100 && id < 120 && (
 									<ActionCard id={`card:${id}`} assetId={id} />
 								)}
-								{}
 							</div>
 						))}
 					</div>
