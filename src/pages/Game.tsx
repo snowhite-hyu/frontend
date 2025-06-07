@@ -170,13 +170,15 @@ const GamePage: React.FC = () => {
 					</div>
 					<div className={`flex flex-col gap-3 items-end`}>
 						{rightPlayers.map((player) => (
-							<PlayerPanel
-								key={player.playerId}
-								player={player}
-								position="right"
-								isPlayerTurn={game?.currentTurnPlayerId === player.playerId}
-								myInfo={myInfo ?? undefined}
-							/>
+							<DroppableCell id={`${PLAYER_PREFIX}${player.playerId}`}>
+								<PlayerPanel
+									key={player.playerId}
+									player={player}
+									position="right"
+									isPlayerTurn={game?.currentTurnPlayerId === player.playerId}
+									myInfo={myInfo ?? undefined}
+								/>
+							</DroppableCell>
 						))}
 					</div>
 				</div>
@@ -192,17 +194,17 @@ const GamePage: React.FC = () => {
 						<p className="text-white text-lg font-holtwood">{game?.deckSize}</p>
 					</div>
 					<div className="flex gap-5 max-w-[580px] bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-auto">
-						{myInfo?.hand.map((id) => (
+						{myInfo?.hand.map((id, index) => (
 							<div
 								key={id}
 								className="group flex flex-col justify-between items-center shrink-0 w-[72px]"
 							>
-								{id === 0 && <Card id={`card:${id}`} assetName="card/start" />}
+								{id === 0 && <Card id={`card:${id}:${index}`} assetName="card/start" />}
 								{id > 0 && id < 40 && (
-									<RouteCard id={`card:${id}`} isHidden={false} assetId={id} />
+									<RouteCard id={`card:${id}:${index}`} isHidden={false} assetId={id} />
 								)}
 								{id > 100 && id < 120 && (
-									<ActionCard id={`card:${id}`} assetId={id} />
+									<ActionCard id={`card:${id}:${index}`} assetId={id} />
 								)}
 							</div>
 						))}

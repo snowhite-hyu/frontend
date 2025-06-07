@@ -77,10 +77,6 @@ const useGame = () => {
 		setGameData(msg.payload.game);
 	};
 
-	type FieldUpdateRes = Payload<string, { field: [number, number][][] }>;
-	const fieldUpdate = (msg: FieldUpdateRes) => {
-		setGameData((prev) => (update(prev, { field: { $set: msg.payload.field } })));
-	};
 	type FieldUpdateOneRes = Payload<
 		string,
 		{ cardId: number; row: number; column: number; isFlipped?: number }
@@ -103,30 +99,9 @@ const useGame = () => {
 			return prev;
 		});
 	};
-	type PlayerUpdateOneRes = Payload<
-		string,
-		{ targetPlayerId: number; cardId: number; targetPlayerState: PlayerState[] }
-	>;
-	const playerUpdateOne = (msg: PlayerUpdateOneRes) => {
-		setGameData((prev) => {
-			const targetIdx = prev?.players.findIndex(
-				(player) => player.playerId === msg.payload.targetPlayerId,
-			);
-			if (targetIdx !== undefined && targetIdx >= 0) {
-				return update(prev, {
-					players: {
-						[targetIdx]: {
-							state: {
-								$set: msg.payload.targetPlayerState,
-							},
-
-						},
-					},
-				});
-			}
-			return prev;
-		});
-	};
+	const myInfoUpdate = (msg: GetPlayerInfoRes) => {
+		setMyInfo(msg.payload);
+	}
 	type PlayerInfoChanged = Payload<string, OpenPlayerState>;
 	const playerInfoUpdate = (msg: PlayerInfoChanged) => {
 
@@ -165,26 +140,6 @@ const useGame = () => {
 				"Round-Started",
 				roundStartedCallback,
 			);
-			actions.registerHandler<FieldUpdateRes>(
-				"game",
-				"Broadcast: Rockfall-Card-use",
-				fieldUpdate,
-			);
-			actions.registerHandler<FieldUpdateOneRes>(
-				"game",
-				"Broadcast: Map-Card-use",
-				fieldUpdateOne,
-			);
-			actions.registerHandler<PlayerUpdateOneRes>(
-				"game",
-				"Broadcast: Broken-Card-use",
-				playerUpdateOne,
-			);
-			actions.registerHandler<PlayerUpdateOneRes>(
-				"game",
-				"Broadcast: Repair-Card-use",
-				playerUpdateOne,
-			);
 			actions.registerHandler<FieldUpdateOneRes>(
 				"game",
 				"Field-Changed",
@@ -195,6 +150,11 @@ const useGame = () => {
 				"Turn-Changed",
 				turnUpdate,
 			);
+			actions.registerHandler<GetPlayerInfoRes>(
+				"game",
+				"Player-Info",
+				myInfoUpdate,
+			)
 			actions.registerHandler<PlayerInfoChanged>(
 				"game",
 				"Player-Info-Changed",
@@ -216,28 +176,9 @@ const useGame = () => {
 
 	const deinit = () => {
 		actions.unregisterHandler("game", "Round-Started", roundStartedCallback);
-		actions.unregisterHandler(
-			"game",
-			"Broadcast: Rockfall-Card-use",
-			fieldUpdate,
-		);
-		actions.unregisterHandler(
-			"game",
-			"Broadcast: Map-Card-use",
-			fieldUpdateOne,
-		);
-		actions.unregisterHandler(
-			"game",
-			"Broadcast: Broken-Card-use",
-			playerUpdateOne,
-		);
-		actions.unregisterHandler(
-			"game",
-			"Broadcast: Repair-Card-use",
-			playerUpdateOne,
-		);
 		actions.unregisterHandler("game", "Field-Changed", fieldUpdateOne);
 		actions.unregisterHandler("game", "Turn-Changed", turnUpdate);
+		actions.unregisterHandler("game", "Player-Info", myInfoUpdate);
 		actions.unregisterHandler("game", "Player-Info-Changed", playerInfoUpdate);
 		actions.unregisterHandler("game", "Changed-Public-Player-Info", playerInfoUpdate);
 		actions.unregisterHandler("game", "Round-Finished", checkRoundFinished);
@@ -263,21 +204,12 @@ const useGame = () => {
 				);
 				setGameData(result.payload);
 
-				const myInfoResult = await sendAndWaitForResponse<
-					GetPlayerInfoReq,
-					GetPlayerInfoRes
-				>(
-					"game",
-					{
-						type: "get-player-info",
-						payload: {
-							gameId,
-						},
+				actions.send("game", {
+					type: "get-player-info",
+					payload: {
+						gameId,
 					},
-					"Player-Info",
-					() => true,
-				);
-				setMyInfo(myInfoResult.payload);
+				} as GetPlayerInfoReq);
 				return result.payload;
 			} catch (e) {
 				console.log(e);
@@ -532,21 +464,14 @@ const useGame = () => {
 				"use-broken-card",
 				{ gameId: number; cardId: number; targetPlayerId: number }
 			>;
-			type res = Payload<"Unicast: Broken-Card-Use", { playerhand: [] }>;
-			const result = await sendAndWaitForResponse<req, res>(
-				"game",
-				{
-					type: "use-broken-card",
-					payload: {
-						gameId,
-						cardId,
-						targetPlayerId,
-					},
+			actions.send("game", {
+				type: "use-broken-card",
+				payload: {
+					gameId,
+					cardId,
+					targetPlayerId,
 				},
-				"Unicast: Broken-Card-Use",
-				() => true,
-			);
-			setMyInfo((prev) => update(prev, { hand: { $set: result.payload.playerhand } }));
+			} as req);
 		} catch (e) {
 			console.log(e);
 		}
