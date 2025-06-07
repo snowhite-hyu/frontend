@@ -15,6 +15,7 @@ const RoomListPage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const { list } = useRoom();
 	const token = useSessionToken();
+	const setIsMaster = useRoomInfoStore((state) => state.setIsMaster);
 
 	const [rooms, setRooms] = useState<RoomItem[]>([]);
 
@@ -44,6 +45,7 @@ const RoomListPage: React.FC = () => {
 			roomSocket.onJoinedRoom((payload) => {
 				useRoomInfoStore.getState().setRoom(payload);
 				navigate("/waiting");
+				setIsMaster(false);
 			});
 
 			roomSocket.joinRoom({ roomId });

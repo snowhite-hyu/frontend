@@ -19,6 +19,7 @@ const CreateRoomPage: React.FC = () => {
 	});
 	// const { register } = useLogin();
 	const { connect } = useRoomSocketStore();
+	const setIsMaster = useRoomInfoStore((state) => state.setIsMaster);
 	const navigate = useNavigate();
 	const token = useSessionToken();
 
@@ -50,6 +51,7 @@ const CreateRoomPage: React.FC = () => {
 			roomSocket.onCreateRoom((payload) => {
 				useRoomInfoStore.getState().setRoom(payload);
 				navigate("/waiting");
+				setIsMaster(true);
 			});
 		}
 	};
