@@ -16,7 +16,7 @@ export const DroppableCell: React.FC<DroppableCellProps> = ({
 	return (
 		<div
 			ref={setNodeRef}
-			className={`w-full h-full ${isOver ? "bg-[#ccf3ff]" : "bg-white/20"}`}
+			className={`w-fit h-fit ${isOver ? "bg-[#ccf3ff]" : "bg-white/20"}`}
 		>
 			{children}
 		</div>
