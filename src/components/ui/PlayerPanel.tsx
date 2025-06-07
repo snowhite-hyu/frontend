@@ -46,14 +46,16 @@ const PlayerPanel: React.FC<PlayerPanelProps> = ({
 				<div className="flex gap-1.5 items-center [&>img]:w-auto [&>img]:h-8">
 					<img
 						src={
-							!player.state.includes("BROKEN_LATERN")
+							!player.state.includes("BROKEN_LANTERN")
 								? lanternIconA
 								: lanternIconB
 						}
 					/>
 					<img
 						src={
-							!player.state.includes("BROKEN_MINECART") ? cartIconA : cartIconB
+							!player.state.includes("BROKEN_MINECART")
+								? cartIconA
+								: cartIconB
 						}
 					/>
 					<img

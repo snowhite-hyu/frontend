@@ -5,7 +5,7 @@ interface RouteCardProps {
 	isHidden: boolean;
 	assetId: number;
 	isDraggable?: boolean;
-	isFlipped?: boolean;
+	flip?: number;
 }
 
 const RouteMap: Record<string, string> = {
@@ -57,7 +57,7 @@ const RouteCard: React.FC<RouteCardProps> = ({
 	isHidden,
 	assetId,
 	isDraggable = true,
-	isFlipped = false,
+	flip = 0,
 }) => {
 	if (isHidden) {
 		assetId = 0;
@@ -69,7 +69,8 @@ const RouteCard: React.FC<RouteCardProps> = ({
     transition-transform
     duration-500
     [transform-style:preserve-3d]
-    ${isFlipped ? '[transform:rotateX(180deg)]' : ''}
+    ${flip === 1 ? '[transform:rotateX(180deg)]' : ''}
+    ${flip === 2 ? '[transform:rotateY(180deg)]' : ''}
   `;
 
 	return <div className={containerClass.trim()}>

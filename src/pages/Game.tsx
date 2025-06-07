@@ -24,6 +24,7 @@ import useGame from "@/hooks/useGame";
 import GameMap from "@/components/game/Map";
 import GoalCard from "@/components/asset/GoalCard";
 import { DroppableCell } from "@/components/game/DroppableCell";
+import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
 
 const PLAYER_PREFIX = "player:";
 const MAP_PREFIX = "map:";
@@ -72,7 +73,7 @@ const GamePage: React.FC = () => {
 		return [leftPlayers, rightPlayers];
 	}, [game?.players]);
 
-	const [isFlipped, setIsFlipped] = useState<boolean>(false);
+	const [flip, setFlip] = useState<number>(0);
 	const flipIterval = useRef<NodeJS.Timeout>(null);
 	const [activeItem, setActiveItem] = useState<string | null>(null);
 	const activeOverlay = useMemo(() => {
@@ -86,7 +87,7 @@ const GamePage: React.FC = () => {
 							assetId={assetId}
 							isDraggable={false}
 							isHidden={false}
-							isFlipped={isFlipped}
+							flip={flip}
 						/>
 					);
 				} else if (100 < assetId && assetId < 120) {
@@ -97,16 +98,16 @@ const GamePage: React.FC = () => {
 			}
 		}
 		return <></>;
-	}, [activeItem, isFlipped]);
+	}, [activeItem, flip]);
 	const dragStart = (e: DragStartEvent) => {
 		const activeId = e.active.id.toString();
 		toast(`Drag start from ${activeId}`);
 		setActiveItem(activeId);
-		setIsFlipped(false);
+		setFlip(0);
 		if (activeId.startsWith(CARD_PREFIX) && flipIterval.current === null) {
 			flipIterval.current = setInterval(() => {
-				setIsFlipped((prev) => !prev);
-			}, 2000);
+				setFlip((prev) => (prev + 1) % 3);
+			}, 500);
 		}
 	};
 	const dragEnd = (e: DragEndEvent) => {
@@ -132,7 +133,7 @@ const GamePage: React.FC = () => {
 
 			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
 			if (0 < cardId && cardId < 60) {
-				usePathCard(cardId, row, col, isFlipped ? 1 : 0);
+				usePathCard(cardId, row, col, flip);
 			} else if (cardId === 107) {
 				useRockfallCard(cardId, row, col);
 			}
@@ -181,41 +182,7 @@ const GamePage: React.FC = () => {
 				</div>
 				{/* 맵 */}
 				<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-					<GameMap
-						height={game?.field.length ?? 7}
-						width={game?.field[0].length ?? 7}
-						renderCell={(row, col) => {
-							const field = game?.field[row][col];
-							const id = `${MAP_PREFIX}${row}:${col}`;
-
-							if (field) {
-								if (field[0] == -1) {
-									return <DroppableCell id={id}>{id}</DroppableCell>;
-								} else if (0 < field[0] && field[0] < 60) {
-									return (
-										<DroppableCell id={id}>
-											{
-												<RouteCard
-													id={`disp-${id}`}
-													assetId={field[0]}
-													isHidden={false}
-													isDraggable={false}
-													isFlipped={field[1] === 1}
-												/>
-											}
-										</DroppableCell>
-									);
-								} else if (60 < field[0] && field[0] < 70) {
-									return (
-										<GoalCard id={id} assetId={field[0]} isHidden={true} isDraggable={false} />
-									);
-								} else {
-									return <Card id="start-card" assetName="card/start" isDraggable={false} />;
-								}
-							}
-							return <div className="w-full h-full">{id}</div>;
-						}}
-					/>
+					{game && <MapGrid field={game?.field} />}
 				</div>
 				{/* 카드 덱 */}
 				<div className="absolute flex bottom-0 left-1/2 -translate-x-1/2 items-end gap-4">
@@ -271,3 +238,32 @@ const GamePage: React.FC = () => {
 };
 
 export default GamePage;
+
+const MapGrid: React.FC<({ field: [number, number][][] })> = ({ field }) => {
+	return (
+		<GameMap height={field.length} width={field[0].length}
+			renderCell={(row, col) => {
+				const cell = field[row][col];
+				const id = `${MAP_PREFIX}${row}:${col}`;
+				if (!cell) return <div key={id}>{id}</div>;
+
+				if (cell[0] === -1) return <DroppableCell id={id} key={id}>{id}</DroppableCell>;
+				if (0 < cell[0] && cell[0] < 60)
+					return (
+						<DroppableCell id={id} key={id}>
+							<RouteCard
+								id={`disp-${id}`}
+								assetId={cell[0]}
+								isHidden={false}
+								isDraggable={false}
+								flip={cell[1]}
+							/>
+						</DroppableCell>
+					);
+				if (60 < cell[0] && cell[0] < 70)
+					return <GoalCard id={id} assetId={cell[0]} isHidden={true} isDraggable={false} key={id} />;
+				return <Card id="start-card" assetName="card/start" isDraggable={false} key={id} />;
+			}}
+		/>
+	);
+}

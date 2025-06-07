@@ -7,20 +7,32 @@ interface GameState {
 	myInfo: PlayerData | null;
 	roundReview?: RoundFinishedRes["payload"] | null;
 	actions: {
-		setGameData: (value: GameState["data"]) => void;
-		setMyInfo: (value: GameState["myInfo"]) => void;
+		setGameData: (value: GameState["data"] | ((value: GameState["data"]) => GameState["data"])) => void;
+		setMyInfo: (value: GameState["myInfo"] | ((value: GameState["myInfo"]) => GameState["myInfo"])) => void;
 		setRoundReview: (value: GameState["roundReview"]) => void;
 	};
 }
 
-const GameStore = create<GameState>((set) => ({
+export const GameStore = create<GameState>((set) => ({
 	socket: null,
 	data: null,
 	myInfo: null,
 	roundReview: null,
 	actions: {
-		setGameData: (value) => set({ data: value }),
-		setMyInfo: (value) => set({ myInfo: value }),
+		setGameData: (value) => {
+			if (value instanceof Function) {
+				set((prev) => ({ data: value(prev.data) }));
+			} else {
+				set({ data: value });
+			}
+		},
+		setMyInfo: (value) => {
+			if (value instanceof Function) {
+				set((prev) => ({ myInfo: value(prev.myInfo) }));
+			} else {
+				set({ myInfo: value })
+			}
+		},
 		setRoundReview: (value) => set({ roundReview: value }),
 	},
 }));
