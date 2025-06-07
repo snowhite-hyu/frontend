@@ -26,4 +26,4 @@ export interface RoomItem {
 
 export type ListResponse = {
 	roomList: RoomItem[];
-}
+};

@@ -16,25 +16,24 @@ const WaitingPage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const socket = useRoomSocketStore.getState().socket;
 	const updateUsers = useRoomInfoStore.getState().updateUsers;
-	
+
 	useEffect(() => {
 		setImage(roomBackground);
 		setUseLayout(false);
-		
+
 		if (!socket) return;
-		
+
 		const handleMessage = (users: any) => {
 			updateUsers(users);
 		};
 
 		socket.onRoomusers(handleMessage);
 		return () => socket.offRoomusers(handleMessage);
-
 	}, [setImage, setUseLayout]);
 
 	const options: { key: string; title: string; setting: string }[] = [
-		{ key: "people", title: "최대 인원", setting: room.capacity+"명" },
-		{ key: "time", title: "턴 시간 제한", setting: room.turnTime+"초" },
+		{ key: "people", title: "최대 인원", setting: room.capacity + "명" },
+		{ key: "time", title: "턴 시간 제한", setting: room.turnTime + "초" },
 	];
 
 	const [currentPage, setCurrentPage] = useState(0);
@@ -45,10 +44,10 @@ const WaitingPage: React.FC = () => {
 	const start = currentPage * membersPerPage;
 	const currentMembers = room.users.slice(start, start + membersPerPage);
 
-	const handleQuitRoom = ( roomId:number ) => {
+	const handleQuitRoom = (roomId: number) => {
 		const roomSocket = useRoomSocketStore.getState().socket;
 		if (roomSocket) {
-			roomSocket.quitRoom({roomId});
+			roomSocket.quitRoom({ roomId });
 		}
 	};
 
@@ -113,11 +112,14 @@ const WaitingPage: React.FC = () => {
 				</div>
 				{/* 나가기 & 시작 버튼 */}
 				<div className="gap-[50px]">
-					<Button 
-						key="exit" 
+					<Button
+						key="exit"
 						variant="exit"
-						className="h-fit mr-[50px]" 
-						onClick={() => { handleQuitRoom(room.roomId); navigate("/room");  }}
+						className="h-fit mr-[50px]"
+						onClick={() => {
+							handleQuitRoom(room.roomId);
+							navigate("/room");
+						}}
 					>
 						나가기
 					</Button>
