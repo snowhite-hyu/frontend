@@ -13,9 +13,7 @@ interface RoundEndDialogProps {
 	roundReview: RoundFinishedRes["payload"];
 }
 
-const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
-	roundReview
-}) => {
+const RoundEndDialog: React.FC<RoundEndDialogProps> = ({ roundReview }) => {
 	const [dialogStep, setDialogStep] = useState(1);
 
 	useEffect(() => {
@@ -37,7 +35,7 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [dialogStep]);
 
-	const saboteurs = roundReview.players.filter((p) => p.role === "SABOTEUR")
+	const saboteurs = roundReview.players.filter((p) => p.role === "SABOTEUR");
 	const miners = roundReview.players.filter((p) => p.role === "DWARF");
 	const winners = roundReview.winnerRole === "SABOTEUR" ? saboteurs : miners;
 
@@ -71,13 +69,25 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 					</div>
 				</div>
 				<div className="flex gap-5">
-					<Button variant={"saboteurCheck"} size={"sm"} onClick={() => setDialogStep(0)}>결과 건너뛰기</Button>
-					<Button variant={"saboteurCheck"} size={"sm"} onClick={() => setDialogStep(2)}> 다음</Button>
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => setDialogStep(0)}
+					>
+						결과 건너뛰기
+					</Button>
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => setDialogStep(2)}
+					>
+						{" "}
+						다음
+					</Button>
 				</div>
-			</Dialog >
+			</Dialog>
 			{/* Step 2: 승자 발표 및 금 배분 */}
-			< Dialog isOpen={dialogStep === 2
-			} setIsOpen={() => setDialogStep(0)}>
+			<Dialog isOpen={dialogStep === 2} setIsOpen={() => setDialogStep(0)}>
 				<Text className="text-9xl text-yellow-600">Dividing Gold ...</Text>
 				<div className="flex flex-col mt-5">
 					<img src={GoldCard}></img>
@@ -85,10 +95,17 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 						승자는{" "}
 						<span
 							className={
-								roundReview.winnerRole === "DWARF" ? "text-yellow-600" : "text-red-600"
+								roundReview.winnerRole === "DWARF"
+									? "text-yellow-600"
+									: "text-red-600"
 							}
 						>
-							{winners.map((winner) => <><p>{winner.playerName}</p><br /></>)}
+							{winners.map((winner) => (
+								<>
+									<p>{winner.playerName}</p>
+									<br />
+								</>
+							))}
 						</span>
 						입니다!
 					</p>
@@ -97,10 +114,23 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 					</p>
 				</div>
 				<div className="flex gap-5">
-					<Button variant={"saboteurCheck"} size={"sm"} onClick={() => setDialogStep(1)}>뒤로가기</Button>
-					<Button variant={"saboteurCheck"} size={"sm"} onClick={() => setDialogStep(0)}> 게임으로 돌아가기</Button>
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => setDialogStep(1)}
+					>
+						뒤로가기
+					</Button>
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => setDialogStep(0)}
+					>
+						{" "}
+						게임으로 돌아가기
+					</Button>
 				</div>
-			</Dialog >
+			</Dialog>
 		</>
 	);
 };

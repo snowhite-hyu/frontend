@@ -48,7 +48,7 @@ const WaitingPage: React.FC = () => {
 	const totalPages = Math.ceil(room.users.length / membersPerPage);
 	const currentMembers = useMemo(() => {
 		const start = currentPage * membersPerPage;
-		return room.users.slice(start, start + membersPerPage)
+		return room.users.slice(start, start + membersPerPage);
 	}, [room.users]);
 
 	const handleQuitRoom = (roomId: number) => {
@@ -69,7 +69,7 @@ const WaitingPage: React.FC = () => {
 			}
 			init();
 		}
-	}
+	};
 
 	return (
 		<div className="overflow-hidden">
@@ -114,8 +114,9 @@ const WaitingPage: React.FC = () => {
 								type="button"
 								key={`page-${i}`}
 								onClick={() => setCurrentPage(i)}
-								className={`w-2 h-2 rounded-full ${i === currentPage ? "bg-black" : "bg-gray-200"
-									}`}
+								className={`w-2 h-2 rounded-full ${
+									i === currentPage ? "bg-black" : "bg-gray-200"
+								}`}
 							/>
 						))}
 					</div>

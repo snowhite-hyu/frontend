@@ -16,7 +16,10 @@ export const useRoomInfoStore = create<RoomInfoState>((set) => ({
 	isMaster: false,
 	gameId: null,
 	setRoom: (room) => set({ room }),
-	updateUsers: (users) => set((state) => state.room ? update(state, { room: { users: { $set: users } } }) : state),
+	updateUsers: (users) =>
+		set((state) =>
+			state.room ? update(state, { room: { users: { $set: users } } }) : state,
+		),
 	clearRoom: () => set({ room: null }),
 	setIsMaster: (value) => set({ isMaster: value }),
 }));

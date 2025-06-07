@@ -14,7 +14,11 @@ import {
 	DragOverlay,
 	DragStartEvent,
 } from "@dnd-kit/core";
-import { useGameData, useGameMyInfo, useGameRoundReview } from "@/stores/game/GameStore";
+import {
+	useGameData,
+	useGameMyInfo,
+	useGameRoundReview,
+} from "@/stores/game/GameStore";
 import { OpenPlayerState } from "@/models/game/Game";
 import Card from "@/components/asset/Card";
 import RouteCard from "@/components/asset/RouteCard";
@@ -157,9 +161,15 @@ const GamePage: React.FC = () => {
 			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
 			if (100 < cardId && cardId <= 104) {
 				switch (cardId) {
-					case 101: useRepairCard(cardId, playerId, "BROKEN_PICKAXE"); break;
-					case 102: useRepairCard(cardId, playerId, "BROKEN_LANTERN"); break;
-					case 103: useRepairCard(cardId, playerId, "BROKEN_MINECART"); break;
+					case 101:
+						useRepairCard(cardId, playerId, "BROKEN_PICKAXE");
+						break;
+					case 102:
+						useRepairCard(cardId, playerId, "BROKEN_LANTERN");
+						break;
+					case 103:
+						useRepairCard(cardId, playerId, "BROKEN_MINECART");
+						break;
 				}
 			} else if (109 <= cardId && cardId <= 111) {
 				useBrokenCard(cardId, playerId);
@@ -174,7 +184,7 @@ const GamePage: React.FC = () => {
 		}
 
 		return <></>;
-	}, [roundReview])
+	}, [roundReview]);
 
 	return (
 		<div className="relative h-screen">
@@ -225,9 +235,15 @@ const GamePage: React.FC = () => {
 								key={id}
 								className="group flex flex-col justify-between items-center shrink-0 w-[72px]"
 							>
-								{id === 0 && <Card id={`card:${id}:${index}`} assetName="card/start" />}
+								{id === 0 && (
+									<Card id={`card:${id}:${index}`} assetName="card/start" />
+								)}
 								{id > 0 && id < 40 && (
-									<RouteCard id={`card:${id}:${index}`} isHidden={false} assetId={id} />
+									<RouteCard
+										id={`card:${id}:${index}`}
+										isHidden={false}
+										assetId={id}
+									/>
 								)}
 								{id > 100 && id < 120 && (
 									<ActionCard id={`card:${id}:${index}`} assetId={id} />
@@ -268,15 +284,22 @@ const GamePage: React.FC = () => {
 
 export default GamePage;
 
-const MapGrid: React.FC<({ field: [number, number][][] })> = ({ field }) => {
+const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 	return (
-		<GameMap height={field.length} width={field[0].length}
+		<GameMap
+			height={field.length}
+			width={field[0].length}
 			renderCell={(row, col) => {
 				const cell = field[row][col];
 				const id = `${MAP_PREFIX}${row}:${col}`;
 				if (!cell) return <div key={id}>{id}</div>;
 
-				if (cell[0] === -1) return <DroppableCell id={id} key={id}>{id}</DroppableCell>;
+				if (cell[0] === -1)
+					return (
+						<DroppableCell id={id} key={id}>
+							{id}
+						</DroppableCell>
+					);
 				if (0 < cell[0] && cell[0] < 60)
 					return (
 						<DroppableCell id={id} key={id}>
@@ -290,11 +313,26 @@ const MapGrid: React.FC<({ field: [number, number][][] })> = ({ field }) => {
 						</DroppableCell>
 					);
 				if (60 < cell[0] && cell[0] < 70)
-					return <DroppableCell id={id} key={id}>
-						<GoalCard id={`${GOAL_PREFIX}:${row}:${col}`} assetId={cell[0]} isHidden={true} isDraggable={false} key={id} />
-					</DroppableCell>;
-				return <Card id="start-card" assetName="card/start" isDraggable={false} key={id} />;
+					return (
+						<DroppableCell id={id} key={id}>
+							<GoalCard
+								id={`${GOAL_PREFIX}:${row}:${col}`}
+								assetId={cell[0]}
+								isHidden={true}
+								isDraggable={false}
+								key={id}
+							/>
+						</DroppableCell>
+					);
+				return (
+					<Card
+						id="start-card"
+						assetName="card/start"
+						isDraggable={false}
+						key={id}
+					/>
+				);
 			}}
 		/>
 	);
-}
+};

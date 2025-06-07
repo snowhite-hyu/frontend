@@ -69,13 +69,15 @@ const RouteCard: React.FC<RouteCardProps> = ({
     transition-transform
     duration-500
     [transform-style:preserve-3d]
-    ${flip === 1 ? '[transform:rotateX(180deg)]' : ''}
-    ${flip === 2 ? '[transform:rotateY(180deg)]' : ''}
+    ${flip === 1 ? "[transform:rotateX(180deg)]" : ""}
+    ${flip === 2 ? "[transform:rotateY(180deg)]" : ""}
   `;
 
-	return <div className={containerClass.trim()}>
-		<Card id={id} assetName={imgName} isDraggable={isDraggable} />
-	</div>;
+	return (
+		<div className={containerClass.trim()}>
+			<Card id={id} assetName={imgName} isDraggable={isDraggable} />
+		</div>
+	);
 };
 
 export default RouteCard;

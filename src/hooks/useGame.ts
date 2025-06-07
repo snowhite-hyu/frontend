@@ -71,7 +71,7 @@ const useGame = () => {
 			"Game-Joined",
 			() => true,
 		);
-	}
+	};
 
 	const roundStartedCallback = (msg: RoundStartRes) => {
 		setGameData(msg.payload.game);
@@ -87,11 +87,11 @@ const useGame = () => {
 				const newField: [number, number][][] = prev.field.map((rowArr, r) =>
 					r === msg.payload.row
 						? rowArr.map((cell, c) =>
-							c === msg.payload.column
-								? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
-								: cell
-						)
-						: rowArr
+								c === msg.payload.column
+									? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
+									: cell,
+							)
+						: rowArr,
 				);
 				return { ...prev, field: newField };
 			}
@@ -101,10 +101,9 @@ const useGame = () => {
 	};
 	const myInfoUpdate = (msg: GetPlayerInfoRes) => {
 		setMyInfo(msg.payload);
-	}
+	};
 	type PlayerInfoChanged = Payload<string, OpenPlayerState>;
 	const playerInfoUpdate = (msg: PlayerInfoChanged) => {
-
 		setGameData((prev) => {
 			const targetIdx = prev?.players.findIndex(
 				(player) => player.playerId === msg.payload.playerId,
@@ -113,7 +112,7 @@ const useGame = () => {
 				return update(prev, {
 					players: { [targetIdx]: { $set: msg.payload } },
 				});
-			};
+			}
 			return prev;
 		});
 	};
@@ -131,7 +130,7 @@ const useGame = () => {
 	};
 	const checkRoundFinished = (msg: RoundFinishedRes) => {
 		setRoundReview(msg.payload);
-	}
+	};
 
 	const init = async () => {
 		if (gameId) {
@@ -154,7 +153,7 @@ const useGame = () => {
 				"game",
 				"Player-Info",
 				myInfoUpdate,
-			)
+			);
 			actions.registerHandler<PlayerInfoChanged>(
 				"game",
 				"Player-Info-Changed",
@@ -180,7 +179,11 @@ const useGame = () => {
 		actions.unregisterHandler("game", "Turn-Changed", turnUpdate);
 		actions.unregisterHandler("game", "Player-Info", myInfoUpdate);
 		actions.unregisterHandler("game", "Player-Info-Changed", playerInfoUpdate);
-		actions.unregisterHandler("game", "Changed-Public-Player-Info", playerInfoUpdate);
+		actions.unregisterHandler(
+			"game",
+			"Changed-Public-Player-Info",
+			playerInfoUpdate,
+		);
 		actions.unregisterHandler("game", "Round-Finished", checkRoundFinished);
 		setGameData(null);
 	};
@@ -229,7 +232,7 @@ const useGame = () => {
 		return true;
 	};
 
-	const getMyCards = () => { };
+	const getMyCards = () => {};
 
 	const drawNewCard = async () => {
 		if (!gameId) return;
@@ -273,7 +276,9 @@ const useGame = () => {
 				"Card-Dropped",
 				() => true,
 			);
-			setMyInfo((prev) => update(prev, { hand: { $set: result.payload.hand } }));
+			setMyInfo((prev) =>
+				update(prev, { hand: { $set: result.payload.hand } }),
+			);
 		} catch (e) {
 			console.log(e);
 		}
@@ -375,7 +380,9 @@ const useGame = () => {
 				"Unicast: Rockfall-Card-Use",
 				() => true,
 			);
-			setGameData((prev) => update(prev, { field: { $set: result.payload.field } }));
+			setGameData((prev) =>
+				update(prev, { field: { $set: result.payload.field } }),
+			);
 		} catch (e) {
 			console.log(e);
 		}
@@ -408,7 +415,9 @@ const useGame = () => {
 				"Unicast: Map-Card-Use",
 				() => true,
 			);
-			setMyInfo((prev) => update(prev, { hand: { $set: result.payload.playerhand } }));
+			setMyInfo((prev) =>
+				update(prev, { hand: { $set: result.payload.playerhand } }),
+			);
 			return result.payload.destCardID;
 		} catch (e) {
 			console.log(e);
@@ -449,7 +458,9 @@ const useGame = () => {
 				"Unicast: Repair-Card-Use",
 				() => true,
 			);
-			setMyInfo((prev) => update(prev, { hand: { $set: result.payload.playerHand } }));
+			setMyInfo((prev) =>
+				update(prev, { hand: { $set: result.payload.playerHand } }),
+			);
 		} catch (e) {
 			console.log(e);
 		}

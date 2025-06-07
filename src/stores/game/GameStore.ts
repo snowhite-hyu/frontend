@@ -7,8 +7,16 @@ interface GameState {
 	myInfo: PlayerData | null;
 	roundReview?: RoundFinishedRes["payload"] | null;
 	actions: {
-		setGameData: (value: GameState["data"] | ((value: GameState["data"]) => GameState["data"])) => void;
-		setMyInfo: (value: GameState["myInfo"] | ((value: GameState["myInfo"]) => GameState["myInfo"])) => void;
+		setGameData: (
+			value:
+				| GameState["data"]
+				| ((value: GameState["data"]) => GameState["data"]),
+		) => void;
+		setMyInfo: (
+			value:
+				| GameState["myInfo"]
+				| ((value: GameState["myInfo"]) => GameState["myInfo"]),
+		) => void;
 		setRoundReview: (value: GameState["roundReview"]) => void;
 	};
 }
@@ -30,7 +38,7 @@ export const GameStore = create<GameState>((set) => ({
 			if (value instanceof Function) {
 				set((prev) => ({ myInfo: value(prev.myInfo) }));
 			} else {
-				set({ myInfo: value })
+				set({ myInfo: value });
 			}
 		},
 		setRoundReview: (value) => set({ roundReview: value }),
