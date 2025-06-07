@@ -15,15 +15,15 @@ export interface CreateRoomResponse {
 }
 
 export interface RoomItem {
-	roomName: string;
 	roomId: number;
-	masterPlayer: RoomUserModel;
-	users: RoomUserModel[];
+	roomName: string;
+	masterPlayer: WsRoomUserModel;
+	users: WsRoomUserModel[];
 	capacity: number;
 	turnTime: number;
-	isPlaying: boolean;
+	playing: boolean;
 }
 
 export type ListResponse = {
 	roomList: RoomItem[];
-};
+}

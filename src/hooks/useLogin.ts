@@ -23,6 +23,7 @@ const useLogin = () => {
 
 		if (response.isSuccess) {
 			sessionActions.setToken(response.result.token);
+			navigate("/room");
 			return true;
 		}
 

@@ -10,3 +10,8 @@ export interface RoomUserModel {
 	createdAt: string;
 	updatedAt: string;
 }
+
+export interface WsRoomUserModel {
+	id: number;
+	username: string;
+}

@@ -1,26 +1,53 @@
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import useRoom from "@/hooks/useRoom";
 // import useLogin from "@/hooks/useLogin";
 import type { CreateRoomRequest } from "@/models/common/Room";
 import update from "immutability-helper";
 import type React from "react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useState, useEffect } from "react";
+import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { useNavigate } from "react-router-dom";
+import { useSessionToken } from "@/stores/common/SessionStore";
 
 const CreateRoomPage: React.FC = () => {
-	const { create } = useRoom();
-
 	const [form, setForm] = useState<CreateRoomRequest>({
 		roomName: "",
 		maxPlayers: 3,
 		turnTimeLimit: 15,
 	});
 	// const { register } = useLogin();
+	const { connect } = useRoomSocketStore();
+	const navigate = useNavigate();
+	const token = useSessionToken();
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		// register(form);
+	};
+
+	useEffect(() => {
+		if (!token) {
+			alert("로그인이 필요합니다.");
+			return;
+		}
+		connect(token);
+	}, []);
+
+	const handleCreateRoom = (roomName: string, capacity: number, turnTime: number) => {
+		const roomSocket = useRoomSocketStore.getState().socket;
+
+		if (roomSocket) {
+			console.log("createRoom 진입");
+			console.log(token);
+			roomSocket.createRoom({ roomName, capacity, turnTime });
+
+			roomSocket.onCreateRoom((payload) => {
+				useRoomInfoStore.getState().setRoom(payload);
+				navigate("/waiting");
+			});
+		}
 	};
 
 	return (
@@ -59,14 +86,7 @@ const CreateRoomPage: React.FC = () => {
 					className="min-w-[147px]"
 					optionSuffix="초"
 				/>
-				<Button
-					variant={"sabotuer"}
-					className="w-fit h-fit"
-					type="button"
-					onClick={async () => {
-						await create(form.roomName, form.maxPlayers, form.turnTimeLimit);
-					}}
-				>
+				<Button variant={"sabotuer"} className="w-fit h-fit" type="submit" onClick={() => handleCreateRoom(form.roomName, form.maxPlayers, form.turnTimeLimit)}>
 					Create
 				</Button>
 			</form>
