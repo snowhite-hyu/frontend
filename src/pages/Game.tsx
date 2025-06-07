@@ -24,12 +24,13 @@ import useGame from "@/hooks/useGame";
 import GameMap from "@/components/game/Map";
 import GoalCard from "@/components/asset/GoalCard";
 import { DroppableCell } from "@/components/game/DroppableCell";
-import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
 import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
+import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
 
 const PLAYER_PREFIX = "player:";
 const MAP_PREFIX = "map:";
 const CARD_PREFIX = "card:";
+const GOAL_PREFIX = "card:";
 const TRASHBIN = "trashbin";
 
 const GamePage: React.FC = () => {
@@ -39,9 +40,7 @@ const GamePage: React.FC = () => {
 	const myInfo = useGameMyInfo();
 
 	const {
-		init,
 		deinit,
-		getMyCards,
 		dropMyCard,
 		usePathCard,
 		useBrokenCard,
@@ -140,12 +139,29 @@ const GamePage: React.FC = () => {
 				useRockfallCard(cardId, row, col);
 			}
 		} else if (
+			overId?.startsWith(GOAL_PREFIX) &&
+			activeId.startsWith(CARD_PREFIX)
+		) {
+			const goalcolrow = overId.split(":");
+			const row = Number.parseInt(goalcolrow[1]);
+			const col = Number.parseInt(goalcolrow[2]);
+			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
+			if ((row === 1 || row === 3 || row === 5) && col === 8) {
+				useMapCard(cardId, row, col);
+			}
+		} else if (
 			overId?.startsWith(PLAYER_PREFIX) &&
 			activeId.startsWith(CARD_PREFIX)
 		) {
 			const playerId = Number.parseInt(overId.slice(PLAYER_PREFIX.length));
 			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
-			if (109 <= cardId && cardId <= 111) {
+			if (100 < cardId && cardId <= 104) {
+				switch (cardId) {
+					case 101: useRepairCard(cardId, playerId, "BROKEN_PICKAXE"); break;
+					case 102: useRepairCard(cardId, playerId, "BROKEN_LANTERN"); break;
+					case 103: useRepairCard(cardId, playerId, "BROKEN_MINECART"); break;
+				}
+			} else if (109 <= cardId && cardId <= 111) {
 				useBrokenCard(cardId, playerId);
 			}
 		}
@@ -274,7 +290,9 @@ const MapGrid: React.FC<({ field: [number, number][][] })> = ({ field }) => {
 						</DroppableCell>
 					);
 				if (60 < cell[0] && cell[0] < 70)
-					return <GoalCard id={id} assetId={cell[0]} isHidden={true} isDraggable={false} key={id} />;
+					return <DroppableCell id={id} key={id}>
+						<GoalCard id={`${GOAL_PREFIX}:${row}:${col}`} assetId={cell[0]} isHidden={true} isDraggable={false} key={id} />
+					</DroppableCell>;
 				return <Card id="start-card" assetName="card/start" isDraggable={false} key={id} />;
 			}}
 		/>
