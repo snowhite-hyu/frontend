@@ -23,7 +23,6 @@ const useLogin = () => {
 
 		if (response.isSuccess) {
 			sessionActions.setToken(response.result.token);
-			navigate("/waiting");
 			return true;
 		}
 
@@ -47,7 +46,7 @@ const useLogin = () => {
 					password: request.password,
 				});
 				if (loginResult) {
-					navigate("/waiting");
+					navigate("/room");
 				} else {
 					navigate("/login");
 				}
@@ -76,9 +75,8 @@ const useLogin = () => {
 		if (response.isSuccess) {
 			toast(response.result.message);
 			return response.result.isExisting;
-		} else {
-			toast(response.message);
 		}
+		toast(response.message);
 
 		return false;
 	};
