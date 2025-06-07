@@ -318,7 +318,7 @@ const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 							<GoalCard
 								id={`${GOAL_PREFIX}:${row}:${col}`}
 								assetId={cell[0]}
-								isHidden={true}
+								isHidden={false}
 								isDraggable={false}
 								key={id}
 							/>
