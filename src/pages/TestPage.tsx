@@ -1,14 +1,14 @@
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import RouteCard from "@/components/asset/RouteCard";
 import GameMap from "@/components/game/Map";
+import { DroppableCell } from "@/components/game/DroppableCell";
 import {
 	DndContext,
 	type DragEndEvent,
 	type DragOverEvent,
 	type DragStartEvent,
-	useDroppable,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
 import {
@@ -153,22 +153,3 @@ const TestPage: React.FC = () => {
 };
 
 export default TestPage;
-
-interface DroppableCellProps {
-	id: string;
-	children: ReactNode;
-}
-
-const DroppableCell: React.FC<DroppableCellProps> = ({ id, children }) => {
-	const { setNodeRef, isOver } = useDroppable({
-		id,
-	});
-	return (
-		<div
-			ref={setNodeRef}
-			className={`w-full h-full ${isOver ? "bg-[#ccf3ff]" : "bg-white"}`}
-		>
-			{children}
-		</div>
-	);
-};

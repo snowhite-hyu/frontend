@@ -21,10 +21,10 @@ export const GameMap: React.FC<GameMapProps> = ({
 				<div
 					key={`${row}-${col}`}
 					style={{
-						width: 80,
-						height: 80,
+						width: 74,
+						height: 112,
 						border: "1px solid #bbb",
-						background: "#fff",
+						// background: "#fff",
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "center",
@@ -45,7 +45,7 @@ export const GameMap: React.FC<GameMapProps> = ({
 	return (
 		<div
 			style={{
-				background: "#eee",
+				// background: "#eee",
 				display: "inline-block",
 				...style,
 			}}
