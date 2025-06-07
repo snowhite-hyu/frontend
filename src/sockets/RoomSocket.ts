@@ -29,7 +29,7 @@ export class RoomSocket extends BaseSocket {
     }
   }
 
-  public createRoom(data: { capacity: number; turnTime: number }) {
+  public createRoom(data: { roomName: string; capacity: number; turnTime: number }) {
     this.send({ type: "create", payload: data });
   }
 

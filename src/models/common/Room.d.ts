@@ -16,11 +16,12 @@ export interface CreateRoomResponse {
 
 export interface RoomItem {
 	roomId: number;
-	masterPlayer: RoomUserModel;
+	roomName: string;
+	masterPlayer: WsRoomUserModel;
 	users: WsRoomUserModel[];
 	capacity: number;
 	turnTime: number;
-	isPlaying: boolean;
+	playing: boolean;
 }
 
 export type ListResponse = {

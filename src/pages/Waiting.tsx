@@ -58,7 +58,7 @@ const WaitingPage: React.FC = () => {
 			<div className="flex w-full h-full justify-between items-center mt-[50px] px-[3%]">
 				{/* 방 제목 */}
 				<div className="rounded-[21px] bg-[#0000004D] w-[50%] h-[110px] pl-[40px] pt-[27px] mr-[38px]">
-					<p className="font-semibold text-[43px]">{room.roomId}</p>
+					<p className="font-semibold text-[43px]">{room.roomName}</p>
 				</div>
 				{/* 옵션 설정 */}
 				<div className="flex justify-center items-center">
@@ -84,7 +84,7 @@ const WaitingPage: React.FC = () => {
 			<div className="w-full flex flex-col items-center mt-[40px]">
 				<div className="grid grid-cols-4 grid-rows-2 gap-10 w-[80%] h-[450px]">
 					{currentMembers.map((member) => (
-						<Profile key={member.id} nickname={member.id.toString()} />
+						<Profile key={member.id} nickname={member.username.toString()} />
 					))}
 				</div>
 				{/* 페이지 버튼 */}

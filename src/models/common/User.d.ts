@@ -14,5 +14,4 @@ export interface RoomUserModel {
 export interface WsRoomUserModel {
 	id: number;
 	username: string;
-	loggedIn: boolean;
 }

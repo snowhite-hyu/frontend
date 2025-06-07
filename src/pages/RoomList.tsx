@@ -67,7 +67,7 @@ const RoomListPage: React.FC = () => {
 								className="w-full flex flex-inline mb-[10px] items-center "
 							>
 								<p className="text-[#000000] text-[25px] ml-[0%] mr-auto max-w-[350px] overflow-hidden">
-									{room.roomId}
+									{room.roomName}
 								</p>
 								<Button
 									variant={"saboteurCheck"}
