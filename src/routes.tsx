@@ -1,18 +1,18 @@
+import CreateRoomPage from "@/pages/CreateRoom";
+import GamePage from "@/pages/Game";
 import LoginPage from "@/pages/Login";
 import MainPage from "@/pages/Main";
 import RegisterPage from "@/pages/Register";
-import WelcomPage from "@/pages/Welcome";
-import WaitingPage from "@/pages/Waiting";
-import CreateRoomPage from "@/pages/CreateRoom";
-import RoomListPage from "./pages/RoomList";
-import GamePage from "@/pages/Game";
 import TestDialog from "@/pages/TestDialog";
-import TestPage from "./pages/TestPage";
+import WaitingPage from "@/pages/Waiting";
+import WelcomPage from "@/pages/Welcome";
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import RoomListPage from "./pages/RoomList";
+import TestPage from "./pages/TestPage";
 import { useBackgroundActions } from "./stores/common/BackgroundStore";
 import { useSessionToken } from "./stores/common/SessionStore";
 
@@ -95,7 +95,7 @@ const Router: React.FC = () => {
 			<Route
 				key={"*"}
 				path={"*"}
-				element={<Navigate to={isLogined ? "/waiting" : "/main"} />}
+				element={<Navigate to={isLogined ? "/room" : "/main"} />}
 			/>
 		</Routes>
 	);

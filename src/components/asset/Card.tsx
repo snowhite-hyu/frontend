@@ -5,22 +5,17 @@ const IMAGES: Record<string, string> = import.meta.glob(
 	"/src/assets/**/*.png",
 	{ eager: true, import: "default" },
 );
+const IMAGE_MAP: Record<string, string> = {};
+Object.entries(IMAGES).forEach(([path, url]) => {
+	const file = path.split("/src/assets/")[1];
+	const m = file?.match(/^(.+?)\.png$/);
+	if (!m) return;
+	const key = m[1];
+	if (!IMAGE_MAP[key]) IMAGE_MAP[key] = "";
+	IMAGE_MAP[key] = url;
+});
 
-const getRandomImage: (assetName: string) => string | null = (assetName) => {
-	const candidates = Object.entries(IMAGES)
-		.filter(([path]) => {
-			const file = path.split("/src/assets/")[1]; // "card/routeTRBL1.png"
-			return (
-				file?.startsWith(assetName) &&
-				/^\d+\.png$/.test(file.slice(assetName.length))
-			);
-		})
-		.map(([, url]) => url);
-
-	if (candidates.length === 0) return null;
-
-	return candidates[Math.floor(Math.random() * candidates.length)];
-};
+console.log(IMAGE_MAP);
 
 export interface CardProps {
 	id?: string;
@@ -29,7 +24,7 @@ export interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ id, assetName, isDraggable = true }) => {
-	const imgSrc = getRandomImage(assetName);
+	const imgSrc = IMAGE_MAP[assetName];
 	const { attributes, listeners, setNodeRef, transform, isDragging } =
 		useSortable({
 			id: id || assetName,

@@ -1,0 +1,3 @@
+interface RoomState {
+	roomId: number;
+}
