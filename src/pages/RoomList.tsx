@@ -86,7 +86,7 @@ const RoomListPage: React.FC = () => {
 						variant={"saboteurCheck"}
 						className="w-fit h-fit bg-[#E0E0E0] text-[#B22222] font-extrabold"
 						type="submit"
-						onClick={() => window.location.reload()}
+						onClick={() => fetchRooms()}
 					>
 						새로고침
 					</Button>
