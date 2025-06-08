@@ -7,10 +7,10 @@ import { useEffect, useMemo, useState } from "react";
 import { RoundFinishedRes } from "@/models/game/Game";
 
 interface GameEndDialogProps {
-	roundReview: RoundFinishedRes["payload"];
+	roundReviews: RoundFinishedRes["payload"][];
 }
 
-const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReview }) => {
+const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReviews }) => {
 	const [dialogStep, setDialogStep] = useState(1);
 	const navigate = useNavigate();
 
@@ -33,16 +33,34 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReview }) => {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [dialogStep, navigate]);
 
-	const winners = useMemo(
-		() =>
-			roundReview.players.filter(
-				(player) => player.role === roundReview.winnerRole,
-			),
-		[roundReview],
-	);
-	const winnersGold: number = useMemo(() => {
-		return winners.reduce((prev, cur) => prev + cur.gainedGold, 0);
-	}, []);
+	const { winners, maxGold } = useMemo(() => {
+		const goldMap = new Map<number, { gold: number; playerName: string }>();
+		roundReviews.forEach((round) => {
+			round.players.forEach((player) => {
+				if (!goldMap.has(player.playerId)) {
+					goldMap.set(player.playerId, {
+						gold: 0,
+						playerName: player.playerName,
+					});
+				}
+				const entry = goldMap.get(player.playerId)!;
+				entry.gold += player.gainedGold;
+			});
+		});
+
+		let max = 0;
+		goldMap.forEach((v) => {
+			if (v.gold > max) max = v.gold;
+		});
+		const winnersArr = Array.from(goldMap)
+			.filter(([, v]) => v.gold === max)
+			.map(([playerId, v]) => ({
+				playerId,
+				playerName: v.playerName,
+				gold: v.gold,
+			}));
+		return { winners: winnersArr, maxGold: max };
+	}, [roundReviews]);
 
 	if (dialogStep === 0) return null;
 
@@ -65,7 +83,7 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReview }) => {
 						{winner.playerName}
 					</p>
 				))}
-				<p className="font-semibold text-3xl">총 금덩이 개수 {winnersGold}개</p>
+				<p className="font-semibold text-3xl">총 금덩이 개수 {maxGold}개</p>
 			</Dialog>
 			<Dialog
 				isOpen={dialogStep === 2}

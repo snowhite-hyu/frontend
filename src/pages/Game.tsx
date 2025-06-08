@@ -15,7 +15,7 @@ import {
 import {
 	useGameData,
 	useGameMyInfo,
-	useGameRoundReview,
+	useGameRoundReviews,
 } from "@/stores/game/GameStore";
 import { OpenPlayerState } from "@/models/game/Game";
 import Card from "@/components/asset/Card";
@@ -39,7 +39,7 @@ const TRASHBIN = "trashbin";
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const game = useGameData();
-	const roundReview = useGameRoundReview();
+	const roundReviews = useGameRoundReviews();
 	const myInfo = useGameMyInfo();
 
 	const {
@@ -66,7 +66,9 @@ const GamePage: React.FC = () => {
 	const [leftPlayers, rightPlayers] = useMemo(() => {
 		const left: OpenPlayerState[] = [];
 		const right: OpenPlayerState[] = [];
-		game?.players.forEach((player, idx) => (idx % 2 ? right : left).push(player));
+		game?.players.forEach((player, idx) =>
+			(idx % 2 ? right : left).push(player),
+		);
 		return [left, right];
 	}, [game?.players]);
 
@@ -81,11 +83,19 @@ const GamePage: React.FC = () => {
 			const assetId = Number.parseInt(activeItem.slice(CARD_PREFIX.length));
 			if (assetId > 0 && assetId < 60) {
 				return (
-					<RouteCard id="overlay" assetId={assetId} isDraggable={false} isHidden={false} flip={flip} />
+					<RouteCard
+						id="overlay"
+						assetId={assetId}
+						isDraggable={false}
+						isHidden={false}
+						flip={flip}
+					/>
 				);
 			}
 			if (assetId > 100 && assetId < 120) {
-				return <ActionCard id="overlay" assetId={assetId} isDraggable={false} />;
+				return (
+					<ActionCard id="overlay" assetId={assetId} isDraggable={false} />
+				);
 			}
 		}
 		return null;
@@ -99,7 +109,10 @@ const GamePage: React.FC = () => {
 		setFlip(0);
 
 		if (id.startsWith(CARD_PREFIX) && !flipInterval.current) {
-			flipInterval.current = setInterval(() => setFlip((f) => (f + 1) % 3), 500);
+			flipInterval.current = setInterval(
+				() => setFlip((f) => (f + 1) % 3),
+				500,
+			);
 		}
 	};
 
@@ -147,7 +160,10 @@ const GamePage: React.FC = () => {
 				const playerId = Number.parseInt(overId.slice(PLAYER_PREFIX.length));
 				if (cardId > 100 && cardId <= 104) {
 					// 수리 카드별 대상 부위 매핑
-					const states: Record<number, "BROKEN_PICKAXE" | "BROKEN_LANTERN" | "BROKEN_MINECART"> = {
+					const states: Record<
+						number,
+						"BROKEN_PICKAXE" | "BROKEN_LANTERN" | "BROKEN_MINECART"
+					> = {
 						101: "BROKEN_PICKAXE",
 						102: "BROKEN_LANTERN",
 						103: "BROKEN_MINECART",
@@ -164,20 +180,22 @@ const GamePage: React.FC = () => {
 	};
 
 	// 라운드 종료 시 다이얼로그 표시
-	const endModal = useMemo(
-		() => {
-			if (!roundReview || !game) return <></>;
-			switch (game.gameState) {
-				case "WAITING":
+	const endModal = useMemo(() => {
+		if (roundReviews.length == 0 || !game) return <></>;
+		switch (game.gameState) {
+			case "WAITING":
+				return <></>;
+			case "IN_GAME":
+				if (game.round > 0) {
+					// 라운드 인덱스 시작 1
+					return <RoundEndDialog roundReview={roundReviews[game.round - 1]} />;
+				} else {
 					return <></>;
-				case "IN_GAME":
-					return <RoundEndDialog roundReview={roundReview} />;
-				case "FINISHED":
-					return <GameEndDialog roundReview={roundReview} />
-
-			},
-			[roundReview, game?.gameState]
-	);
+				}
+			case "FINISHED":
+				return <GameEndDialog roundReviews={roundReviews} />;
+		}
+	}, [roundReviews, game?.gameState]);
 
 	return (
 		<div className="relative h-screen">
@@ -186,7 +204,10 @@ const GamePage: React.FC = () => {
 				<div className="absolute w-full top-0 left-0 flex justify-between pt-10">
 					<div className="flex flex-col gap-3">
 						{leftPlayers.map((player) => (
-							<DroppableCell id={`${PLAYER_PREFIX}${player.playerId}`} key={player.playerId}>
+							<DroppableCell
+								id={`${PLAYER_PREFIX}${player.playerId}`}
+								key={player.playerId}
+							>
 								<PlayerPanel
 									player={player}
 									position="left"
@@ -198,7 +219,10 @@ const GamePage: React.FC = () => {
 					</div>
 					<div className="flex flex-col gap-3 items-end">
 						{rightPlayers.map((player) => (
-							<DroppableCell id={`${PLAYER_PREFIX}${player.playerId}`} key={player.playerId}>
+							<DroppableCell
+								id={`${PLAYER_PREFIX}${player.playerId}`}
+								key={player.playerId}
+							>
 								<PlayerPanel
 									player={player}
 									position="right"
@@ -223,17 +247,32 @@ const GamePage: React.FC = () => {
 					{/* 내 패(손패) */}
 					<div className="flex gap-5 max-w-[580px] bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-auto">
 						{myInfo?.hand.map((id, index) => (
-							<div key={`${id}-${index}`} className="group flex flex-col justify-between items-center shrink-0 w-[72px]">
-								{id === 0 && <Card id={`card:${id}:${index}`} assetName="card/start" />}
-								{id > 0 && id < 40 && <RouteCard id={`card:${id}:${index}`} isHidden={false} assetId={id} />}
-								{id > 100 && id < 120 && <ActionCard id={`card:${id}:${index}`} assetId={id} />}
+							<div
+								key={`${id}-${index}`}
+								className="group flex flex-col justify-between items-center shrink-0 w-[72px]"
+							>
+								{id === 0 && (
+									<Card id={`card:${id}:${index}`} assetName="card/start" />
+								)}
+								{id > 0 && id < 40 && (
+									<RouteCard
+										id={`card:${id}:${index}`}
+										isHidden={false}
+										assetId={id}
+									/>
+								)}
+								{id > 100 && id < 120 && (
+									<ActionCard id={`card:${id}:${index}`} assetId={id} />
+								)}
 							</div>
 						))}
 					</div>
 					{/* 버리기 (쓰레기통) */}
 					<DroppableCell id={TRASHBIN}>
 						<div className="h-28 flex flex-col justify-between items-center">
-							<p className="text-white text-xl font-holtwood font-bold">버리기</p>
+							<p className="text-white text-xl font-holtwood font-bold">
+								버리기
+							</p>
 							<img src={trashCan} className="w-19" alt="쓰레기통" />
 						</div>
 					</DroppableCell>
@@ -288,7 +327,13 @@ const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 				if (cell[0] > 0 && cell[0] < 60) {
 					return (
 						<DroppableCell id={id} key={id}>
-							<RouteCard id={`disp-${id}`} assetId={cell[0]} isHidden={false} isDraggable={false} flip={cell[1]} />
+							<RouteCard
+								id={`disp-${id}`}
+								assetId={cell[0]}
+								isHidden={false}
+								isDraggable={false}
+								flip={cell[1]}
+							/>
 						</DroppableCell>
 					);
 				}
@@ -296,12 +341,24 @@ const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 				if (cell[0] > 60 && cell[0] < 70) {
 					return (
 						<DroppableCell id={id} key={id}>
-							<GoalCard id={`${GOAL_PREFIX}${row}:${col}`} assetId={cell[0]} isHidden={false} isDraggable={false} />
+							<GoalCard
+								id={`${GOAL_PREFIX}${row}:${col}`}
+								assetId={cell[0]}
+								isHidden={false}
+								isDraggable={false}
+							/>
 						</DroppableCell>
 					);
 				}
 				// 시작카드
-				return <Card id="start-card" assetName="card/start" isDraggable={false} key={id} />;
+				return (
+					<Card
+						id="start-card"
+						assetName="card/start"
+						isDraggable={false}
+						key={id}
+					/>
+				);
 			}}
 		/>
 	);

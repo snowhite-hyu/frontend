@@ -1,11 +1,12 @@
 import type { GameData, RoundFinishedRes } from "@/models/game/Game";
 import { PlayerData } from "@/models/game/Player";
 import { create } from "zustand";
+import update from "immutability-helper";
 
 interface GameState {
 	data: GameData | null;
 	myInfo: PlayerData | null;
-	roundReview?: RoundFinishedRes["payload"] | null;
+	roundReviews: RoundFinishedRes["payload"][];
 	actions: {
 		setGameData: (
 			value:
@@ -17,7 +18,7 @@ interface GameState {
 				| GameState["myInfo"]
 				| ((value: GameState["myInfo"]) => GameState["myInfo"]),
 		) => void;
-		setRoundReview: (value: GameState["roundReview"]) => void;
+		pushRoundReview: (value: GameState["roundReviews"][number]) => void;
 	};
 }
 
@@ -25,7 +26,7 @@ export const GameStore = create<GameState>((set) => ({
 	socket: null,
 	data: null,
 	myInfo: null,
-	roundReview: null,
+	roundReviews: [],
 	actions: {
 		setGameData: (value) => {
 			if (value instanceof Function) {
@@ -41,11 +42,15 @@ export const GameStore = create<GameState>((set) => ({
 				set({ myInfo: value });
 			}
 		},
-		setRoundReview: (value) => set({ roundReview: value }),
+		pushRoundReview: (value) =>
+			set((prev) => ({
+				roundReviews: update(prev.roundReviews, { $push: [value] }),
+			})),
 	},
 }));
 
 export const useGameData = () => GameStore((state) => state.data);
 export const useGameMyInfo = () => GameStore((state) => state.myInfo);
-export const useGameRoundReview = () => GameStore((state) => state.roundReview);
+export const useGameRoundReviews = () =>
+	GameStore((state) => state.roundReviews);
 export const useGameActions = () => GameStore((state) => state.actions);

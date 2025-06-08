@@ -30,7 +30,7 @@ const useGame = () => {
 	const token = useSessionToken();
 	const actions = useSocketActions();
 	const gameId = useRoomInfoStore((state) => state.room?.roomId);
-	const { setGameData, setMyInfo, setRoundReview } = useGameActions();
+	const { setGameData, setMyInfo, pushRoundReview } = useGameActions();
 	const myId = useGameMyInfo()?.playerId;
 
 	const register = actions.registerHandler;
@@ -127,7 +127,7 @@ const useGame = () => {
 	};
 
 	const checkRoundFinished = (msg: RoundFinishedRes) =>
-		setRoundReview(msg.payload);
+		pushRoundReview(msg.payload);
 
 	const registerHandlers = () => {
 		register<RoundStartRes>(CHANNEL, "Round-Started", roundStartedCallback);
