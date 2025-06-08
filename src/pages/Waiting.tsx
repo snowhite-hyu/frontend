@@ -18,6 +18,7 @@ const WaitingPage: React.FC = () => {
 	const game = useGameData();
 	const navigate = useNavigate();
 	if (!room) return <p>로딩 중...</p>;
+	console.log(game);
 	if (game != null && game.deckSize > 0) navigate("/game");
 
 	const { setImage, setUseLayout } = useBackgroundActions();

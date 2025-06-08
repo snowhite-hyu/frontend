@@ -4,7 +4,6 @@ import {
 	GetGameStateReq,
 	GetGameStateRes,
 	JoinGameReq,
-	JoinGameRes,
 	PlayerInfoChanged,
 	RoundFinishedRes,
 	RoundStartReq,
@@ -74,13 +73,12 @@ const useGame = () => {
 		}
 	};
 
-	const join = (gameId: number) =>
-		sendAndWaitForResponse<JoinGameReq, JoinGameRes>(
-			CHANNEL,
-			{ type: "join-game", payload: { gameId } },
-			"Game-Joined",
-			() => true,
-		);
+	const join = (gameId: number) => {
+		actions.send(CHANNEL, {
+			type: "join-game",
+			payload: { gameId },
+		} as JoinGameReq);
+	};
 
 	const fieldUpdateOne = (msg: FieldUpdateOneRes) => {
 		setGameData((prev) => {
@@ -98,8 +96,9 @@ const useGame = () => {
 		});
 	};
 
-	const roundStartedCallback = (msg: RoundStartRes) =>
-		setGameData(msg.payload.game);
+	const roundStartedCallback = (msg: RoundStartRes) => {
+		setGameData(() => msg.payload);
+	};
 	const myInfoUpdate = (msg: GetPlayerInfoRes) => setMyInfo(msg.payload);
 
 	const playerInfoUpdate = (msg: PlayerInfoChanged) => {
@@ -161,10 +160,7 @@ const useGame = () => {
 	};
 
 	const init = () => {
-		if (gameId) {
-			registerHandlers();
-			forceUpdate();
-		}
+		registerHandlers();
 	};
 
 	const deinit = () => {

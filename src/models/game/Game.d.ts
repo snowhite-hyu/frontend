@@ -23,12 +23,7 @@ export type RoundStartReq = Payload<
 	}
 >;
 
-export type RoundStartRes = Payload<
-	"Round-Started",
-	{
-		game: GameData;
-	}
->;
+export type RoundStartRes = Payload<"Round-Started", GameData>;
 
 type GameState = "WAITING" | "IN_GAME" | "FINISHED";
 type FieldState = [number, number];
