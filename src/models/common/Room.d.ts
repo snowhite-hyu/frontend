@@ -26,4 +26,18 @@ export interface RoomItem {
 
 export type ListResponse = {
 	roomList: RoomItem[];
-};
+}
+
+export interface ChatRequest {
+	roomId: number;
+	message: string;
+}
+
+export interface ChatResponse {
+	user: {
+		id: number;
+		username: string;
+		loggedIn: boolean;
+	};
+	message: string;
+}

@@ -1,3 +1,4 @@
+import { ChatRequest, ChatResponse } from "@/models/common/Room";
 import { BaseSocket } from "@/sockets/BaseSocket";
 
 type RoomEvent =
@@ -22,10 +23,7 @@ export class RoomSocket extends BaseSocket {
 			if (this.listeners[type]) {
 				this.listeners[type].forEach((cb) => cb(payload));
 			} else {
-				console.warn(
-					`[RoomSocket] 핸들러가 없는 메시지 수신: ${type}`,
-					payload,
-				);
+				console.warn(`[RoomSocket] 핸들러가 없는 메시지 수신: ${type}`, payload);
 			}
 		} catch (err) {
 			console.error("[RoomSocket] 잘못된 메시지 형식:", data);
@@ -50,6 +48,10 @@ export class RoomSocket extends BaseSocket {
 
 	public startGame(data: { roomId: number }) {
 		this.send({ type: "start-game", payload: data });
+	}
+
+	public sendMessage(data: ChatRequest) {
+		this.send({ type: "chat", payload: data });
 	}
 
 	public on(event: string, callback: (payload: any) => void) {
@@ -80,5 +82,13 @@ export class RoomSocket extends BaseSocket {
 
 	public onCreateRoom(callback: (payload: any) => void) {
 		this.on("created-room", callback);
+	}
+
+	public onChat(callback: (payload: ChatResponse) => void) {
+		this.on("chat", callback);
+	}
+
+	public offChat(callback: (payload: ChatResponse) => void) {
+		this.off("chat", callback);
 	}
 }
