@@ -119,7 +119,6 @@ const useGame = () => {
 	const turnUpdate = (msg: TurnChangedRes) => {
 		setGameData((prev) => {
 			if (!prev) return prev;
-			if (prev.currentTurnPlayerId === myId) drawNewCard();
 			return update(prev, {
 				currentTurnPlayerId: { $set: msg.payload.nextTurnPlayerId },
 			});
@@ -201,23 +200,6 @@ const useGame = () => {
 			return false;
 		}
 		return true;
-	};
-
-	const drawNewCard = async () => {
-		if (!gameId) return;
-		try {
-			type Req = Payload<"get-card", { gameId: number }>;
-			type Res = Payload<"Got-Card", PlayerData>;
-			const result = await sendAndWaitForResponse<Req, Res>(
-				CHANNEL,
-				{ type: "get-card", payload: { gameId } },
-				"Got-Card",
-				() => true,
-			);
-			setMyInfo(result.payload);
-		} catch (e) {
-			console.error(e);
-		}
 	};
 
 	const dropMyCard = async (cardId: number) => {

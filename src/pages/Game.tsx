@@ -268,7 +268,7 @@ const GamePage: React.FC = () => {
 								{id === 0 && (
 									<Card id={`card:${id}:${index}`} assetName="card/start" />
 								)}
-								{id > 0 && id < 40 && (
+								{id > 0 && id <= 40 && (
 									<RouteCard
 										id={`card:${id}:${index}`}
 										isHidden={false}
