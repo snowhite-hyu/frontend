@@ -29,6 +29,7 @@ import { DroppableCell } from "@/components/game/DroppableCell";
 import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
 import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
 import { useNavigate } from "react-router-dom";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 
 // 드래그 앤 드랍 대상 prefix
 const PLAYER_PREFIX = "player:";
@@ -40,6 +41,7 @@ const TRASHBIN = "trashbin";
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const navigate = useNavigate();
+	const room = useRoomInfoStore();
 	const game = useGameData();
 	const roundReviews = useGameRoundReviews();
 	const myInfo = useGameMyInfo();
@@ -191,7 +193,9 @@ const GamePage: React.FC = () => {
 					return (
 						<RoundEndDialog
 							roundReview={roundReviews[game.round - 1]}
-							onExit={startRound}
+							onExit={() => {
+								if (room.isMaster) startRound();
+							}}
 						/>
 					);
 				} else {

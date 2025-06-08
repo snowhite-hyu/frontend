@@ -17,7 +17,7 @@ export type JoinGameRes = Payload<
 >;
 
 export type RoundStartReq = Payload<
-	"Start-Round",
+	"start-round",
 	{
 		gameId: number;
 	}

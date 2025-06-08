@@ -31,7 +31,6 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 				case 2:
 					e.preventDefault();
 					setDialogStep(0);
-					onExit();
 					break;
 			}
 		};
@@ -77,7 +76,10 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 					<Button
 						variant={"saboteurCheck"}
 						size={"sm"}
-						onClick={() => setDialogStep(0)}
+						onClick={() => {
+							setDialogStep(0);
+							onExit();
+						}}
 					>
 						결과 건너뛰기
 					</Button>
@@ -129,7 +131,10 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 					<Button
 						variant={"saboteurCheck"}
 						size={"sm"}
-						onClick={() => setDialogStep(0)}
+						onClick={() => {
+							setDialogStep(0);
+							onExit();
+						}}
 					>
 						{" "}
 						게임으로 돌아가기

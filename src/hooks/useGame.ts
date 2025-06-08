@@ -88,10 +88,10 @@ const useGame = () => {
 			const newField: [number, number][][] = prev.field.map((rowArr, r) =>
 				r === msg.payload.row
 					? rowArr.map((cell, c) =>
-							c === msg.payload.column
-								? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
-								: cell,
-						)
+						c === msg.payload.column
+							? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
+							: cell,
+					)
 					: rowArr,
 			);
 			return { ...prev, field: newField };
@@ -229,16 +229,7 @@ const useGame = () => {
 		if (!(await checkMyTurn())) return;
 		try {
 			type Req = Payload<"drop-card", { gameId: number; cardId: number }>;
-			type Res = Payload<"Card-Dropped", { hand: number[] }>;
-			const result = await sendAndWaitForResponse<Req, Res>(
-				CHANNEL,
-				{ type: "drop-card", payload: { gameId, cardId } },
-				"Card-Dropped",
-				() => true,
-			);
-			setMyInfo((prev) =>
-				update(prev, { hand: { $set: result.payload.hand } }),
-			);
+			actions.send(CHANNEL, { type: "drop-card", payload: { gameId, cardId } } as Req);
 		} catch (e) {
 			console.error(e);
 		}
@@ -411,7 +402,7 @@ const useGame = () => {
 	const startRound = async () => {
 		try {
 			actions.send(CHANNEL, {
-				type: "Start-Round",
+				type: "start-round",
 				payload: { gameId },
 			} as RoundStartReq);
 		} catch (e) {
