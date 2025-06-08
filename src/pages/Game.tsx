@@ -55,13 +55,10 @@ const GamePage: React.FC = () => {
 
 	useEffect(() => {
 		forceUpdate();
-		return () => deinit();
-	}, [forceUpdate, deinit]);
-
-	useEffect(() => {
 		setImage(roomBackground);
 		setUseLayout(false);
-	}, [setImage, setUseLayout]);
+		return () => deinit();
+	}, []);
 
 	const [leftPlayers, rightPlayers] = useMemo(() => {
 		const left: OpenPlayerState[] = [];
