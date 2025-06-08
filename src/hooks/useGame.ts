@@ -5,7 +5,6 @@ import {
 	GetGameStateRes,
 	JoinGameReq,
 	JoinGameRes,
-	OpenPlayerState,
 	PlayerInfoChanged,
 	RoundFinishedRes,
 	RoundStartRes,
@@ -37,10 +36,13 @@ const useGame = () => {
 	const register = actions.registerHandler;
 	const unregister = actions.unregisterHandler;
 
-	function sendAndWaitForResponse<TSend extends object, TRes>(
+	function sendAndWaitForResponse<
+		TSend extends object,
+		TRes extends { type: string },
+	>(
 		channel: "room" | "game",
 		sendPayload: TSend,
-		responseType: string,
+		responseType: TRes["type"],
 		handler: (res: TRes) => boolean,
 		timeoutMs = TIMEOUT,
 	): Promise<TRes> {
