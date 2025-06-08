@@ -1,12 +1,15 @@
 import { Payload } from "@/models/common/Payload";
 import {
+	FieldUpdateOneRes,
 	GetGameStateReq,
 	GetGameStateRes,
 	JoinGameReq,
 	JoinGameRes,
 	OpenPlayerState,
+	PlayerInfoChanged,
 	RoundFinishedRes,
 	RoundStartRes,
+	TurnChangedRes,
 } from "@/models/game/Game";
 import {
 	GetPlayerInfoReq,
@@ -76,10 +79,6 @@ const useGame = () => {
 			() => true,
 		);
 
-	type FieldUpdateOneRes = Payload<
-		string,
-		{ cardId: number; row: number; column: number; isFlipped?: number }
-	>;
 	const fieldUpdateOne = (msg: FieldUpdateOneRes) => {
 		setGameData((prev) => {
 			if (!prev) return prev;
@@ -100,7 +99,6 @@ const useGame = () => {
 		setGameData(msg.payload.game);
 	const myInfoUpdate = (msg: GetPlayerInfoRes) => setMyInfo(msg.payload);
 
-	type PlayerInfoChanged = Payload<string, OpenPlayerState>;
 	const playerInfoUpdate = (msg: PlayerInfoChanged) => {
 		setGameData((prev) => {
 			if (!prev) return prev;
@@ -116,7 +114,6 @@ const useGame = () => {
 		});
 	};
 
-	type TurnChangedRes = Payload<"Turn-Changed", { nextTurnPlayerId: number }>;
 	const turnUpdate = (msg: TurnChangedRes) => {
 		setGameData((prev) => {
 			if (!prev) return prev;

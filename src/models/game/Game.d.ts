@@ -76,3 +76,12 @@ export type RoundFinishedRes = Payload<
 		}[];
 	}
 >;
+
+export type FieldUpdateOneRes = Payload<
+	string,
+	{ cardId: number; row: number; column: number; isFlipped?: number }
+>;
+
+export type PlayerInfoChanged = Payload<string, OpenPlayerState>;
+
+export type TurnChangedRes = Payload<"Turn-Changed", { nextTurnPlayerId: number }>;
