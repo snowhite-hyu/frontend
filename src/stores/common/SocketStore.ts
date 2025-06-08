@@ -23,12 +23,12 @@ interface SocketState {
 		registerHandler: <T = unknown>(
 			socketType: SocketType,
 			type: string,
-			cb: MessageHandler<T>
+			cb: MessageHandler<T>,
 		) => void;
 		unregisterHandler: (
 			socketType: SocketType,
 			type: string,
-			cb: MessageHandler
+			cb: MessageHandler,
 		) => void;
 	};
 }
@@ -38,7 +38,7 @@ const socketHandlerMap: SocketHandlerMap = {};
 const addHandler = <T = unknown>(
 	socketType: string,
 	type: string,
-	cb: MessageHandler<T>
+	cb: MessageHandler<T>,
 ) => {
 	if (!socketHandlerMap[socketType]) {
 		socketHandlerMap[socketType] = {};
@@ -54,7 +54,7 @@ const addHandler = <T = unknown>(
 const removeHandler = (
 	socketType: string,
 	type: string,
-	cb: MessageHandler
+	cb: MessageHandler,
 ) => {
 	socketHandlerMap[socketType]?.[type]?.delete(cb);
 };
@@ -70,14 +70,17 @@ const fireHandlers = (socketType: string, type: string, msg: any) => {
 	});
 };
 
-function getSocketFromState(state: SocketState, type: SocketType): WebSocket | null {
+function getSocketFromState(
+	state: SocketState,
+	type: SocketType,
+): WebSocket | null {
 	return type === "room" ? state.roomSocket : state.gameSocket;
 }
 
 function setSocketInState(
 	set: (partial: Partial<SocketState>) => void,
 	type: SocketType,
-	ws: WebSocket | null
+	ws: WebSocket | null,
 ) {
 	set(type === "room" ? { roomSocket: ws } : { gameSocket: ws });
 }
@@ -101,7 +104,7 @@ const SocketStore = create<SocketState>((set, get) => ({
 
 			try {
 				const ws = new WebSocket(
-					`${import.meta.env.VITE_WS_BASE_URL}/${type}?token=${token}`
+					`${import.meta.env.VITE_WS_BASE_URL}/${type}?token=${token}`,
 				);
 
 				ws.onopen = () => setSocketInState(set, type, ws);

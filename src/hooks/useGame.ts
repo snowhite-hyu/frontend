@@ -22,6 +22,7 @@ import update from "immutability-helper";
 import { toast } from "sonner";
 
 const TIMEOUT = 5000;
+const CHANNEL: "game" = "game";
 
 const useGame = () => {
 	const token = useSessionToken();
@@ -29,6 +30,9 @@ const useGame = () => {
 	const gameId = useRoomInfoStore((state) => state.room?.roomId);
 	const { setGameData, setMyInfo, setRoundReview } = useGameActions();
 	const myId = useGameMyInfo()?.playerId;
+
+	const register = actions.registerHandler;
+	const unregister = actions.unregisterHandler;
 
 	function sendAndWaitForResponse<TSend extends object, TRes>(
 		channel: "room" | "game",
@@ -42,40 +46,35 @@ const useGame = () => {
 
 			const callback = (msg: TRes) => {
 				if (handler(msg)) {
-					actions.unregisterHandler(channel, responseType, callback);
+					unregister(channel, responseType, callback);
 					if (timer) clearTimeout(timer);
 					resolve(msg);
 				}
 			};
 
-			actions.registerHandler(channel, responseType, callback);
+			register(channel, responseType, callback);
 			actions.send(channel, sendPayload);
 
 			timer = setTimeout(() => {
-				actions.unregisterHandler(channel, responseType, callback);
+				unregister(channel, responseType, callback);
 				reject(new Error("TIMEOUT"));
 			}, timeoutMs);
 		});
 	}
 
 	const open = () => {
-		if (!actions.isConnected("game") && token) {
-			actions.open("game", token);
+		if (!actions.isConnected(CHANNEL) && token) {
+			actions.open(CHANNEL, token);
 		}
 	};
 
-	const join = async (gameId: number) => {
-		await sendAndWaitForResponse<JoinGameReq, JoinGameRes>(
-			"game",
+	const join = (gameId: number) =>
+		sendAndWaitForResponse<JoinGameReq, JoinGameRes>(
+			CHANNEL,
 			{ type: "join-game", payload: { gameId } },
 			"Game-Joined",
 			() => true,
 		);
-	};
-
-	const roundStartedCallback = (msg: RoundStartRes) => {
-		setGameData(msg.payload.game);
-	};
 
 	type FieldUpdateOneRes = Payload<
 		string,
@@ -83,32 +82,32 @@ const useGame = () => {
 	>;
 	const fieldUpdateOne = (msg: FieldUpdateOneRes) => {
 		setGameData((prev) => {
-			if (prev) {
-				const newField: [number, number][][] = prev.field.map((rowArr, r) =>
-					r === msg.payload.row
-						? rowArr.map((cell, c) =>
-								c === msg.payload.column
-									? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
-									: cell,
-							)
-						: rowArr,
-				);
-				return { ...prev, field: newField };
-			}
-
-			return prev;
+			if (!prev) return prev;
+			const newField: [number, number][][] = prev.field.map((rowArr, r) =>
+				r === msg.payload.row
+					? rowArr.map((cell, c) =>
+							c === msg.payload.column
+								? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
+								: cell,
+						)
+					: rowArr,
+			);
+			return { ...prev, field: newField };
 		});
 	};
-	const myInfoUpdate = (msg: GetPlayerInfoRes) => {
-		setMyInfo(msg.payload);
-	};
+
+	const roundStartedCallback = (msg: RoundStartRes) =>
+		setGameData(msg.payload.game);
+	const myInfoUpdate = (msg: GetPlayerInfoRes) => setMyInfo(msg.payload);
+
 	type PlayerInfoChanged = Payload<string, OpenPlayerState>;
 	const playerInfoUpdate = (msg: PlayerInfoChanged) => {
 		setGameData((prev) => {
-			const targetIdx = prev?.players.findIndex(
+			if (!prev) return prev;
+			const targetIdx = prev.players.findIndex(
 				(player) => player.playerId === msg.payload.playerId,
 			);
-			if (targetIdx !== undefined && targetIdx >= 0) {
+			if (targetIdx >= 0) {
 				return update(prev, {
 					players: { [targetIdx]: { $set: msg.payload } },
 				});
@@ -120,159 +119,118 @@ const useGame = () => {
 	type TurnChangedRes = Payload<"Turn-Changed", { nextTurnPlayerId: number }>;
 	const turnUpdate = (msg: TurnChangedRes) => {
 		setGameData((prev) => {
-			if (prev?.currentTurnPlayerId === myId) {
-				drawNewCard();
-			}
+			if (!prev) return prev;
+			if (prev.currentTurnPlayerId === myId) drawNewCard();
 			return update(prev, {
 				currentTurnPlayerId: { $set: msg.payload.nextTurnPlayerId },
 			});
 		});
 	};
-	const checkRoundFinished = (msg: RoundFinishedRes) => {
+
+	const checkRoundFinished = (msg: RoundFinishedRes) =>
 		setRoundReview(msg.payload);
+
+	const registerHandlers = () => {
+		register<RoundStartRes>(CHANNEL, "Round-Started", roundStartedCallback);
+		register<FieldUpdateOneRes>(CHANNEL, "Field-Changed", fieldUpdateOne);
+		register<TurnChangedRes>(CHANNEL, "Turn-Changed", turnUpdate);
+		register<GetPlayerInfoRes>(CHANNEL, "Player-Info", myInfoUpdate);
+		register<PlayerInfoChanged>(
+			CHANNEL,
+			"Player-Info-Changed",
+			playerInfoUpdate,
+		);
+		register<PlayerInfoChanged>(
+			CHANNEL,
+			"Changed-Public-Player-Info",
+			playerInfoUpdate,
+		);
+		register<RoundFinishedRes>(CHANNEL, "Round-Finished", checkRoundFinished);
 	};
 
-	const init = async () => {
+	const unregisterHandlers = () => {
+		unregister(CHANNEL, "Round-Started", roundStartedCallback);
+		unregister(CHANNEL, "Field-Changed", fieldUpdateOne);
+		unregister(CHANNEL, "Turn-Changed", turnUpdate);
+		unregister(CHANNEL, "Player-Info", myInfoUpdate);
+		unregister(CHANNEL, "Player-Info-Changed", playerInfoUpdate);
+		unregister(CHANNEL, "Changed-Public-Player-Info", playerInfoUpdate);
+		unregister(CHANNEL, "Round-Finished", checkRoundFinished);
+	};
+
+	const init = () => {
 		if (gameId) {
-			actions.registerHandler<RoundStartRes>(
-				"game",
-				"Round-Started",
-				roundStartedCallback,
-			);
-			actions.registerHandler<FieldUpdateOneRes>(
-				"game",
-				"Field-Changed",
-				fieldUpdateOne,
-			);
-			actions.registerHandler<TurnChangedRes>(
-				"game",
-				"Turn-Changed",
-				turnUpdate,
-			);
-			actions.registerHandler<GetPlayerInfoRes>(
-				"game",
-				"Player-Info",
-				myInfoUpdate,
-			);
-			actions.registerHandler<PlayerInfoChanged>(
-				"game",
-				"Player-Info-Changed",
-				playerInfoUpdate,
-			);
-			actions.registerHandler<PlayerInfoChanged>(
-				"game",
-				"Changed-Public-Player-Info",
-				playerInfoUpdate,
-			);
-			actions.registerHandler<RoundFinishedRes>(
-				"game",
-				"Round-Finished",
-				checkRoundFinished,
-			);
+			registerHandlers();
 			forceUpdate();
 		}
 	};
 
 	const deinit = () => {
-		actions.unregisterHandler("game", "Round-Started", roundStartedCallback);
-		actions.unregisterHandler("game", "Field-Changed", fieldUpdateOne);
-		actions.unregisterHandler("game", "Turn-Changed", turnUpdate);
-		actions.unregisterHandler("game", "Player-Info", myInfoUpdate);
-		actions.unregisterHandler("game", "Player-Info-Changed", playerInfoUpdate);
-		actions.unregisterHandler(
-			"game",
-			"Changed-Public-Player-Info",
-			playerInfoUpdate,
-		);
-		actions.unregisterHandler("game", "Round-Finished", checkRoundFinished);
+		unregisterHandlers();
 		setGameData(null);
 	};
 
 	const forceUpdate = async () => {
-		if (gameId) {
-			try {
-				const result = await sendAndWaitForResponse<
-					GetGameStateReq,
-					GetGameStateRes
-				>(
-					"game",
-					{
-						type: "get-game-state",
-						payload: {
-							gameId,
-						},
-					},
-					"Game-State",
-					() => true,
-				);
-				setGameData(result.payload);
+		if (!gameId) return;
+		try {
+			const result = await sendAndWaitForResponse<
+				GetGameStateReq,
+				GetGameStateRes
+			>(
+				CHANNEL,
+				{ type: "get-game-state", payload: { gameId } },
+				"Game-State",
+				() => true,
+			);
+			setGameData(result.payload);
 
-				actions.send("game", {
-					type: "get-player-info",
-					payload: {
-						gameId,
-					},
-				} as GetPlayerInfoReq);
-				return result.payload;
-			} catch (e) {
-				console.log(e);
-			}
+			actions.send(CHANNEL, {
+				type: "get-player-info",
+				payload: { gameId },
+			} as GetPlayerInfoReq);
+
+			return result.payload;
+		} catch (e) {
+			console.error(e);
 		}
 	};
 
 	const checkMyTurn = async () => {
 		const game = await forceUpdate();
 		if (!game || !myId) return false;
-
 		if (myId !== game.currentTurnPlayerId) {
 			toast("Not your turn");
 			return false;
 		}
-
 		return true;
 	};
 
-	const getMyCards = () => {};
-
 	const drawNewCard = async () => {
 		if (!gameId) return;
-
 		try {
-			type req = Payload<"get-card", { gameId: number }>;
-			type res = Payload<"Got-Card", PlayerData>;
-			const result = await sendAndWaitForResponse<req, res>(
-				"game",
-				{
-					type: "get-card",
-					payload: {
-						gameId,
-					},
-				},
+			type Req = Payload<"get-card", { gameId: number }>;
+			type Res = Payload<"Got-Card", PlayerData>;
+			const result = await sendAndWaitForResponse<Req, Res>(
+				CHANNEL,
+				{ type: "get-card", payload: { gameId } },
 				"Got-Card",
 				() => true,
 			);
 			setMyInfo(result.payload);
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 		}
 	};
 
 	const dropMyCard = async (cardId: number) => {
 		if (!gameId) return;
-		if (!checkMyTurn()) return;
-
+		if (!(await checkMyTurn())) return;
 		try {
-			type req = Payload<"drop-card", { gameId: number; cardId: number }>;
-			type res = Payload<"Card-Dropped", { hand: number[] }>;
-			const result = await sendAndWaitForResponse<req, res>(
-				"game",
-				{
-					type: "drop-card",
-					payload: {
-						gameId,
-						cardId,
-					},
-				},
+			type Req = Payload<"drop-card", { gameId: number; cardId: number }>;
+			type Res = Payload<"Card-Dropped", { hand: number[] }>;
+			const result = await sendAndWaitForResponse<Req, Res>(
+				CHANNEL,
+				{ type: "drop-card", payload: { gameId, cardId } },
 				"Card-Dropped",
 				() => true,
 			);
@@ -280,7 +238,7 @@ const useGame = () => {
 				update(prev, { hand: { $set: result.payload.hand } }),
 			);
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 		}
 	};
 
@@ -292,9 +250,8 @@ const useGame = () => {
 	) => {
 		if (!gameId) return;
 		if (!(await checkMyTurn())) return;
-
 		try {
-			type req = Payload<
+			type Req = Payload<
 				"use-path-card",
 				{
 					gameId: number;
@@ -305,47 +262,36 @@ const useGame = () => {
 				}
 			>;
 
-			const promise = new Promise<void>((resolve, reject) => {
+			await new Promise<void>((resolve, reject) => {
 				let timer: NodeJS.Timeout | null = null;
-
 				const callback = (msg: Payload<string, unknown>) => {
-					actions.unregisterHandler("game", "Place-PathCard-Failed", callback);
-					actions.unregisterHandler("game", "Player-Info", callback);
+					unregister(CHANNEL, "Place-PathCard-Failed", callback);
+					unregister(CHANNEL, "Player-Info", callback);
 					if (timer) clearTimeout(timer);
 
-					if (msg.type === "Place-PathCard-Failed") {
-						reject("FAILED");
-					}
-					if (msg.type === "Player-Info") {
-						setMyInfo(msg.payload as PlayerData);
-					}
+					if (msg.type === "Place-PathCard-Failed") reject("FAILED");
+					if (msg.type === "Player-Info") setMyInfo(msg.payload as PlayerData);
+
 					resolve();
 				};
 
-				actions.registerHandler("game", "Place-PathCard-Failed", callback);
-				actions.registerHandler("game", "Player-Info", callback);
-				actions.send("game", {
+				register(CHANNEL, "Place-PathCard-Failed", callback);
+				register(CHANNEL, "Player-Info", callback);
+
+				actions.send(CHANNEL, {
 					type: "use-path-card",
-					payload: {
-						gameId,
-						cardId,
-						row,
-						column,
-						isFlipped,
-					},
-				} as req);
+					payload: { gameId, cardId, row, column, isFlipped },
+				} as Req);
 
 				timer = setTimeout(() => {
-					actions.unregisterHandler("game", "Place-PathCard-Failed", callback);
-					actions.unregisterHandler("game", "Player-Info", callback);
+					unregister(CHANNEL, "Place-PathCard-Failed", callback);
+					unregister(CHANNEL, "Player-Info", callback);
 					reject(new Error("TIMEOUT"));
 				}, TIMEOUT);
 			});
-
-			await promise;
 		} catch (e) {
-			toast(`카드를 놓을 수 없습니다.`);
-			console.log(e);
+			toast("카드를 놓을 수 없습니다.");
+			console.error(e);
 		}
 	};
 
@@ -356,27 +302,18 @@ const useGame = () => {
 	) => {
 		if (!gameId) return;
 		if (!(await checkMyTurn())) return;
-
 		try {
-			type req = Payload<
+			type Req = Payload<
 				"use-rockfall-card",
 				{ gameId: number; cardId: number; row: number; column: number }
 			>;
-			type res = Payload<
+			type Res = Payload<
 				"Unicast: Rockfall-Card-Use",
 				{ field: [number, number][][] }
 			>;
-			const result = await sendAndWaitForResponse<req, res>(
-				"game",
-				{
-					type: "use-rockfall-card",
-					payload: {
-						gameId,
-						cardId,
-						row,
-						column,
-					},
-				},
+			const result = await sendAndWaitForResponse<Req, Res>(
+				CHANNEL,
+				{ type: "use-rockfall-card", payload: { gameId, cardId, row, column } },
 				"Unicast: Rockfall-Card-Use",
 				() => true,
 			);
@@ -384,34 +321,26 @@ const useGame = () => {
 				update(prev, { field: { $set: result.payload.field } }),
 			);
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 		}
 	};
 
 	const useMapCard = async (cardId: number, row: 1 | 3 | 5, column: 8) => {
-		if (!gameId) return;
-		if (!(await checkMyTurn())) return;
+		if (!gameId) return -1;
+		if (!(await checkMyTurn())) return -1;
 
 		try {
-			type req = Payload<
+			type Req = Payload<
 				"use-map-card",
 				{ gameId: number; cardId: number; row: number; column: number }
 			>;
-			type res = Payload<
+			type Res = Payload<
 				"Unicast: Map-Card-Use",
 				{ playerhand: []; destCardID: number }
 			>;
-			const result = await sendAndWaitForResponse<req, res>(
-				"game",
-				{
-					type: "use-map-card",
-					payload: {
-						gameId,
-						cardId,
-						row,
-						column,
-					},
-				},
+			const result = await sendAndWaitForResponse<Req, Res>(
+				CHANNEL,
+				{ type: "use-map-card", payload: { gameId, cardId, row, column } },
 				"Unicast: Map-Card-Use",
 				() => true,
 			);
@@ -420,7 +349,7 @@ const useGame = () => {
 			);
 			return result.payload.destCardID;
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 		}
 		return -1;
 	};
@@ -432,9 +361,8 @@ const useGame = () => {
 	) => {
 		if (!gameId) return;
 		if (!(await checkMyTurn())) return;
-
 		try {
-			type req = Payload<
+			type Req = Payload<
 				"use-repair-card",
 				{
 					gameId: number;
@@ -443,17 +371,12 @@ const useGame = () => {
 					targetState: PlayerState;
 				}
 			>;
-			type res = Payload<"Unicast: Repair-Card-Use", { playerHand: number[] }>;
-			const result = await sendAndWaitForResponse<req, res>(
-				"game",
+			type Res = Payload<"Unicast: Repair-Card-Use", { playerHand: number[] }>;
+			const result = await sendAndWaitForResponse<Req, Res>(
+				CHANNEL,
 				{
 					type: "use-repair-card",
-					payload: {
-						gameId,
-						cardId,
-						targetPlayerId,
-						targetState,
-					},
+					payload: { gameId, cardId, targetPlayerId, targetState },
 				},
 				"Unicast: Repair-Card-Use",
 				() => true,
@@ -462,29 +385,24 @@ const useGame = () => {
 				update(prev, { hand: { $set: result.payload.playerHand } }),
 			);
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 		}
 	};
 
 	const useBrokenCard = async (cardId: number, targetPlayerId: number) => {
 		if (!gameId) return;
 		if (!(await checkMyTurn())) return;
-
 		try {
-			type req = Payload<
+			type Req = Payload<
 				"use-broken-card",
 				{ gameId: number; cardId: number; targetPlayerId: number }
 			>;
-			actions.send("game", {
+			actions.send(CHANNEL, {
 				type: "use-broken-card",
-				payload: {
-					gameId,
-					cardId,
-					targetPlayerId,
-				},
-			} as req);
+				payload: { gameId, cardId, targetPlayerId },
+			} as Req);
 		} catch (e) {
-			console.log(e);
+			console.error(e);
 		}
 	};
 
@@ -494,7 +412,6 @@ const useGame = () => {
 		deinit,
 		join,
 		forceUpdate,
-		getMyCards,
 		dropMyCard,
 		usePathCard,
 		useRockfallCard,
