@@ -11,9 +11,13 @@ import { Button } from "../button";
 
 interface RoundEndDialogProps {
 	roundReview: RoundFinishedRes["payload"];
+	onExit: () => void | Promise<void>;
 }
 
-const RoundEndDialog: React.FC<RoundEndDialogProps> = ({ roundReview }) => {
+const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
+	roundReview,
+	onExit,
+}) => {
 	const [dialogStep, setDialogStep] = useState(1);
 
 	useEffect(() => {
@@ -27,6 +31,7 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({ roundReview }) => {
 				case 2:
 					e.preventDefault();
 					setDialogStep(0);
+					onExit();
 					break;
 			}
 		};

@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import Dialog from "@/components/ui/dialog/Dialog";
 import { Button } from "@/components/ui/button";
 import gameEndImage from "@/assets/gameEnd.svg";
@@ -8,11 +7,14 @@ import { RoundFinishedRes } from "@/models/game/Game";
 
 interface GameEndDialogProps {
 	roundReviews: RoundFinishedRes["payload"][];
+	onExit: () => void | Promise<void>;
 }
 
-const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReviews }) => {
+const GameEndDialog: React.FC<GameEndDialogProps> = ({
+	roundReviews,
+	onExit,
+}) => {
 	const [dialogStep, setDialogStep] = useState(1);
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -24,14 +26,14 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReviews }) => {
 					break;
 				case 2:
 					e.preventDefault();
-					navigate("/waiting");
+					onExit();
 					break;
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [dialogStep, navigate]);
+	}, [dialogStep]);
 
 	const { winners, maxGold } = useMemo(() => {
 		const goldMap = new Map<number, { gold: number; playerName: string }>();
@@ -103,7 +105,7 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReviews }) => {
 						type="button"
 						variant={"replay"}
 						className="w-fit h-fit opacity-50"
-						onClick={() => navigate("/waiting")}
+						onClick={onExit}
 					>
 						나가기
 					</Button>
@@ -111,7 +113,7 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReviews }) => {
 						type="button"
 						variant={"replay"}
 						className="w-fit h-fit opacity-90"
-						onClick={() => navigate("/waiting")}
+						onClick={onExit}
 					>
 						다시하기
 					</Button>

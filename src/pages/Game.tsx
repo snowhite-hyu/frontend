@@ -28,6 +28,7 @@ import GoalCard from "@/components/asset/GoalCard";
 import { DroppableCell } from "@/components/game/DroppableCell";
 import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
 import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
+import { useNavigate } from "react-router-dom";
 
 // 드래그 앤 드랍 대상 prefix
 const PLAYER_PREFIX = "player:";
@@ -38,6 +39,7 @@ const TRASHBIN = "trashbin";
 
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
+	const navigate = useNavigate();
 	const game = useGameData();
 	const roundReviews = useGameRoundReviews();
 	const myInfo = useGameMyInfo();
@@ -51,6 +53,7 @@ const GamePage: React.FC = () => {
 		useRepairCard,
 		useRockfallCard,
 		forceUpdate,
+		startRound,
 	} = useGame();
 
 	useEffect(() => {
@@ -185,12 +188,22 @@ const GamePage: React.FC = () => {
 			case "IN_GAME":
 				if (game.round > 0) {
 					// 라운드 인덱스 시작 1
-					return <RoundEndDialog roundReview={roundReviews[game.round - 1]} />;
+					return (
+						<RoundEndDialog
+							roundReview={roundReviews[game.round - 1]}
+							onExit={startRound}
+						/>
+					);
 				} else {
 					return <></>;
 				}
 			case "FINISHED":
-				return <GameEndDialog roundReviews={roundReviews} />;
+				return (
+					<GameEndDialog
+						roundReviews={roundReviews}
+						onExit={() => navigate("/waiting")}
+					/>
+				);
 		}
 	}, [roundReviews, game?.gameState]);
 
@@ -290,9 +303,8 @@ const GamePage: React.FC = () => {
 				{/* 카드 드래그 오버레이 */}
 				<DragOverlay>{activeOverlay}</DragOverlay>
 			</DndContext>
-			{/* 라운드 종료 다이얼로그 출력 */}
+			{/* 라운드 및 게임 종료 다이얼로그 출력 */}
 			{endModal}
-			{/* <GameEndDialog /> // 게임 종료 시 표시 */}
 		</div>
 	);
 };
@@ -337,9 +349,9 @@ const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 				// 목표/보상 카드
 				if (cell[0] > 60 && cell[0] < 70) {
 					return (
-						<DroppableCell id={id} key={id}>
+						<DroppableCell id={`${GOAL_PREFIX}${row}:${col}`} key={id}>
 							<GoalCard
-								id={`${GOAL_PREFIX}${row}:${col}`}
+								id={id}
 								assetId={cell[0]}
 								isHidden={false}
 								isDraggable={false}

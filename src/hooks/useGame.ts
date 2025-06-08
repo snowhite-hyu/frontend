@@ -7,6 +7,7 @@ import {
 	JoinGameRes,
 	PlayerInfoChanged,
 	RoundFinishedRes,
+	RoundStartReq,
 	RoundStartRes,
 	TurnChangedRes,
 } from "@/models/game/Game";
@@ -126,8 +127,10 @@ const useGame = () => {
 		});
 	};
 
-	const checkRoundFinished = (msg: RoundFinishedRes) =>
+	const checkRoundFinished = (msg: RoundFinishedRes) => {
 		pushRoundReview(msg.payload);
+		forceUpdate();
+	};
 
 	const registerHandlers = () => {
 		register<RoundStartRes>(CHANNEL, "Round-Started", roundStartedCallback);
@@ -405,6 +408,17 @@ const useGame = () => {
 		}
 	};
 
+	const startRound = async () => {
+		try {
+			actions.send(CHANNEL, {
+				type: "Start-Round",
+				payload: { gameId },
+			} as RoundStartReq);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
 	return {
 		open,
 		init,
@@ -417,6 +431,7 @@ const useGame = () => {
 		useMapCard,
 		useRepairCard,
 		useBrokenCard,
+		startRound,
 	};
 };
 
