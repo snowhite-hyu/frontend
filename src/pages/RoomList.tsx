@@ -15,8 +15,9 @@ const RoomListPage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const { list } = useRoom();
 	const token = useSessionToken();
+	const setIsMaster = useRoomInfoStore((state) => state.setIsMaster);
 
-	const [ rooms, setRooms ] = useState<RoomItem[]>([]);
+	const [rooms, setRooms] = useState<RoomItem[]>([]);
 
 	const { connect } = useRoomSocketStore();
 
@@ -29,7 +30,6 @@ const RoomListPage: React.FC = () => {
 			return;
 		}
 		connect(token);
-		
 	}, []);
 
 	const fetchRooms = async () => {
@@ -45,11 +45,12 @@ const RoomListPage: React.FC = () => {
 			roomSocket.onJoinedRoom((payload) => {
 				useRoomInfoStore.getState().setRoom(payload);
 				navigate("/waiting");
-			})
+				setIsMaster(false);
+			});
 
-			roomSocket.joinRoom({roomId});
+			roomSocket.joinRoom({ roomId });
 		}
-	}
+	};
 
 	return (
 		<div className="flex flex-inline w-full h-full items-start">
@@ -58,26 +59,28 @@ const RoomListPage: React.FC = () => {
 					<div className="h-full overflow-y-auto">
 						{rooms.length === 0 ? (
 							<div className="w-full h-full flex justify-center items-center">
-								<p className="text-[#999999] text-[20px] text-center">방이 없습니다.</p>
+								<p className="text-[#999999] text-[20px] text-center">
+									방이 없습니다.
+								</p>
 							</div>
 						) : (
-						rooms.map((room) => (
-							<div
-								key={room.roomId}
-								className="w-full flex flex-inline mb-[10px] items-center "
-							>
-								<p className="text-[#000000] text-[25px] ml-[0%] mr-auto max-w-[350px] overflow-hidden">
-									{room.roomName}
-								</p>
-								<Button
-									variant={"saboteurCheck"}
-									className="h-fit mr-[0%] ml-auto text-[21px]"
-									onClick={() => handleJoinRoom(room.roomId)}
+							rooms.map((room) => (
+								<div
+									key={room.roomId}
+									className="w-full flex flex-inline mb-[10px] items-center "
 								>
-									참가
-								</Button>
-							</div>
-						))
+									<p className="text-[#000000] text-[25px] ml-[0%] mr-auto max-w-[350px] overflow-hidden">
+										{room.roomName}
+									</p>
+									<Button
+										variant={"saboteurCheck"}
+										className="h-fit mr-[0%] ml-auto text-[21px]"
+										onClick={() => handleJoinRoom(room.roomId)}
+									>
+										참가
+									</Button>
+								</div>
+							))
 						)}
 					</div>
 				</div>

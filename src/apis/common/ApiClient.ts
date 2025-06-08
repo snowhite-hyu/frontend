@@ -1,3 +1,4 @@
+import { SessionStore } from "@/stores/common/SessionStore";
 import axios, { type AxiosHeaders } from "axios";
 
 type ServiceType = "api" | "asset";
@@ -31,3 +32,15 @@ const service = (type: ServiceType) => {
 
 export const apiSerivce = service("api");
 export const assetService = service("asset");
+
+apiSerivce.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		console.log(error);
+		if (error) {
+			SessionStore.getInitialState().actions.clear();
+		}
+
+		return Promise.reject(error);
+	},
+);

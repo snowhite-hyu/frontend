@@ -9,10 +9,11 @@ interface SessionState {
 	actions: {
 		setToken: (value: SessionState["token"]) => void;
 		setUser: (value: SessionState["user"]) => void;
+		clear: () => void;
 	};
 }
 
-const SessionStore = create<SessionState>()(
+export const SessionStore = create<SessionState>()(
 	persist(
 		(set) => ({
 			token: null,
@@ -27,11 +28,19 @@ const SessionStore = create<SessionState>()(
 					set({ token: value });
 				},
 				setUser: (value) => set({ user: value }),
+				clear: () => {
+					apiSerivce.defaults.headers.common.Authorization = undefined;
+					set({ token: null, user: null });
+				},
 			},
 		}),
 		{
 			name: "session-storage",
 			storage: createJSONStorage(() => sessionStorage),
+			partialize: (state) => ({
+				token: state.token,
+				user: state.user,
+			}),
 		},
 	),
 );

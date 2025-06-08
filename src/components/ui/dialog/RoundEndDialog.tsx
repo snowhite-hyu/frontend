@@ -6,17 +6,17 @@ import Text from "@/components/ui/text";
 import SaboteurCard from "@/assets/roleCard/saboteur.png";
 import MinerCard from "@/assets/roleCard/miner.png";
 import GoldCard from "@/assets/goldCard.png";
+import { RoundFinishedRes } from "@/models/game/Game";
+import { Button } from "../button";
 
 interface RoundEndDialogProps {
-	saboteurs: string[];
-	miners: string[];
-	winner: string;
+	roundReview: RoundFinishedRes["payload"];
+	onExit: () => void | Promise<void>;
 }
 
 const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
-	saboteurs,
-	miners,
-	winner,
+	roundReview,
+	onExit,
 }) => {
 	const [dialogStep, setDialogStep] = useState(1);
 
@@ -39,6 +39,10 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [dialogStep]);
 
+	const saboteurs = roundReview.players.filter((p) => p.role === "SABOTEUR");
+	const miners = roundReview.players.filter((p) => p.role === "DWARF");
+	const winners = roundReview.winnerRole === "SABOTEUR" ? saboteurs : miners;
+
 	if (dialogStep === 0) return null;
 
 	return (
@@ -52,7 +56,7 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 						<div className="flex flex-col justify-center w-[200px]">
 							{saboteurs.map((saboteur) => (
 								<p className="text-white text-3xl font-bold pl-[30px] pr-[30px] mb-3">
-									{saboteur}
+									{saboteur.playerName}
 								</p>
 							))}
 						</div>
@@ -62,11 +66,31 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 						<div className="flex flex-col justify-center w-[200px]">
 							{miners.map((miner) => (
 								<p className="text-white text-3xl font-bold pl-[30px] pr-[30px] mb-3">
-									{miner}
+									{miner.playerName}: {miner.gainedGold} Gold
 								</p>
 							))}
 						</div>
 					</div>
+				</div>
+				<div className="flex gap-5">
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => {
+							setDialogStep(0);
+							onExit();
+						}}
+					>
+						결과 건너뛰기
+					</Button>
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => setDialogStep(2)}
+					>
+						{" "}
+						다음
+					</Button>
 				</div>
 			</Dialog>
 			{/* Step 2: 승자 발표 및 금 배분 */}
@@ -78,16 +102,43 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 						승자는{" "}
 						<span
 							className={
-								winner === "광부들" ? "text-yellow-600" : "text-red-600"
+								roundReview.winnerRole === "DWARF"
+									? "text-yellow-600"
+									: "text-red-600"
 							}
 						>
-							{winner}
+							{winners.map((winner) => (
+								<>
+									<p>{winner.playerName}</p>
+									<br />
+								</>
+							))}
 						</span>
 						입니다!
 					</p>
 					<p className="text-white text-2xl font-bold mt-3">
 						금덩이를 자동으로 배분합니다...
 					</p>
+				</div>
+				<div className="flex gap-5">
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => setDialogStep(1)}
+					>
+						뒤로가기
+					</Button>
+					<Button
+						variant={"saboteurCheck"}
+						size={"sm"}
+						onClick={() => {
+							setDialogStep(0);
+							onExit();
+						}}
+					>
+						{" "}
+						게임으로 돌아가기
+					</Button>
 				</div>
 			</Dialog>
 		</>

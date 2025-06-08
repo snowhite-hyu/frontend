@@ -3,21 +3,26 @@ import { Button } from "@/components/ui/button";
 import Profile from "@/components/ui/Profile";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 import { ChatResponse } from "@/models/common/Room";
-import { WillChangeMotionValue } from "framer-motion";
+import useGame from "@/hooks/useGame";
+import { useGameData } from "@/stores/game/GameStore";
 
 const WaitingPage: React.FC = () => {
-	const room = useRoomInfoStore((state) => state.room);
-	if (!room) return <p>로딩 중...</p>;
-
+	const { room, isMaster, updateUsers, chats, pushChat, clearChat } =
+		useRoomInfoStore((state) => state);
+	const socket = useRoomSocketStore((state) => state.socket);
+	const { open, init, join } = useGame();
+	const game = useGameData();
 	const navigate = useNavigate();
+	if (!room) return <p>로딩 중...</p>;
+	console.log(game);
+	if (game != null && game.deckSize > 0) navigate("/game");
+
 	const { setImage, setUseLayout } = useBackgroundActions();
-	const socket = useRoomSocketStore.getState().socket;
-	const { updateUsers, chats, pushChat, clearChat } = useRoomInfoStore((state) => state);
 
 	useEffect(() => {
 		setImage(roomBackground);
@@ -31,10 +36,11 @@ const WaitingPage: React.FC = () => {
 
 		const handleChat = (msg: ChatResponse) => {
 			pushChat(msg);
-		}
+		};
 
 		socket.onRoomusers(handleMessage);
-		socket.onChat(handleChat)
+		socket.onChat(handleChat);
+		open();
 		return () => {
 			socket.offRoomusers(handleMessage);
 			socket.offChat(handleChat);
@@ -51,15 +57,28 @@ const WaitingPage: React.FC = () => {
 
 	const membersPerPage = 8;
 	const totalPages = Math.ceil(room.users.length / membersPerPage);
-
-	const start = currentPage * membersPerPage;
-	const currentMembers = room.users.slice(start, start + membersPerPage);
+	const currentMembers = useMemo(() => {
+		const start = currentPage * membersPerPage;
+		return room.users.slice(start, start + membersPerPage);
+	}, [room.users]);
 
 	const handleQuitRoom = (roomId: number) => {
-		const roomSocket = useRoomSocketStore.getState().socket;
-		if (roomSocket) {
-			roomSocket.quitRoom({ roomId });
+		if (socket) {
+			socket.quitRoom({ roomId });
 		}
+	};
+
+	const handleStartGame = (roomId: number) => {
+		if (!socket) return;
+		if (isMaster) {
+			socket.startGame({ roomId });
+			setTimeout(() => {
+				join(roomId);
+			}, 500);
+		} else {
+			join(roomId);
+		}
+		init();
 	};
 
 	const chatViewRef = useRef<HTMLDivElement | null>(null);
@@ -77,7 +96,7 @@ const WaitingPage: React.FC = () => {
 			});
 			setMessage("");
 		}
-	}
+	};
 
 	const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
 		if (e.key === "Enter") sendChat();
@@ -142,12 +161,16 @@ const WaitingPage: React.FC = () => {
 						{chats.length ? (
 							chats.slice(-20).map((chat: ChatResponse) => (
 								<div key={chat.user.id} className="mb-1">
-									<span className="font-bold text-white">{chat.user.username}: </span>
+									<span className="font-bold text-white">
+										{chat.user.username}:{" "}
+									</span>
 									<span className="text-white">{chat.message}</span>
 								</div>
 							))
 						) : (
-							<div className="text-gray-400 text-sm">아직 메시지가 없습니다.</div>
+							<div className="text-gray-400 text-sm">
+								아직 메시지가 없습니다.
+							</div>
 						)}
 					</div>
 					{/* 입력창 */}
@@ -157,7 +180,7 @@ const WaitingPage: React.FC = () => {
 							className="flex-1 bg-transparent text-white outline-none"
 							value={message}
 							placeholder="텍스트를 입력해주세요"
-							onChange={e => setMessage(e.target.value)}
+							onChange={(e) => setMessage(e.target.value)}
 							onKeyDown={handleKeyDown}
 						/>
 						<button
@@ -176,7 +199,10 @@ const WaitingPage: React.FC = () => {
 						key="exit"
 						variant="exit"
 						className="h-fit mr-[50px]"
-						onClick={() => { handleQuitRoom(room.roomId); navigate("/room"); }}
+						onClick={() => {
+							handleQuitRoom(room.roomId);
+							navigate("/room");
+						}}
 					>
 						나가기
 					</Button>
@@ -185,8 +211,9 @@ const WaitingPage: React.FC = () => {
 						variant="sabotuer"
 						size="custom"
 						className="w-[160px] h-[88px]"
+						onClick={() => handleStartGame(room.roomId)}
 					>
-						시작
+						{isMaster ? "시작" : "준비"}
 					</Button>
 				</div>
 			</div>

@@ -1,247 +1,378 @@
-import type React from "react";
-import { useState, useEffect } from "react";
-import { useBackgroundActions } from "@/stores/common/BackgroundStore";
-import roomBackground from "@/assets/room.png";
-import PlayerPanel from "@/components/ui/PlayerPanel";
+import { useMemo, useRef, useState, useEffect } from "react";
 import remainCard from "@/assets/card/routeH1.png";
-import transhCan from "@/assets/trash.png";
-import rotateIcon from "@/assets/rotate.png";
-import roleCard from "@/assets/roleCard/saboteur.png";
+import roomBackground from "@/assets/room.png";
+import trashCan from "@/assets/trash.png";
+import saboteur from "@/assets/role/saboteur.png";
+import worker from "@/assets/role/worker.png";
+import PlayerPanel from "@/components/ui/PlayerPanel";
+import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import {
 	DndContext,
-	type DragEndEvent,
-	type DragOverEvent,
-	type DragStartEvent,
+	DragEndEvent,
+	DragOverlay,
+	DragStartEvent,
 } from "@dnd-kit/core";
-import { toast } from "sonner";
-import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import GameMap from "@/components/game/Map";
+import {
+	useGameData,
+	useGameMyInfo,
+	useGameRoundReviews,
+} from "@/stores/game/GameStore";
+import { OpenPlayerState } from "@/models/game/Game";
+import Card from "@/components/asset/Card";
 import RouteCard from "@/components/asset/RouteCard";
+import ActionCard from "@/components/asset/ActionCard";
+import { toast } from "sonner";
+import useGame from "@/hooks/useGame";
+import GameMap from "@/components/game/Map";
+import GoalCard from "@/components/asset/GoalCard";
 import { DroppableCell } from "@/components/game/DroppableCell";
-import update from "immutability-helper";
+import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
+import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
+import { useNavigate } from "react-router-dom";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+
+// 드래그 앤 드랍 대상 prefix
+const PLAYER_PREFIX = "player:";
+const MAP_PREFIX = "map:";
+const CARD_PREFIX = "card:";
+const GOAL_PREFIX = "goal:";
+const TRASHBIN = "trashbin";
 
 const GamePage: React.FC = () => {
 	const { setImage, setUseLayout } = useBackgroundActions();
+	const navigate = useNavigate();
+	const room = useRoomInfoStore();
+	const game = useGameData();
+	const roundReviews = useGameRoundReviews();
+	const myInfo = useGameMyInfo();
+
+	const {
+		deinit,
+		dropMyCard,
+		usePathCard,
+		useBrokenCard,
+		useMapCard,
+		useRepairCard,
+		useRockfallCard,
+		forceUpdate,
+		startRound,
+	} = useGame();
 
 	useEffect(() => {
+		forceUpdate();
 		setImage(roomBackground);
 		setUseLayout(false);
-	}, [setImage, setUseLayout]);
+		return () => deinit();
+	}, []);
 
-    // 플레이어 관련
-	type ToolState = "normal" | "broken";
+	const [leftPlayers, rightPlayers] = useMemo(() => {
+		const left: OpenPlayerState[] = [];
+		const right: OpenPlayerState[] = [];
+		game?.players.forEach((player, idx) =>
+			(idx % 2 ? right : left).push(player),
+		);
+		return [left, right];
+	}, [game?.players]);
 
-	type Player = {
-		id: number;
-		name: string;
-		card: number;
-		gold: number;
-		tools: {
-			lantern: ToolState;
-			cart: ToolState;
-			pickaxe: ToolState;
-		};
-	};
+	const [flip, setFlip] = useState<number>(0);
+	const flipInterval = useRef<NodeJS.Timeout | null>(null);
+	const [activeItem, setActiveItem] = useState<string | null>(null);
 
-    const players: Player[] = [
-        { id: 1, name: "신데렐라", card: 1, gold: 1, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
-        { id: 2, name: "앨리스", card: 2, gold: 2, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
-        { id: 3, name: "백설공주", card: 3, gold: 3, tools: {lantern: "normal", cart: "broken", pickaxe: "normal"} },
-        { id: 4, name: "오로라", card: 4, gold: 4, tools: {lantern: "normal", cart: "broken", pickaxe: "broken"} },
-        { id: 5, name: "벨", card: 5, gold: 5, tools: {lantern: "normal", cart: "broken", pickaxe: "broken"} },
-        { id: 6, name: "엘사", card: 6, gold: 6, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
-        { id: 7, name: "자스민", card: 7, gold: 7, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
-        { id: 8, name: "뮬란", card: 8, gold: 8, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
-        { id: 9, name: "애리얼", card: 9, gold: 9, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
-        { id: 10, name: "NAME", card: 10, gold: 10, tools: {lantern: "normal", cart: "normal", pickaxe: "normal"} },
-    ];
-
-	const leftPlayers: Player[] = [];
-	const rightPlayers: Player[] = [];
-
-	players.forEach((player, index) => {
-		if (index % 2 === 0) {
-			leftPlayers.push(player); // 짝수 번째 플레이어 -> 왼쪽
-		} else {
-			rightPlayers.push(player); // 홀수 번째 플레이어 -> 오른쪽
+	// 현재 드래그중인 카드 오버레이
+	const activeOverlay = useMemo(() => {
+		if (!activeItem) return null;
+		if (activeItem.startsWith(CARD_PREFIX)) {
+			const assetId = Number.parseInt(activeItem.slice(CARD_PREFIX.length));
+			if (assetId > 0 && assetId < 60) {
+				return (
+					<RouteCard
+						id="overlay"
+						assetId={assetId}
+						isDraggable={false}
+						isHidden={false}
+						flip={flip}
+					/>
+				);
+			}
+			if (assetId > 100 && assetId < 120) {
+				return (
+					<ActionCard id="overlay" assetId={assetId} isDraggable={false} />
+				);
+			}
 		}
-	});
+		return null;
+	}, [activeItem, flip]);
 
-    // 카드 관련
-    type CardData = {
-        id: string;
-        row: number;
-        col: number;
-        direction: Array<"top" | "right" | "bottom" | "left">;
-    };
-    const initialMyCards: CardData[] = [
-        { id: "mycard-1", direction: ["top", "right", "bottom", "left"], row: 0, col: 0 },
-        { id: "mycard-2", direction: ["top", "bottom"], row: 2, col: 1 },
-    ];
-    const initialCards: CardData[] = [
-        { id: "", direction: ["top", "right", "bottom", "left"], row: 0, col: 0 },
-        { id: "", direction: ["top", "bottom"], row: 2, col: 1 },
-    ];
+	// 드래그 시작: 오버레이와 flip 애니메이션 설정
+	const handleDragStart = (e: DragStartEvent) => {
+		const id = e.active.id.toString();
+		toast(`드래그 시작: ${id}`);
+		setActiveItem(id);
+		setFlip(0);
 
-    const [myCards, setMyCards] = useState<CardData[]>(initialMyCards);
-	const [cards, setCards] = useState<CardData[]>(initialCards);
-
-    const cardAt = (row: number, col: number) => {
-		return cards.find((c) => c.row === row && c.col === col);
+		if (id.startsWith(CARD_PREFIX) && !flipInterval.current) {
+			flipInterval.current = setInterval(
+				() => setFlip((prev) => (prev + 1) % 2),
+				1500,
+			);
+		}
 	};
 
-    // 드래그 이벤트 핸들러
-    const handleDragStart = (e: DragStartEvent) => {
-		toast.info(`Drag Start: ${JSON.stringify(e)}`);
-	};
-
-	const handleDragOver = (e: DragOverEvent) => {
-		toast.info(`Drag Over on ${e.over?.id}`);
-	};
-
+	// 드래그 종료: 카드 드랍 처리 및 flip 인터벌 해제
 	const handleDragEnd = (e: DragEndEvent) => {
-		const { active, over } = e;
-		if (!over) return;
+		const overId = e.over?.id.toString();
+		const activeId = e.active.id.toString();
 
-		toast.info(`Active: ${JSON.stringify(active)}`);
-		toast.info(`Over: ${JSON.stringify(over)}`);
-
-		// 게임보드에 카드 배치
-		if (
-			active.id.toString().startsWith("mycard") &&
-			over.id.toString().startsWith("cell")
-		) {
-			const activeIndex = myCards.findIndex((data) => data.id === active.id);
-
-			const [_, rowStr, colStr] = over.id.toString().split("-");
-			const row = Number.parseInt(rowStr, 10);
-			const col = Number.parseInt(colStr, 10);
-
-			setCards((prev) =>
-				update(prev, {
-					$push: [
-						{
-							id: "",
-							row: row,
-							col: col,
-							direction: myCards[activeIndex].direction,
-						},
-					],
-				}),
-			);
+		// flip 반복 종료
+		if (flipInterval.current) {
+			clearInterval(flipInterval.current);
+			flipInterval.current = null;
 		}
 
-		// 카드 덱 내 카드 순서 변경
-		if (
-			active.id.toString().startsWith("mycard") &&
-			over.id.toString().startsWith("mycard")
-		) {
-			const activeIndex = myCards.findIndex((data) => data.id === active.id);
-			const overIndex = myCards.findIndex((data) => data.id === over.id);
-			setMyCards((prev) =>
-				update(
-					update(prev, { $splice: [[activeIndex, 1, myCards[overIndex]]] }),
-					{ $splice: [[overIndex, 1, myCards[activeIndex]]] },
-				),
-			);
+		if (activeId.startsWith(CARD_PREFIX)) {
+			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
+
+			// 내 카드 버리기에 드랍
+			if (overId === TRASHBIN && cardId) {
+				toast("카드 버리기!");
+				dropMyCard(cardId);
+
+				// 맵 셀에 드랍 (길카드/암석낙하카드)
+			} else if (overId?.startsWith(MAP_PREFIX)) {
+				const [, rowStr, colStr] = overId.split(":");
+				const row = Number(rowStr);
+				const col = Number(colStr);
+
+				if (cardId > 0 && cardId < 60) usePathCard(cardId, row, col, flip);
+				else if (cardId === 107) useRockfallCard(cardId, row, col);
+
+				// 골셀에 드랍 (지도카드)
+			} else if (overId?.startsWith(GOAL_PREFIX)) {
+				const [, rowStr, colStr] = overId.split(":");
+				const row = Number(rowStr);
+				const col = Number(colStr);
+
+				// 지도카드는 특정 위치만 허용
+				if ((row === 1 || row === 3 || row === 5) && col === 8) {
+					useMapCard(cardId, row, col);
+				}
+
+				// 플레이어에 드랍 (수리/부서짐카드)
+			} else if (overId?.startsWith(PLAYER_PREFIX)) {
+				const playerId = Number.parseInt(overId.slice(PLAYER_PREFIX.length));
+				if (cardId > 100 && cardId <= 104) {
+					// 수리 카드별 대상 부위 매핑
+					const states: Record<
+						number,
+						"BROKEN_PICKAXE" | "BROKEN_LANTERN" | "BROKEN_MINECART"
+					> = {
+						101: "BROKEN_PICKAXE",
+						102: "BROKEN_LANTERN",
+						103: "BROKEN_MINECART",
+					};
+					const targetState = states[cardId];
+					if (targetState) useRepairCard(cardId, playerId, targetState);
+				} else if (cardId >= 109 && cardId <= 111) {
+					useBrokenCard(cardId, playerId);
+				}
+			}
 		}
+
+		setActiveItem(null);
 	};
+
+	// 라운드 종료 시 다이얼로그 표시
+	const endModal = useMemo(() => {
+		if (roundReviews.length == 0 || !game) return <></>;
+		switch (game.gameState) {
+			case "WAITING":
+				return <></>;
+			case "IN_GAME":
+				if (game.round > 0 && roundReviews[game.round - 1]) {
+					// 라운드 인덱스 시작 1
+					return (
+						<RoundEndDialog
+							roundReview={roundReviews[game.round - 1]}
+							onExit={() => {
+								if (room.isMaster) startRound();
+							}}
+						/>
+					);
+				} else {
+					return <></>;
+				}
+			case "FINISHED":
+				return (
+					<GameEndDialog
+						roundReviews={roundReviews}
+						onExit={() => navigate("/waiting")}
+					/>
+				);
+		}
+	}, [roundReviews, game?.gameState]);
 
 	return (
 		<div className="relative h-screen">
-            <DndContext
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-            >
-                {/* 플레이어 패널 */}
-                <div className="flex justify-between pt-10">
-                    <div className="flex flex-col gap-3">
-                        {leftPlayers.map((player) => (
-                            <PlayerPanel key={player.id} player={player} position="left" />
-                        ))}
-                    </div>
-                    <div className="flex flex-col gap-3 items-end">
-                        {rightPlayers.map((player) => (
-                            <PlayerPanel key={player.id} player={player} position="right" />
-                        ))}
-                    </div>
-                </div>
-
-                {/* 게임 보드 */}
-                <div className="absolute top-10 left-1/2 -translate-x-1/2">
-                    <GameMap
-                        width={9}
-                        height={5}
-                        renderCell={(row, col) => (
-                            <DroppableCell id={`cell-${row}-${col}`}>
-                                {cardAt(row, col) && (
-                                    <RouteCard
-                                        id={`card-${row}-${col}`}
-                                        isBlock={false}
-                                        isHidden={false}
-                                        direction={cardAt(row, col)!.direction}
-                                        isDraggable={false}
-                                    />
-                                )}
-                            </DroppableCell>
-                        )}
-                    />
-                </div>
-
-                {/* 남은 카드 */}
-                <div className="absolute bottom-2 left-75">
-                    <img src={remainCard} className="w-18" />
-                    <p className="absolute top-1 left-1/2 -translate-x-1/2 text-white text-lg font-holtwood">64</p>
-                </div>
-
-                {/* 카드 덱 */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-                    <SortableContext
-                        items={myCards.map((data) => data.id)}
-                        strategy={horizontalListSortingStrategy}
-                    >
-                        <div className="flex gap-5 w-[580px] h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-hidden">
-                            {myCards.map((data) => (
-                                <div key={data.id} className="group flex flex-col justify-between items-center shrink-0 w-[72px]">
-                                    <img
-                                        src={rotateIcon}
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => {}} // 카드 회전 기능 추가 필요
-                                    />
-                                    <RouteCard
-                                        id={data.id}
-                                        isBlock={false}
-                                        isHidden={false}
-                                        direction={data.direction}
-                                        isDraggable={true}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </SortableContext>
-                </div>
-
-                {/* 버리기 */}
-                <div className="absolute bottom-2 right-75 h-28">
-                    <DroppableCell id="trash">
-                        <div className="h-28 flex flex-col justify-between items-center">
-                            <p className="text-white text-xl font-holtwood font-bold">버리기</p>
-                            <img src={transhCan} className="w-19" />
-                        </div>
-                    </DroppableCell>
-                </div>
-
-                {/* 역할 카드 */}
-                <div className="absolute bottom-0 right-13"> 
-                    <div className="w-37 h-42 bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 flex flex-col gap-1">
-                        <p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34] text-shadow-[0_-1.46px_0.73px_#FFFFFFCC,0_1.46px_2.19px_#000000]">ROLE</p>
-                        <img src={roleCard} className="w-18 flex-1 object-contain mx-auto" />
-                    </div>
-                </div>
-            </DndContext>
+			<DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+				{/* 플레이어 패널 (좌/우) */}
+				<div className="absolute w-full top-0 left-0 flex justify-between pt-10">
+					<div className="flex flex-col gap-3">
+						{leftPlayers.map((player) => (
+							<DroppableCell
+								id={`${PLAYER_PREFIX}${player.playerId}`}
+								key={player.playerId}
+							>
+								<PlayerPanel
+									player={player}
+									position="left"
+									isPlayerTurn={game?.currentTurnPlayerId === player.playerId}
+									myInfo={myInfo ?? undefined}
+								/>
+							</DroppableCell>
+						))}
+					</div>
+					<div className="flex flex-col gap-3 items-end">
+						{rightPlayers.map((player) => (
+							<DroppableCell
+								id={`${PLAYER_PREFIX}${player.playerId}`}
+								key={player.playerId}
+							>
+								<PlayerPanel
+									player={player}
+									position="right"
+									isPlayerTurn={game?.currentTurnPlayerId === player.playerId}
+									myInfo={myInfo ?? undefined}
+								/>
+							</DroppableCell>
+						))}
+					</div>
+				</div>
+				{/* 맵 그리드 */}
+				<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+					{game && <MapGrid field={game.field} />}
+				</div>
+				{/* 카드 패, 쓰레기통, 역할카드 렌더링 */}
+				<div className="absolute flex bottom-0 left-1/2 -translate-x-1/2 items-end gap-4">
+					{/* 남은 카드 수 */}
+					<div>
+						<img src={remainCard} className="w-18" alt="남은카드" />
+						<p className="text-white text-lg font-holtwood">{game?.deckSize}</p>
+					</div>
+					{/* 내 패(손패) */}
+					<div className="flex gap-5 max-w-[580px] bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 overflow-auto">
+						{myInfo?.hand.map((id, index) => (
+							<div
+								key={`${id}-${index}`}
+								className="group flex flex-col justify-between items-center shrink-0 w-[72px]"
+							>
+								{id === 0 && (
+									<Card id={`card:${id}:${index}`} assetName="card/start" />
+								)}
+								{id > 0 && id <= 40 && (
+									<RouteCard
+										id={`card:${id}:${index}`}
+										isHidden={false}
+										assetId={id}
+									/>
+								)}
+								{id > 100 && id < 120 && (
+									<ActionCard id={`card:${id}:${index}`} assetId={id} />
+								)}
+							</div>
+						))}
+					</div>
+					{/* 버리기 (쓰레기통) */}
+					<DroppableCell id={TRASHBIN}>
+						<div className="h-28 flex flex-col justify-between items-center">
+							<p className="text-white text-xl font-holtwood font-bold">
+								버리기
+							</p>
+							<img src={trashCan} className="w-19" alt="쓰레기통" />
+						</div>
+					</DroppableCell>
+					{/* 역할 카드 */}
+					<div>
+						<div className="flex flex-col bg-black/30 rounded-tl-xl rounded-tr-xl pt-4 px-6 pb-2 gap-1 items-center">
+							<p className="text-xl font-holtwood font-bold uppercase text-[#DF1E34] text-shadow-[0_-1.46px_0.73px_#FFFFFFCC,0_1.46px_2.19px_#000000]">
+								ROLE
+							</p>
+							<img
+								src={myInfo?.playerRole === "SABOTEUR" ? saboteur : worker}
+								className="w-18 flex-1 object-contain mx-auto"
+								alt="직업카드"
+							/>
+						</div>
+					</div>
+				</div>
+				{/* 카드 드래그 오버레이 */}
+				<DragOverlay>{activeOverlay}</DragOverlay>
+			</DndContext>
+			{/* 라운드 및 게임 종료 다이얼로그 출력 */}
+			{endModal}
 		</div>
 	);
 };
 
 export default GamePage;
+
+/**
+ * 맵 렌더링용 별도 컴포넌트 (row, col별 셀 렌더)
+ */
+const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
+	return (
+		<GameMap
+			height={field.length}
+			width={field[0].length}
+			renderCell={(row, col) => {
+				const cell = field[row][col];
+				const id = `${MAP_PREFIX}${row}:${col}`;
+				if (!cell) return <div key={id}>{id}</div>;
+
+				// 드랍 가능영역(빈칸)
+				if (cell[0] === -1) {
+					return (
+						<DroppableCell id={id} key={id}>
+							{id}
+						</DroppableCell>
+					);
+				}
+				// 길카드(노멀)
+				if (cell[0] > 0 && cell[0] < 60) {
+					return (
+						<DroppableCell id={id} key={id}>
+							<RouteCard
+								id={`disp-${id}`}
+								assetId={cell[0]}
+								isHidden={false}
+								isDraggable={false}
+								flip={cell[1]}
+							/>
+						</DroppableCell>
+					);
+				}
+				// 목표/보상 카드
+				if (cell[0] > 60 && cell[0] < 70) {
+					return (
+						<DroppableCell id={`${GOAL_PREFIX}${row}:${col}`} key={id}>
+							<GoalCard
+								id={id}
+								assetId={cell[0]}
+								isHidden={false}
+								isDraggable={false}
+							/>
+						</DroppableCell>
+					);
+				}
+				// 시작카드
+				return (
+					<Card
+						id="start-card"
+						assetName="card/start"
+						isDraggable={false}
+						key={id}
+					/>
+				);
+			}}
+		/>
+	);
+};

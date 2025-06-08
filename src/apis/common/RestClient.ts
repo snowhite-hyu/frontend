@@ -1,6 +1,6 @@
 import type { RestReqest, RestResponse } from "@/models/common/RestModel";
-import { apiSerivce } from "./ApiClient";
 import type { AxiosResponse } from "axios";
+import { apiSerivce } from "./ApiClient";
 
 async function restService<REQ, RES>(
 	request: RestReqest<REQ>,

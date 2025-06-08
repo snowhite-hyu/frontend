@@ -76,9 +76,8 @@ const useLogin = () => {
 		if (response.isSuccess) {
 			toast(response.result.message);
 			return response.result.isExisting;
-		} else {
-			toast(response.message);
 		}
+		toast(response.message);
 
 		return false;
 	};

@@ -1,18 +1,20 @@
-import { useNavigate } from "react-router-dom";
 import Dialog from "@/components/ui/dialog/Dialog";
 import { Button } from "@/components/ui/button";
 import gameEndImage from "@/assets/gameEnd.svg";
 import replayImage from "@/assets/replay.svg";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { RoundFinishedRes } from "@/models/game/Game";
 
 interface GameEndDialogProps {
-	winner: string;
-	gold: number;
+	roundReviews: RoundFinishedRes["payload"][];
+	onExit: () => void | Promise<void>;
 }
 
-const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
+const GameEndDialog: React.FC<GameEndDialogProps> = ({
+	roundReviews,
+	onExit,
+}) => {
 	const [dialogStep, setDialogStep] = useState(1);
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -24,14 +26,43 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 					break;
 				case 2:
 					e.preventDefault();
-					navigate("/waiting");
+					onExit();
 					break;
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [dialogStep, navigate]);
+	}, [dialogStep]);
+
+	const { winners, maxGold } = useMemo(() => {
+		const goldMap = new Map<number, { gold: number; playerName: string }>();
+		roundReviews.forEach((round) => {
+			round.players.forEach((player) => {
+				if (!goldMap.has(player.playerId)) {
+					goldMap.set(player.playerId, {
+						gold: 0,
+						playerName: player.playerName,
+					});
+				}
+				const entry = goldMap.get(player.playerId)!;
+				entry.gold += player.gainedGold;
+			});
+		});
+
+		let max = 0;
+		goldMap.forEach((v) => {
+			if (v.gold > max) max = v.gold;
+		});
+		const winnersArr = Array.from(goldMap)
+			.filter(([, v]) => v.gold === max)
+			.map(([playerId, v]) => ({
+				playerId,
+				playerName: v.playerName,
+				gold: v.gold,
+			}));
+		return { winners: winnersArr, maxGold: max };
+	}, [roundReviews]);
 
 	if (dialogStep === 0) return null;
 
@@ -49,8 +80,12 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 						aria-hidden={true}
 					/>
 				</div>
-				<p className="font-semibold text-4xl">{winner}</p>
-				<p className="font-semibold text-3xl">총 금덩이 개수 {gold}개</p>
+				{winners.map((winner) => (
+					<p key={winner.playerId} className="font-semibold text-4xl">
+						{winner.playerName}
+					</p>
+				))}
+				<p className="font-semibold text-3xl">총 금덩이 개수 {maxGold}개</p>
 			</Dialog>
 			<Dialog
 				isOpen={dialogStep === 2}
@@ -70,7 +105,7 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 						type="button"
 						variant={"replay"}
 						className="w-fit h-fit opacity-50"
-						onClick={() => navigate("/waiting")}
+						onClick={onExit}
 					>
 						나가기
 					</Button>
@@ -78,7 +113,7 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 						type="button"
 						variant={"replay"}
 						className="w-fit h-fit opacity-90"
-						onClick={() => navigate("/waiting")}
+						onClick={onExit}
 					>
 						다시하기
 					</Button>

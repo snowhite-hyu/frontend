@@ -1,6 +1,6 @@
+import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dropdown } from "@/components/ui/Dropdown";
 // import useLogin from "@/hooks/useLogin";
 import type { CreateRoomRequest } from "@/models/common/Room";
 import update from "immutability-helper";
@@ -19,6 +19,7 @@ const CreateRoomPage: React.FC = () => {
 	});
 	// const { register } = useLogin();
 	const { connect } = useRoomSocketStore();
+	const setIsMaster = useRoomInfoStore((state) => state.setIsMaster);
 	const navigate = useNavigate();
 	const token = useSessionToken();
 
@@ -35,7 +36,11 @@ const CreateRoomPage: React.FC = () => {
 		connect(token);
 	}, []);
 
-	const handleCreateRoom = ( roomName: string, capacity: number, turnTime: number ) => {
+	const handleCreateRoom = (
+		roomName: string,
+		capacity: number,
+		turnTime: number,
+	) => {
 		const roomSocket = useRoomSocketStore.getState().socket;
 
 		if (roomSocket) {
@@ -46,6 +51,7 @@ const CreateRoomPage: React.FC = () => {
 			roomSocket.onCreateRoom((payload) => {
 				useRoomInfoStore.getState().setRoom(payload);
 				navigate("/waiting");
+				setIsMaster(true);
 			});
 		}
 	};
@@ -86,7 +92,14 @@ const CreateRoomPage: React.FC = () => {
 					className="min-w-[147px]"
 					optionSuffix="초"
 				/>
-				<Button variant={"sabotuer"} className="w-fit h-fit" type="submit" onClick={() => handleCreateRoom(form.roomName, form.maxPlayers, form.turnTimeLimit)}>
+				<Button
+					variant={"sabotuer"}
+					className="w-fit h-fit"
+					type="submit"
+					onClick={() =>
+						handleCreateRoom(form.roomName, form.maxPlayers, form.turnTimeLimit)
+					}
+				>
 					Create
 				</Button>
 			</form>
