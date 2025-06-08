@@ -59,10 +59,7 @@ export type GetGameStateReq = Payload<
 	}
 >;
 
-export type GetGameStateRes = Payload<
-	"Game-State",
-	GameData,
->;
+export type GetGameStateRes = Payload<"Game-State", GameData>;
 
 export type RoundFinishedRes = Payload<
 	"Round-Finished",
@@ -84,4 +81,7 @@ export type FieldUpdateOneRes = Payload<
 
 export type PlayerInfoChanged = Payload<string, OpenPlayerState>;
 
-export type TurnChangedRes = Payload<"Turn-Changed", { nextTurnPlayerId: number }>;
+export type TurnChangedRes = Payload<
+	"Turn-Changed",
+	{ nextTurnPlayerId: number }
+>;

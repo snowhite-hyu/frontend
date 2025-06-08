@@ -2,7 +2,11 @@ import type { Payload } from "../common/Payload";
 import { type ActionCardData, CardData, type RouteCardData } from "./Card";
 
 export type PlayerRole = "DWARF" | "SABOTEUR";
-export type PlayerState = "NORMAL" | "BROKEN_PICKAXE" | "BROKEN_MINECART" | "BROKEN_LANTERN";
+export type PlayerState =
+	| "NORMAL"
+	| "BROKEN_PICKAXE"
+	| "BROKEN_MINECART"
+	| "BROKEN_LANTERN";
 
 export interface PlayerData {
 	playerId: number;
@@ -20,7 +24,4 @@ export type GetPlayerInfoReq = Payload<
 	}
 >;
 
-export type GetPlayerInfoRes = Payload<
-	"Player-Info",
-	PlayerData,
->;
+export type GetPlayerInfoRes = Payload<"Player-Info", PlayerData>;
