@@ -30,7 +30,7 @@ export type RoundStartRes = Payload<
 	}
 >;
 
-type GameState = "WAITING" | "IN_GAME";
+type GameState = "WAITING" | "IN_GAME" | "FINISHED";
 type FieldState = [number, number];
 interface OpenPlayerState {
 	playerId: number;

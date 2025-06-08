@@ -3,14 +3,14 @@ import Dialog from "@/components/ui/dialog/Dialog";
 import { Button } from "@/components/ui/button";
 import gameEndImage from "@/assets/gameEnd.svg";
 import replayImage from "@/assets/replay.svg";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { RoundFinishedRes } from "@/models/game/Game";
 
 interface GameEndDialogProps {
-	winner: string;
-	gold: number;
+	roundReview: RoundFinishedRes["payload"];
 }
 
-const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
+const GameEndDialog: React.FC<GameEndDialogProps> = ({ roundReview }) => {
 	const [dialogStep, setDialogStep] = useState(1);
 	const navigate = useNavigate();
 
@@ -33,6 +33,17 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [dialogStep, navigate]);
 
+	const winners = useMemo(
+		() =>
+			roundReview.players.filter(
+				(player) => player.role === roundReview.winnerRole,
+			),
+		[roundReview],
+	);
+	const winnersGold: number = useMemo(() => {
+		return winners.reduce((prev, cur) => prev + cur.gainedGold, 0);
+	}, []);
+
 	if (dialogStep === 0) return null;
 
 	return (
@@ -49,8 +60,12 @@ const GameEndDialog: React.FC<GameEndDialogProps> = ({ winner, gold }) => {
 						aria-hidden={true}
 					/>
 				</div>
-				<p className="font-semibold text-4xl">{winner}</p>
-				<p className="font-semibold text-3xl">총 금덩이 개수 {gold}개</p>
+				{winners.map((winner) => (
+					<p key={winner.playerId} className="font-semibold text-4xl">
+						{winner.playerName}
+					</p>
+				))}
+				<p className="font-semibold text-3xl">총 금덩이 개수 {winnersGold}개</p>
 			</Dialog>
 			<Dialog
 				isOpen={dialogStep === 2}
