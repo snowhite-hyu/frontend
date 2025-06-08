@@ -112,8 +112,8 @@ const GamePage: React.FC = () => {
 
 		if (id.startsWith(CARD_PREFIX) && !flipInterval.current) {
 			flipInterval.current = setInterval(
-				() => setFlip((f) => (f + 1) % 3),
-				500,
+				() => setFlip((prev) => (prev + 1) % 2),
+				1500,
 			);
 		}
 	};
