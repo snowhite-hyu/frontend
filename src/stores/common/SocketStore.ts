@@ -50,7 +50,6 @@ const addHandler = <T = unknown>(
 	handlerMap[type].add(cb);
 };
 
-/** Remove a previously registered handler */
 const removeHandler = (
 	socketType: string,
 	type: string,
@@ -59,7 +58,6 @@ const removeHandler = (
 	socketHandlerMap[socketType]?.[type]?.delete(cb);
 };
 
-/** Fire all handlers listening to this socket/type */
 const fireHandlers = (socketType: string, type: string, msg: any) => {
 	socketHandlerMap[socketType]?.[type]?.forEach((cb) => {
 		try {
@@ -84,8 +82,6 @@ function setSocketInState(
 ) {
 	set(type === "room" ? { roomSocket: ws } : { gameSocket: ws });
 }
-
-// --- Zustand store ---
 
 const SocketStore = create<SocketState>((set, get) => ({
 	roomSocket: null,
@@ -153,9 +149,10 @@ const SocketStore = create<SocketState>((set, get) => ({
 	},
 }));
 
-SocketStore((state) => ({
-	gameSocket: state.gameSocket,
-	roomSocket: state.roomSocket,
-}));
+export const useSocket = () =>
+	SocketStore((state) => ({
+		gameSocket: state.gameSocket,
+		roomSocket: state.roomSocket,
+	}));
 
 export const useSocketActions = () => SocketStore((state) => state.actions);

@@ -3,7 +3,6 @@ import GamePage from "@/pages/Game";
 import LoginPage from "@/pages/Login";
 import MainPage from "@/pages/Main";
 import RegisterPage from "@/pages/Register";
-import TestDialog from "@/pages/TestDialog";
 import WaitingPage from "@/pages/Waiting";
 import WelcomPage from "@/pages/Welcome";
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,7 +11,6 @@ import { Suspense } from "react";
 import type { ReactNode } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import RoomListPage from "./pages/RoomList";
-import TestPage from "./pages/TestPage";
 import { useBackgroundActions } from "./stores/common/BackgroundStore";
 import { useSessionToken } from "./stores/common/SessionStore";
 
@@ -49,14 +47,11 @@ const Router: React.FC = () => {
 		{ path: "/create-room", element: <CreateRoomPage /> },
 		{ path: "/room", element: <RoomListPage /> },
 		{ path: "/game", element: <GamePage /> },
-		{ path: "/dialog", element: <TestDialog /> }, // 테스트용 페이지. 추후 삭제 요망
 	];
 	const openRoutes: MyRoute[] = [
 		{ path: "/main", element: <MainPage /> },
 		{ path: "/login", element: <LoginPage /> },
 		{ path: "/register", element: <RegisterPage /> },
-		{ path: "/dialog", element: <TestDialog /> }, // 테스트용 페이지. 추후 삭제 요망
-		{ path: "/component", element: <TestPage /> }, // 테스트용 페이지. 추후 삭제 요망
 	];
 
 	const backgroundActions = useBackgroundActions();
