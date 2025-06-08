@@ -26,7 +26,7 @@ export interface RoomItem {
 
 export type ListResponse = {
 	roomList: RoomItem[];
-}
+};
 
 export interface ChatRequest {
 	roomId: number;

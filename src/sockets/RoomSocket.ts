@@ -23,7 +23,10 @@ export class RoomSocket extends BaseSocket {
 			if (this.listeners[type]) {
 				this.listeners[type].forEach((cb) => cb(payload));
 			} else {
-				console.warn(`[RoomSocket] 핸들러가 없는 메시지 수신: ${type}`, payload);
+				console.warn(
+					`[RoomSocket] 핸들러가 없는 메시지 수신: ${type}`,
+					payload,
+				);
 			}
 		} catch (err) {
 			console.error("[RoomSocket] 잘못된 메시지 형식:", data);

@@ -12,7 +12,8 @@ import useGame from "@/hooks/useGame";
 import { useGameData } from "@/stores/game/GameStore";
 
 const WaitingPage: React.FC = () => {
-	const { room, isMaster, updateUsers, chats, pushChat, clearChat } = useRoomInfoStore((state) => state);
+	const { room, isMaster, updateUsers, chats, pushChat, clearChat } =
+		useRoomInfoStore((state) => state);
 	const socket = useRoomSocketStore((state) => state.socket);
 	const { open, init, join } = useGame();
 	const game = useGameData();
@@ -35,10 +36,10 @@ const WaitingPage: React.FC = () => {
 
 		const handleChat = (msg: ChatResponse) => {
 			pushChat(msg);
-		}
+		};
 
 		socket.onRoomusers(handleMessage);
-		socket.onChat(handleChat)
+		socket.onChat(handleChat);
 		return () => {
 			socket.offRoomusers(handleMessage);
 			socket.offChat(handleChat);
@@ -77,7 +78,7 @@ const WaitingPage: React.FC = () => {
 			join(roomId);
 		}
 		init();
-	}
+	};
 
 	const chatViewRef = useRef<HTMLDivElement | null>(null);
 	useEffect(() => {
@@ -94,7 +95,7 @@ const WaitingPage: React.FC = () => {
 			});
 			setMessage("");
 		}
-	}
+	};
 
 	const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
 		if (e.key === "Enter") sendChat();
@@ -143,8 +144,9 @@ const WaitingPage: React.FC = () => {
 								type="button"
 								key={`page-${i}`}
 								onClick={() => setCurrentPage(i)}
-								className={`w-2 h-2 rounded-full ${i === currentPage ? "bg-black" : "bg-gray-200"
-									}`}
+								className={`w-2 h-2 rounded-full ${
+									i === currentPage ? "bg-black" : "bg-gray-200"
+								}`}
 							/>
 						))}
 					</div>
@@ -159,12 +161,16 @@ const WaitingPage: React.FC = () => {
 						{chats.length ? (
 							chats.slice(-20).map((chat: ChatResponse) => (
 								<div key={chat.user.id} className="mb-1">
-									<span className="font-bold text-white">{chat.user.username}: </span>
+									<span className="font-bold text-white">
+										{chat.user.username}:{" "}
+									</span>
 									<span className="text-white">{chat.message}</span>
 								</div>
 							))
 						) : (
-							<div className="text-gray-400 text-sm">아직 메시지가 없습니다.</div>
+							<div className="text-gray-400 text-sm">
+								아직 메시지가 없습니다.
+							</div>
 						)}
 					</div>
 					{/* 입력창 */}
@@ -174,7 +180,7 @@ const WaitingPage: React.FC = () => {
 							className="flex-1 bg-transparent text-white outline-none"
 							value={message}
 							placeholder="텍스트를 입력해주세요"
-							onChange={e => setMessage(e.target.value)}
+							onChange={(e) => setMessage(e.target.value)}
 							onKeyDown={handleKeyDown}
 						/>
 						<button
