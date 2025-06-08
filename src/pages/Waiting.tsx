@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import Profile from "@/components/ui/Profile";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
+import { ChatResponse } from "@/models/common/Room";
+import { WillChangeMotionValue } from "framer-motion";
 
 const WaitingPage: React.FC = () => {
 	const room = useRoomInfoStore((state) => state.room);
@@ -15,26 +17,34 @@ const WaitingPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { setImage, setUseLayout } = useBackgroundActions();
 	const socket = useRoomSocketStore.getState().socket;
-	const updateUsers = useRoomInfoStore.getState().updateUsers;
-	
+	const { updateUsers, chats, pushChat, clearChat } = useRoomInfoStore((state) => state);
+
 	useEffect(() => {
 		setImage(roomBackground);
 		setUseLayout(false);
-		
+
 		if (!socket) return;
-		
+
 		const handleMessage = (users: any) => {
 			updateUsers(users);
 		};
 
-		socket.onRoomusers(handleMessage);
-		return () => socket.offRoomusers(handleMessage);
+		const handleChat = (msg: ChatResponse) => {
+			pushChat(msg);
+		}
 
-	}, [setImage, setUseLayout]);
+		socket.onRoomusers(handleMessage);
+		socket.onChat(handleChat)
+		return () => {
+			socket.offRoomusers(handleMessage);
+			socket.offChat(handleChat);
+			clearChat();
+		};
+	}, []);
 
 	const options: { key: string; title: string; setting: string }[] = [
-		{ key: "people", title: "최대 인원", setting: room.capacity+"명" },
-		{ key: "time", title: "턴 시간 제한", setting: room.turnTime+"초" },
+		{ key: "people", title: "최대 인원", setting: room.capacity + "명" },
+		{ key: "time", title: "턴 시간 제한", setting: room.turnTime + "초" },
 	];
 
 	const [currentPage, setCurrentPage] = useState(0);
@@ -45,11 +55,32 @@ const WaitingPage: React.FC = () => {
 	const start = currentPage * membersPerPage;
 	const currentMembers = room.users.slice(start, start + membersPerPage);
 
-	const handleQuitRoom = ( roomId:number ) => {
+	const handleQuitRoom = (roomId: number) => {
 		const roomSocket = useRoomSocketStore.getState().socket;
 		if (roomSocket) {
-			roomSocket.quitRoom({roomId});
+			roomSocket.quitRoom({ roomId });
 		}
+	};
+
+	const chatViewRef = useRef<HTMLDivElement | null>(null);
+	useEffect(() => {
+		if (chatViewRef.current) {
+			chatViewRef.current.scrollTop = chatViewRef.current.scrollHeight;
+		}
+	}, [chats]);
+	const [message, setMessage] = useState<string>("");
+	const sendChat = () => {
+		if (socket) {
+			socket?.sendMessage({
+				roomId: room.roomId,
+				message,
+			});
+			setMessage("");
+		}
+	}
+
+	const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+		if (e.key === "Enter") sendChat();
 	};
 
 	return (
@@ -95,9 +126,8 @@ const WaitingPage: React.FC = () => {
 								type="button"
 								key={`page-${i}`}
 								onClick={() => setCurrentPage(i)}
-								className={`w-2 h-2 rounded-full ${
-									i === currentPage ? "bg-black" : "bg-gray-200"
-								}`}
+								className={`w-2 h-2 rounded-full ${i === currentPage ? "bg-black" : "bg-gray-200"
+									}`}
 							/>
 						))}
 					</div>
@@ -106,18 +136,47 @@ const WaitingPage: React.FC = () => {
 			{/* 하단부 */}
 			<div className="absolute bottom-0 w-full flex justify-between px-[3%]">
 				{/* 채팅창 */}
-				<div className="rounded-t-[21px] bg-[#0000004D] w-[500px] h-[140px]">
-					<div className="absolute bottom-0 bg-[#0000003D] w-[500px] h-[44px] text-[#ffffff5D] pl-[13px] flex items-center">
-						텍스트를 입력해주세요
+				<div className="rounded-t-[21px] bg-[#0000004D] w-[500px] h-[140px] flex flex-col">
+					{/* 채팅 메시지 뷰 */}
+					<div ref={chatViewRef} className="flex-1 overflow-y-auto px-2 py-2">
+						{chats.length ? (
+							chats.slice(-20).map((chat: ChatResponse) => (
+								<div key={chat.user.id} className="mb-1">
+									<span className="font-bold text-white">{chat.user.username}: </span>
+									<span className="text-white">{chat.message}</span>
+								</div>
+							))
+						) : (
+							<div className="text-gray-400 text-sm">아직 메시지가 없습니다.</div>
+						)}
+					</div>
+					{/* 입력창 */}
+					<div className="flex items-center border-t bg-[#0000003D] w-full h-[44px] px-2">
+						<input
+							type="text"
+							className="flex-1 bg-transparent text-white outline-none"
+							value={message}
+							placeholder="텍스트를 입력해주세요"
+							onChange={e => setMessage(e.target.value)}
+							onKeyDown={handleKeyDown}
+						/>
+						<button
+							className="ml-2 text-white"
+							onClick={sendChat}
+							disabled={!message.trim()}
+							type="button"
+						>
+							전송
+						</button>
 					</div>
 				</div>
 				{/* 나가기 & 시작 버튼 */}
 				<div className="gap-[50px]">
-					<Button 
-						key="exit" 
+					<Button
+						key="exit"
 						variant="exit"
-						className="h-fit mr-[50px]" 
-						onClick={() => { handleQuitRoom(room.roomId); navigate("/room");  }}
+						className="h-fit mr-[50px]"
+						onClick={() => { handleQuitRoom(room.roomId); navigate("/room"); }}
 					>
 						나가기
 					</Button>
