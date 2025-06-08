@@ -188,7 +188,7 @@ const GamePage: React.FC = () => {
 			case "WAITING":
 				return <></>;
 			case "IN_GAME":
-				if (game.round > 0) {
+				if (game.round > 0 && roundReviews[game.round - 1]) {
 					// 라운드 인덱스 시작 1
 					return (
 						<RoundEndDialog
