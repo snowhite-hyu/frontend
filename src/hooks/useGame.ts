@@ -226,7 +226,7 @@ const useGame = () => {
 		cardId: number,
 		row: number,
 		column: number,
-		isFlipped: number,
+		isRotated: number,
 	) => {
 		if (!gameId) return;
 		if (!(await checkMyTurn())) return;
@@ -238,7 +238,7 @@ const useGame = () => {
 					cardId: number;
 					row: number;
 					column: number;
-					isFlipped: number;
+					isRotated: number;
 				}
 			>;
 
@@ -260,7 +260,7 @@ const useGame = () => {
 
 				actions.send(CHANNEL, {
 					type: "use-path-card",
-					payload: { gameId, cardId, row, column, isFlipped },
+					payload: { gameId, cardId, row, column, isRotated },
 				} as Req);
 
 				timer = setTimeout(() => {
