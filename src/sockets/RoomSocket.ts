@@ -1,4 +1,4 @@
-import { ChatRequest, ChatResponse } from "@/models/common/Room";
+import type { ChatRequest, ChatResponse } from "@/models/common/Room";
 import { BaseSocket } from "@/sockets/BaseSocket";
 
 type RoomEvent =

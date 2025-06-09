@@ -2,13 +2,13 @@ import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { CreateRoomRequest } from "@/models/common/Room";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
+import { useSessionToken } from "@/stores/common/SessionStore";
 import update from "immutability-helper";
 import type React from "react";
-import { type FormEvent, useState, useEffect } from "react";
-import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
-import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { type FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSessionToken } from "@/stores/common/SessionStore";
 import { toast } from "sonner";
 
 const CreateRoomPage: React.FC = () => {

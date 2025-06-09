@@ -1,7 +1,7 @@
-import { create } from "zustand";
+import type { ChatResponse, RoomItem } from "@/models/common/Room";
+import type { WsRoomUserModel } from "@/models/common/User";
 import update from "immutability-helper";
-import { WsRoomUserModel } from "@/models/common/User";
-import { ChatResponse, RoomItem } from "@/models/common/Room";
+import { create } from "zustand";
 
 interface RoomInfoState {
 	room: RoomItem | null;

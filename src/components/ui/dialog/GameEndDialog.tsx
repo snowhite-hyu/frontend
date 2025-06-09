@@ -1,9 +1,9 @@
-import Dialog from "@/components/ui/dialog/Dialog";
-import { Button } from "@/components/ui/button";
 import gameEndImage from "@/assets/gameEnd.svg";
 import replayImage from "@/assets/replay.svg";
+import { Button } from "@/components/ui/button";
+import Dialog from "@/components/ui/dialog/Dialog";
+import type { RoundFinishedRes } from "@/models/game/Game";
 import { useEffect, useMemo, useState } from "react";
-import { RoundFinishedRes } from "@/models/game/Game";
 
 interface GameEndDialogProps {
 	roundReviews: RoundFinishedRes["payload"][];
