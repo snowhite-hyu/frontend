@@ -10,6 +10,7 @@ import RouteCard from "@/components/asset/RouteCard";
 import { DroppableCell } from "@/components/game/DroppableCell";
 import GameMap from "@/components/game/Map";
 import PlayerPanel from "@/components/ui/PlayerPanel";
+import Dialog from "@/components/ui/dialog/Dialog";
 import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
 import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
 import useGame from "@/hooks/useGame";
@@ -73,6 +74,8 @@ const GamePage: React.FC = () => {
 		);
 		return [left, right];
 	}, [game?.players]);
+
+	const [cardIdByMapCard, setCardIdByMapCard] = useState<number | null>(null);
 
 	const [isRotated, setIsRotated] = useState<number>(0);
 	const rotateInterval = useRef<NodeJS.Timeout | null>(null);
@@ -152,8 +155,17 @@ const GamePage: React.FC = () => {
 				const col = Number(colStr);
 
 				// 지도카드는 특정 위치만 허용
-				if ((row === 1 || row === 3 || row === 5) && col === 8 && cardId === 108) {
-					useMapCard(cardId, row, col);
+				if (
+					(row === 1 || row === 3 || row === 5) &&
+					col === 8 &&
+					cardId === 108
+				) {
+					useMapCard(cardId, row, col).then((cardId) => {
+						setCardIdByMapCard(cardId);
+						setTimeout(() => {
+							setCardIdByMapCard(null);
+						}, 3000);
+					});
 				} else if (cardId !== 108) {
 					toast("목적지 카드에는 지도 카드만 사용할 수 있습니다.");
 				}
@@ -305,6 +317,16 @@ const GamePage: React.FC = () => {
 			</DndContext>
 			{/* 라운드 및 게임 종료 다이얼로그 출력 */}
 			{endModal}
+			<Dialog isOpen={cardIdByMapCard !== null} setIsOpen={() => {}}>
+				<div className="flex flex-col items-center gap-10">
+					<p className="text-red-600 text-xl font-holtwood font-bold">
+						3 초동안만 볼 수 있습니다 !
+					</p>
+					{cardIdByMapCard && (
+						<GoalCard id={"destId"} assetId={cardIdByMapCard} />
+					)}
+				</div>
+			</Dialog>
 		</div>
 	);
 };

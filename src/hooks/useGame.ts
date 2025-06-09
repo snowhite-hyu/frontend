@@ -326,20 +326,14 @@ const useGame = () => {
 				"use-map-card",
 				{ gameId: number; cardId: number; row: number; column: number }
 			>;
-			type Res = Payload<
-				"Unicast: Map-Card-Use",
-				{ playerhand: []; destCardID: number }
-			>;
+			type Res = Payload<"Dest-Card-Id", { cardId: number }>;
 			const result = await sendAndWaitForResponse<Req, Res>(
 				CHANNEL,
 				{ type: "use-map-card", payload: { gameId, cardId, row, column } },
-				"Unicast: Map-Card-Use",
+				"Dest-Card-Id",
 				() => true,
 			);
-			setMyInfo((prev) =>
-				update(prev, { hand: { $set: result.payload.playerhand } }),
-			);
-			return result.payload.destCardID;
+			return result.payload.cardId;
 		} catch (e) {
 			console.error(e);
 		}
