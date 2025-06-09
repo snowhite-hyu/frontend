@@ -26,12 +26,16 @@ const RegisterPage: React.FC = () => {
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
 
+		const isNameValid = form.username.trim() !== "";
 		const passwordChecked = form.password === checkPassword;
-		if (isEmailValid && passwordChecked) {
+		if (isNameValid && isEmailValid && passwordChecked) {
 			register(form);
 		} else {
+			if (isNameValid === false) {
+				toast("닉네임은 공백으로 입력할 수 없어요.");
+			  }
 			if (isEmailValid === false) {
-				toast(`${form.email} - 이메일 중복을 체크해주세요`);
+				toast(`${form.email} - 이메일 중복을 체크해주세요.`);
 			}
 			if (passwordChecked === false) {
 				toast("입력한 비밀번호와 똑같이 입력해주세요.");

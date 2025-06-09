@@ -1,7 +1,6 @@
 import { Dropdown } from "@/components/ui/Dropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import useLogin from "@/hooks/useLogin";
 import type { CreateRoomRequest } from "@/models/common/Room";
 import update from "immutability-helper";
 import type React from "react";
@@ -10,6 +9,7 @@ import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useNavigate } from "react-router-dom";
 import { useSessionToken } from "@/stores/common/SessionStore";
+import { toast } from "sonner";
 
 const CreateRoomPage: React.FC = () => {
 	const [form, setForm] = useState<CreateRoomRequest>({
@@ -17,7 +17,6 @@ const CreateRoomPage: React.FC = () => {
 		maxPlayers: 3,
 		turnTimeLimit: 15,
 	});
-	// const { register } = useLogin();
 	const { connect } = useRoomSocketStore();
 	const setIsMaster = useRoomInfoStore((state) => state.setIsMaster);
 	const navigate = useNavigate();
@@ -25,7 +24,6 @@ const CreateRoomPage: React.FC = () => {
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		// register(form);
 	};
 
 	useEffect(() => {
@@ -41,6 +39,12 @@ const CreateRoomPage: React.FC = () => {
 		capacity: number,
 		turnTime: number,
 	) => {
+		const isNameValid = roomName.trim() !== "";
+		if (!isNameValid) {
+			toast("방 제목을 입력해주세요.");
+			return;
+		}
+
 		const roomSocket = useRoomSocketStore.getState().socket;
 
 		if (roomSocket) {
