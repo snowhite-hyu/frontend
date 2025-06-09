@@ -20,13 +20,25 @@ const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const currentImages = images.slice(currentPage * 2, currentPage * 2 + 2);
 
+	const [highlightImg, setHighlightImg] = useState<string | null>(null);
+
 	return (
 		<>
 			<Dialog isOpen={isOpen} setIsOpen={setIsOpen} size="big">
+				{highlightImg && (
+					<Dialog isOpen={highlightImg !== null} setIsOpen={() => {}}>
+						<img
+							key="highlightImg"
+							src={highlightImg}
+							onClick={() => setHighlightImg(null)}
+							className="w-[100vw] h-[100vh]"
+						/>
+					</Dialog>
+				)}
 				<Text className="text-9xl">Manual</Text>
 				<div className="relative w-fit mt-3 flex gap-5">
-					{currentImages.map((src, index) => (
-						<img key={index} src={src} />
+					{currentImages.map((src) => (
+						<img key={src} src={src} onClick={() => setHighlightImg(src)} />
 					))}
 				</div>
 				<div className="absolute top-1/2 right-25">
