@@ -9,6 +9,13 @@ export type JoinGameReq = Payload<
 	}
 >;
 
+export type ErrorRes = Payload<
+	"error",
+	{
+		message: string;
+	}
+>;
+
 export type JoinGameRes = Payload<
 	"Game-Joined",
 	{

@@ -10,6 +10,7 @@ import type {
 	RoundStartReq,
 	RoundStartRes,
 	TurnChangedRes,
+	ErrorRes,
 } from "@/models/game/Game";
 import type {
 	GetPlayerInfoReq,
@@ -136,6 +137,10 @@ const useGame = () => {
 		forceUpdate();
 	};
 
+	const handleError = () => {
+		toast("행동 카드를 사용할 수 없습니다.");
+	}
+
 	const registerHandlers = () => {
 		register<RoundStartRes>(CHANNEL, "Round-Started", roundStartedCallback);
 		register<FieldUpdateOneRes>(CHANNEL, "Field-Changed", fieldUpdateOne);
@@ -152,6 +157,7 @@ const useGame = () => {
 			playerInfoUpdate,
 		);
 		register<RoundFinishedRes>(CHANNEL, "Round-Finished", checkRoundFinished);
+		register<ErrorRes>(CHANNEL, "error", handleError);
 	};
 
 	const unregisterHandlers = () => {
@@ -162,6 +168,7 @@ const useGame = () => {
 		unregister(CHANNEL, "Player-Info-Changed", playerInfoUpdate);
 		unregister(CHANNEL, "Changed-Public-Player-Info", playerInfoUpdate);
 		unregister(CHANNEL, "Round-Finished", checkRoundFinished);
+		unregister(CHANNEL, "error", handleError);
 	};
 
 	const init = () => {
@@ -176,6 +183,7 @@ const useGame = () => {
 	const forceUpdate = async () => {
 		if (!gameId) return;
 		try {
+			// 1. 게임 상태 가져오기
 			const result = await sendAndWaitForResponse<
 				GetGameStateReq,
 				GetGameStateRes
@@ -187,10 +195,13 @@ const useGame = () => {
 			);
 			setGameData(result.payload);
 
-			actions.send(CHANNEL, {
-				type: "get-player-info",
-				payload: { gameId },
-			} as GetPlayerInfoReq);
+			// 2. 플레이어 정보 가져오기
+			await sendAndWaitForResponse<GetPlayerInfoReq, GetPlayerInfoRes>(
+				CHANNEL,
+				{ type: "get-player-info", payload: { gameId } },
+				"Player-Info",
+				() =>  true,
+			);
 
 			return result.payload;
 		} catch (e) {
@@ -245,6 +256,7 @@ const useGame = () => {
 			await new Promise<void>((resolve, reject) => {
 				let timer: NodeJS.Timeout | null = null;
 				const callback = (msg: Payload<string, unknown>) => {
+					console.log("타입: ", msg.type);
 					unregister(CHANNEL, "Place-PathCard-Failed", callback);
 					unregister(CHANNEL, "Player-Info", callback);
 					if (timer) clearTimeout(timer);
