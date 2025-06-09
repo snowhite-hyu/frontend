@@ -38,8 +38,13 @@ const WaitingPage: React.FC = () => {
 			pushChat(msg);
 		};
 
+		const handleQuitRoom = () => {
+			navigate("/room");
+		}
+
 		socket.onRoomusers(handleMessage);
 		socket.onChat(handleChat);
+		socket.onQuitRoom(handleQuitRoom);
 		open();
 		return () => {
 			socket.offRoomusers(handleMessage);
