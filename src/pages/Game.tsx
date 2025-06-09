@@ -152,8 +152,10 @@ const GamePage: React.FC = () => {
 				const col = Number(colStr);
 
 				// 지도카드는 특정 위치만 허용
-				if ((row === 1 || row === 3 || row === 5) && col === 8) {
+				if ((row === 1 || row === 3 || row === 5) && col === 8 && cardId === 108) {
 					useMapCard(cardId, row, col);
+				} else if (cardId !== 108) {
+					toast("목적지 카드에는 지도 카드만 사용할 수 있습니다.");
 				}
 
 				// 플레이어에 드랍 (수리/부서짐카드)
