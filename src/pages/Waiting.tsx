@@ -154,8 +154,9 @@ const WaitingPage: React.FC = () => {
 								type="button"
 								key={`page-${i}`}
 								onClick={() => setCurrentPage(i)}
-								className={`w-2 h-2 rounded-full ${i === currentPage ? "bg-black" : "bg-gray-200"
-									}`}
+								className={`w-2 h-2 rounded-full ${
+									i === currentPage ? "bg-black" : "bg-gray-200"
+								}`}
 							/>
 						))}
 					</div>
