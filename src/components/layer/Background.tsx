@@ -42,21 +42,21 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 	return (
 		<div className="min-h-screen bg-gray-900 text-white w-screen h-screen">
 			<div className="relative min-h-screen bg-cover bg-no-repeat bg-center w-full h-full">
-				<div className="absolute inset-0 bg-[#000232]">
+				<div className="fixed inset-0 bg-[#000232]">
 					<img
 						src={image}
 						className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "w-screen h-screen object-cover"} h-full object-contain object-left`}
 						aria-hidden={true}
 					/>
 				</div>
-				<div className="absolute inset-0 w-full">
+				<div className="fixed inset-0 w-full">
 					<img
 						src={ageNoticeImage}
-						className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} w-full h-fit object-contain object-top-right`}
+						className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} w-full h-fit max-h-[250px] object-contain object-top-right`}
 						aria-hidden={true}
 					/>
 				</div>
-				<div className="absolute inset-0 w-full content-end">
+				<div className="fixed inset-0 w-full content-end">
 					<img
 						ref={ref}
 						src={bottomBarImage}
@@ -64,18 +64,18 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
 						aria-hidden={true}
 					/>
 				</div>
-				<div className="absolute w-full h-full items-end justify-center">
+				<div className="fixed w-full h-full items-end justify-center">
 					<div
 						className="relative flex w-full h-fit items-center justify-center"
 						style={{ top: `${top}px` }}
 					>
 						<img
-							className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} absolute`}
+							className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} fixed`}
 							src={bottomBubbleImage}
 							aria-hidden={true}
 						/>
 						<Text
-							className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} absolute`}
+							className={`${isVisible ? "" : "hidden"} ${useLayout ? "" : "hidden"} fixed`}
 						>
 							{basename}
 						</Text>
