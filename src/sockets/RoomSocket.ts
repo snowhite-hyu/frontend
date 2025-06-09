@@ -94,4 +94,8 @@ export class RoomSocket extends BaseSocket {
 	public offChat(callback: (payload: ChatResponse) => void) {
 		this.off("chat", callback);
 	}
+
+	public onQuitRoom(callback: (payload: any) => void) {
+		this.on("quit-success", callback);
+	}
 }
