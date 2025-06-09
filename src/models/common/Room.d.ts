@@ -41,3 +41,7 @@ export interface ChatResponse {
 	};
 	message: string;
 }
+
+export interface GameStartedResponse {
+	gameId: number;
+}

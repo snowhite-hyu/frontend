@@ -2,7 +2,7 @@ import roomBackground from "@/assets/room.png";
 import Profile from "@/components/ui/Profile";
 import { Button } from "@/components/ui/button";
 import useGame from "@/hooks/useGame";
-import type { ChatResponse } from "@/models/common/Room";
+import type { ChatResponse, GameStartedResponse } from "@/models/common/Room";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
@@ -40,15 +40,22 @@ const WaitingPage: React.FC = () => {
 
 		const handleQuitRoom = () => {
 			navigate("/room");
-		}
+		};
+
+		const handleGameStarted = (msg: GameStartedResponse) => {
+			join(msg.gameId);
+			init();
+		};
 
 		socket.onRoomusers(handleMessage);
 		socket.onChat(handleChat);
 		socket.onQuitRoom(handleQuitRoom);
+		socket.onGameStarted(handleGameStarted);
 		open();
 		return () => {
 			socket.offRoomusers(handleMessage);
 			socket.offChat(handleChat);
+			socket.offGameStarted(handleGameStarted);
 			clearChat();
 		};
 	}, []);
@@ -77,13 +84,7 @@ const WaitingPage: React.FC = () => {
 		if (!socket) return;
 		if (isMaster) {
 			socket.startGame({ roomId });
-			setTimeout(() => {
-				join(roomId);
-			}, 500);
-		} else {
-			join(roomId);
 		}
-		init();
 	};
 
 	const chatViewRef = useRef<HTMLDivElement | null>(null);
@@ -212,15 +213,17 @@ const WaitingPage: React.FC = () => {
 					>
 						나가기
 					</Button>
-					<Button
-						key="start"
-						variant="sabotuer"
-						size="custom"
-						className="w-[160px] h-[88px]"
-						onClick={() => handleStartGame(room.roomId)}
-					>
-						{isMaster ? "시작" : "준비"}
-					</Button>
+					{isMaster && (
+						<Button
+							key="start"
+							variant="sabotuer"
+							size="custom"
+							className="w-[160px] h-[88px]"
+							onClick={() => handleStartGame(room.roomId)}
+						>
+							시작
+						</Button>
+					)}
 				</div>
 			</div>
 		</div>

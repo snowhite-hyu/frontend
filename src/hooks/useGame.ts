@@ -1,5 +1,6 @@
 import type { Payload } from "@/models/common/Payload";
 import type {
+	ErrorRes,
 	FieldState,
 	FieldUpdateOneRes,
 	GetGameStateReq,
@@ -10,7 +11,6 @@ import type {
 	RoundStartReq,
 	RoundStartRes,
 	TurnChangedRes,
-	ErrorRes,
 } from "@/models/game/Game";
 import type {
 	GetPlayerInfoReq,
@@ -139,7 +139,7 @@ const useGame = () => {
 
 	const handleError = () => {
 		toast("행동 카드를 사용할 수 없습니다.");
-	}
+	};
 
 	const registerHandlers = () => {
 		register<RoundStartRes>(CHANNEL, "Round-Started", roundStartedCallback);
@@ -200,7 +200,7 @@ const useGame = () => {
 				CHANNEL,
 				{ type: "get-player-info", payload: { gameId } },
 				"Player-Info",
-				() =>  true,
+				() => true,
 			);
 
 			return result.payload;
