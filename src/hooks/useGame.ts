@@ -9,6 +9,7 @@ import {
 	RoundStartReq,
 	RoundStartRes,
 	TurnChangedRes,
+	ErrorRes,
 } from "@/models/game/Game";
 import {
 	GetPlayerInfoReq,
@@ -130,6 +131,10 @@ const useGame = () => {
 		forceUpdate();
 	};
 
+	const handleError = () => {
+		toast("행동 카드를 사용할 수 없습니다.");
+	}
+
 	const registerHandlers = () => {
 		register<RoundStartRes>(CHANNEL, "Round-Started", roundStartedCallback);
 		register<FieldUpdateOneRes>(CHANNEL, "Field-Changed", fieldUpdateOne);
@@ -146,6 +151,7 @@ const useGame = () => {
 			playerInfoUpdate,
 		);
 		register<RoundFinishedRes>(CHANNEL, "Round-Finished", checkRoundFinished);
+		register<ErrorRes>(CHANNEL, "error", handleError);
 	};
 
 	const unregisterHandlers = () => {
@@ -156,6 +162,7 @@ const useGame = () => {
 		unregister(CHANNEL, "Player-Info-Changed", playerInfoUpdate);
 		unregister(CHANNEL, "Changed-Public-Player-Info", playerInfoUpdate);
 		unregister(CHANNEL, "Round-Finished", checkRoundFinished);
+		unregister(CHANNEL, "error", handleError);
 	};
 
 	const init = () => {
