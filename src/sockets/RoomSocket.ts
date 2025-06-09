@@ -1,4 +1,8 @@
-import type { ChatRequest, ChatResponse } from "@/models/common/Room";
+import type {
+	ChatRequest,
+	ChatResponse,
+	GameStartedResponse,
+} from "@/models/common/Room";
 import { BaseSocket } from "@/sockets/BaseSocket";
 
 type RoomEvent =
@@ -97,5 +101,13 @@ export class RoomSocket extends BaseSocket {
 
 	public onQuitRoom(callback: (payload: any) => void) {
 		this.on("quit-success", callback);
+	}
+
+	public onGameStarted(callback: (payload: GameStartedResponse) => void) {
+		this.on("Game-Started", callback);
+	}
+
+	public offGameStarted(callback: (payload: GameStartedResponse) => void) {
+		this.off("Game-Started", callback);
 	}
 }
