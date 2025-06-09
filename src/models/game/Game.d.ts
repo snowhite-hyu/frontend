@@ -1,6 +1,6 @@
 import type { Payload } from "../common/Payload";
 import { CardData, GoalCardData, RouteCardData } from "./Card";
-import { PlayerRole, PlayerState } from "./Player";
+import type { PlayerRole, PlayerState } from "./Player";
 
 export type JoinGameReq = Payload<
 	"join-game",
@@ -26,7 +26,8 @@ export type RoundStartReq = Payload<
 export type RoundStartRes = Payload<"Round-Started", GameData>;
 
 type GameState = "WAITING" | "IN_GAME" | "FINISHED";
-type FieldState = [number, number];
+// cardId, isRotated, isFlipped, isConnectedFromStart
+type FieldState = [number, number, number, number];
 interface OpenPlayerState {
 	playerId: number;
 	playerName: string;
@@ -71,7 +72,13 @@ export type RoundFinishedRes = Payload<
 
 export type FieldUpdateOneRes = Payload<
 	string,
-	{ cardId: number; row: number; column: number; isFlipped?: number }
+	{
+		cardId: number;
+		row: number;
+		column: number;
+		isRotated: number;
+		isFlipped: number;
+	}
 >;
 
 export type PlayerInfoChanged = Payload<string, OpenPlayerState>;

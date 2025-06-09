@@ -33,7 +33,7 @@ const RegisterPage: React.FC = () => {
 		} else {
 			if (isNameValid === false) {
 				toast("닉네임은 공백으로 입력할 수 없어요.");
-			  }
+			}
 			if (isEmailValid === false) {
 				toast(`${form.email} - 이메일 중복을 체크해주세요.`);
 			}
@@ -70,15 +70,15 @@ const RegisterPage: React.FC = () => {
 					</Button>
 				</div>
 				<Input
-						variant="sabotuer"
-						placeholder="닉네임을 입력해주세요."
-						type="text"
-						required
-						value={form.username}
-						onChange={(e) => 
-							setForm(update(form, { username: { $set: e.target.value } }))
-						}
-					/>
+					variant="sabotuer"
+					placeholder="닉네임을 입력해주세요."
+					type="text"
+					required
+					value={form.username}
+					onChange={(e) =>
+						setForm(update(form, { username: { $set: e.target.value } }))
+					}
+				/>
 				<Input
 					variant="sabotuer"
 					placeholder="비밀번호를 입력해주세요."

@@ -1,15 +1,15 @@
-import type React from "react";
-import { Button } from "@/components/ui/button";
-import Profile from "@/components/ui/Profile";
-import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import roomBackground from "@/assets/room.png";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import Profile from "@/components/ui/Profile";
+import { Button } from "@/components/ui/button";
+import useGame from "@/hooks/useGame";
+import type { ChatResponse } from "@/models/common/Room";
+import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import { useRoomSocketStore } from "@/stores/common/RoomSocketStore";
-import { ChatResponse } from "@/models/common/Room";
-import useGame from "@/hooks/useGame";
 import { useGameData } from "@/stores/game/GameStore";
+import type React from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const WaitingPage: React.FC = () => {
 	const { room, isMaster, updateUsers, chats, pushChat, clearChat } =
@@ -54,8 +54,8 @@ const WaitingPage: React.FC = () => {
 	}, []);
 
 	const options: { key: string; title: string; setting: string }[] = [
-		{ key: "people", title: "최대 인원", setting: room.capacity + "명" },
-		{ key: "time", title: "턴 시간 제한", setting: room.turnTime + "초" },
+		{ key: "people", title: "최대 인원", setting: `${room.capacity}명` },
+		{ key: "time", title: "턴 시간 제한", setting: `${room.turnTime}초` },
 	];
 
 	const [currentPage, setCurrentPage] = useState(0);
@@ -150,8 +150,9 @@ const WaitingPage: React.FC = () => {
 								type="button"
 								key={`page-${i}`}
 								onClick={() => setCurrentPage(i)}
-								className={`w-2 h-2 rounded-full ${i === currentPage ? "bg-black" : "bg-gray-200"
-									}`}
+								className={`w-2 h-2 rounded-full ${
+									i === currentPage ? "bg-black" : "bg-gray-200"
+								}`}
 							/>
 						))}
 					</div>

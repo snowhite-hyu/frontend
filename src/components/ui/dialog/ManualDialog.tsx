@@ -1,13 +1,13 @@
-import { useState } from "react";
-import Dialog from "@/components/ui/dialog/Dialog";
-import Text from "@/components/ui/text";
-import { Button } from "@/components/ui/button";
 import manualImage1 from "@/assets/manual/manual1.svg";
 import manualImage2 from "@/assets/manual/manual2.svg";
 import manualImage3 from "@/assets/manual/manual3.svg";
 import manualImage4 from "@/assets/manual/manual4.svg";
 import nextIcon from "@/assets/nextIcon.svg";
 import prevIcon from "@/assets/prevIcon.svg";
+import { Button } from "@/components/ui/button";
+import Dialog from "@/components/ui/dialog/Dialog";
+import Text from "@/components/ui/text";
+import { useState } from "react";
 
 interface ManualDialogProps {
 	isOpen: boolean;
@@ -30,7 +30,7 @@ const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 					))}
 				</div>
 				<div className="absolute top-1/2 right-25">
-					{currentPage == 0 && (
+					{currentPage === 0 && (
 						<Button
 							variant="ghost"
 							size="custom"
@@ -42,7 +42,7 @@ const ManualDialog: React.FC<ManualDialogProps> = ({ isOpen, setIsOpen }) => {
 					)}
 				</div>
 				<div className="absolute top-1/2 left-25">
-					{currentPage == 1 && (
+					{currentPage === 1 && (
 						<Button
 							variant="ghost"
 							size="custom"

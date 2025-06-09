@@ -1,14 +1,14 @@
-import type { ReactNode } from "react";
 import {
-	useFloating,
-	useDismiss,
-	useRole,
-	useInteractions,
-	useId,
-	FloatingOverlay,
 	FloatingFocusManager,
+	FloatingOverlay,
+	useDismiss,
+	useFloating,
+	useId,
+	useInteractions,
+	useRole,
 } from "@floating-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 interface DialogProps {
 	size?: "big" | "small";

@@ -1,35 +1,35 @@
-import { useMemo, useRef, useState, useEffect } from "react";
 import remainCard from "@/assets/card/routeH1.png";
-import roomBackground from "@/assets/room.png";
-import trashCan from "@/assets/trash.png";
 import saboteur from "@/assets/role/saboteur.png";
 import worker from "@/assets/role/worker.png";
+import roomBackground from "@/assets/room.png";
+import trashCan from "@/assets/trash.png";
+import ActionCard from "@/components/asset/ActionCard";
+import Card from "@/components/asset/Card";
+import GoalCard from "@/components/asset/GoalCard";
+import RouteCard from "@/components/asset/RouteCard";
+import { DroppableCell } from "@/components/game/DroppableCell";
+import GameMap from "@/components/game/Map";
 import PlayerPanel from "@/components/ui/PlayerPanel";
+import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
+import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
+import useGame from "@/hooks/useGame";
+import type { FieldState, OpenPlayerState } from "@/models/game/Game";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
-import {
-	DndContext,
-	DragEndEvent,
-	DragOverlay,
-	DragStartEvent,
-} from "@dnd-kit/core";
+import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import {
 	useGameData,
 	useGameMyInfo,
 	useGameRoundReviews,
 } from "@/stores/game/GameStore";
-import { OpenPlayerState } from "@/models/game/Game";
-import Card from "@/components/asset/Card";
-import RouteCard from "@/components/asset/RouteCard";
-import ActionCard from "@/components/asset/ActionCard";
-import { toast } from "sonner";
-import useGame from "@/hooks/useGame";
-import GameMap from "@/components/game/Map";
-import GoalCard from "@/components/asset/GoalCard";
-import { DroppableCell } from "@/components/game/DroppableCell";
-import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
-import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
+import {
+	DndContext,
+	type DragEndEvent,
+	DragOverlay,
+	type DragStartEvent,
+} from "@dnd-kit/core";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
+import { toast } from "sonner";
 
 // 드래그 앤 드랍 대상 prefix
 const PLAYER_PREFIX = "player:";
@@ -74,8 +74,8 @@ const GamePage: React.FC = () => {
 		return [left, right];
 	}, [game?.players]);
 
-	const [flip, setFlip] = useState<number>(0);
-	const flipInterval = useRef<NodeJS.Timeout | null>(null);
+	const [isRotated, setIsRotated] = useState<number>(0);
+	const rotateInterval = useRef<NodeJS.Timeout | null>(null);
 	const [activeItem, setActiveItem] = useState<string | null>(null);
 
 	// 현재 드래그중인 카드 오버레이
@@ -89,8 +89,7 @@ const GamePage: React.FC = () => {
 						id="overlay"
 						assetId={assetId}
 						isDraggable={false}
-						isHidden={false}
-						flip={flip}
+						isRotated={isRotated}
 					/>
 				);
 			}
@@ -101,32 +100,32 @@ const GamePage: React.FC = () => {
 			}
 		}
 		return null;
-	}, [activeItem, flip]);
+	}, [activeItem, isRotated]);
 
-	// 드래그 시작: 오버레이와 flip 애니메이션 설정
+	// 드래그 시작: 오버레이와 rotate 애니메이션 설정
 	const handleDragStart = (e: DragStartEvent) => {
 		const id = e.active.id.toString();
 		toast(`드래그 시작: ${id}`);
 		setActiveItem(id);
-		setFlip(0);
+		setIsRotated(0);
 
-		if (id.startsWith(CARD_PREFIX) && !flipInterval.current) {
-			flipInterval.current = setInterval(
-				() => setFlip((prev) => (prev + 1) % 2),
+		if (id.startsWith(CARD_PREFIX) && !rotateInterval.current) {
+			rotateInterval.current = setInterval(
+				() => setIsRotated((prev) => (prev + 1) % 2),
 				1500,
 			);
 		}
 	};
 
-	// 드래그 종료: 카드 드랍 처리 및 flip 인터벌 해제
+	// 드래그 종료: 카드 드랍 처리 및 rotate 인터벌 해제
 	const handleDragEnd = (e: DragEndEvent) => {
 		const overId = e.over?.id.toString();
 		const activeId = e.active.id.toString();
 
-		// flip 반복 종료
-		if (flipInterval.current) {
-			clearInterval(flipInterval.current);
-			flipInterval.current = null;
+		// rotate 반복 종료
+		if (rotateInterval.current) {
+			clearInterval(rotateInterval.current);
+			rotateInterval.current = null;
 		}
 
 		if (activeId.startsWith(CARD_PREFIX)) {
@@ -143,7 +142,7 @@ const GamePage: React.FC = () => {
 				const row = Number(rowStr);
 				const col = Number(colStr);
 
-				if (cardId > 0 && cardId < 60) usePathCard(cardId, row, col, flip);
+				if (cardId > 0 && cardId < 60) usePathCard(cardId, row, col, isRotated);
 				else if (cardId === 107) useRockfallCard(cardId, row, col);
 
 				// 골셀에 드랍 (지도카드)
@@ -183,7 +182,7 @@ const GamePage: React.FC = () => {
 
 	// 라운드 종료 시 다이얼로그 표시
 	const endModal = useMemo(() => {
-		if (roundReviews.length == 0 || !game) return <></>;
+		if (roundReviews.length === 0 || !game) return <></>;
 		switch (game.gameState) {
 			case "WAITING":
 				return <></>;
@@ -198,9 +197,8 @@ const GamePage: React.FC = () => {
 							}}
 						/>
 					);
-				} else {
-					return <></>;
 				}
+				return <></>;
 			case "FINISHED":
 				return (
 					<GameEndDialog
@@ -269,11 +267,7 @@ const GamePage: React.FC = () => {
 									<Card id={`card:${id}:${index}`} assetName="card/start" />
 								)}
 								{id > 0 && id <= 40 && (
-									<RouteCard
-										id={`card:${id}:${index}`}
-										isHidden={false}
-										assetId={id}
-									/>
+									<RouteCard id={`card:${id}:${index}`} assetId={id} />
 								)}
 								{id > 100 && id < 120 && (
 									<ActionCard id={`card:${id}:${index}`} assetId={id} />
@@ -318,7 +312,7 @@ export default GamePage;
 /**
  * 맵 렌더링용 별도 컴포넌트 (row, col별 셀 렌더)
  */
-const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
+const MapGrid: React.FC<{ field: FieldState[][] }> = ({ field }) => {
 	return (
 		<GameMap
 			height={field.length}
@@ -343,9 +337,9 @@ const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 							<RouteCard
 								id={`disp-${id}`}
 								assetId={cell[0]}
-								isHidden={false}
 								isDraggable={false}
-								flip={cell[1]}
+								isRotated={cell[1]}
+								isFlipped={cell[2]}
 							/>
 						</DroppableCell>
 					);
@@ -357,8 +351,8 @@ const MapGrid: React.FC<{ field: [number, number][][] }> = ({ field }) => {
 							<GoalCard
 								id={id}
 								assetId={cell[0]}
-								isHidden={false}
 								isDraggable={false}
+								isFlipped={cell[2]}
 							/>
 						</DroppableCell>
 					);

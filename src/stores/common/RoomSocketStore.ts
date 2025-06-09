@@ -1,5 +1,5 @@
-import { create } from "zustand";
 import { RoomSocket } from "@/sockets/RoomSocket";
+import { create } from "zustand";
 
 interface RoomSocketState {
 	socket: RoomSocket | null;

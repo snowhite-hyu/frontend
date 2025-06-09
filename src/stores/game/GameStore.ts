@@ -1,7 +1,7 @@
 import type { GameData, RoundFinishedRes } from "@/models/game/Game";
-import { PlayerData } from "@/models/game/Player";
-import { create } from "zustand";
+import type { PlayerData } from "@/models/game/Player";
 import update from "immutability-helper";
+import { create } from "zustand";
 
 interface GameState {
 	data: GameData | null;

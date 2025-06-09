@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 
 import Text from "@/components/ui/text";
 
-import SaboteurCard from "@/assets/roleCard/saboteur.png";
-import MinerCard from "@/assets/roleCard/miner.png";
 import GoldCard from "@/assets/goldCard.png";
-import { RoundFinishedRes } from "@/models/game/Game";
+import MinerCard from "@/assets/roleCard/miner.png";
+import SaboteurCard from "@/assets/roleCard/saboteur.png";
+import type { RoundFinishedRes } from "@/models/game/Game";
 import { Button } from "../button";
 
 interface RoundEndDialogProps {
@@ -52,7 +52,7 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 				<Text className="text-9xl">Role Reveal</Text>
 				<div className="flex mt-17 w-[700px] h-[250px] space-between mb-17">
 					<div className="flex">
-						<img src={SaboteurCard} className="w-[156px] h-[244px]"></img>
+						<img src={SaboteurCard} className="w-[156px] h-[244px]" />
 						<div className="flex flex-col justify-center w-[200px]">
 							{saboteurs.map((saboteur) => (
 								<p className="text-white text-3xl font-bold pl-[30px] pr-[30px] mb-3">
@@ -62,7 +62,7 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 						</div>
 					</div>
 					<div className="flex ml-10">
-						<img src={MinerCard} className="w-[156px] h-[244px]"></img>
+						<img src={MinerCard} className="w-[156px] h-[244px]" />
 						<div className="flex flex-col justify-center w-[200px]">
 							{miners.map((miner) => (
 								<p className="text-white text-3xl font-bold pl-[30px] pr-[30px] mb-3">
@@ -97,7 +97,7 @@ const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 			<Dialog isOpen={dialogStep === 2} setIsOpen={() => setDialogStep(0)}>
 				<Text className="text-9xl text-yellow-600">Dividing Gold ...</Text>
 				<div className="flex flex-col mt-5">
-					<img src={GoldCard}></img>
+					<img src={GoldCard} />
 					<p className="text-white text-3xl font-bold items-center">
 						승자는{" "}
 						<span

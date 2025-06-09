@@ -2,9 +2,9 @@ import Card from "./Card";
 
 interface RouteCardProps {
 	id: string;
-	isHidden: boolean;
 	assetId: number;
 	isDraggable?: boolean;
+	isFlipped?: number;
 }
 
 const RouteMap: Record<string, string> = {
@@ -16,14 +16,14 @@ const RouteMap: Record<string, string> = {
 
 const GoalCard: React.FC<RouteCardProps> = ({
 	id,
-	isHidden,
 	assetId,
 	isDraggable = true,
+	isFlipped = true,
 }) => {
-	if (isHidden) {
+	if (isFlipped) {
 		assetId = 0;
 	}
-	let imgName = "card/goal" + RouteMap[assetId];
+	const imgName = `card/goal${RouteMap[assetId]}`;
 
 	return <Card id={id} assetName={imgName} isDraggable={isDraggable} />;
 };

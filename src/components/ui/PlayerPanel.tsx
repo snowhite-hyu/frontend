@@ -6,8 +6,8 @@ import cartIconB from "@/assets/icon/blockC.png";
 import pickaxeIconB from "@/assets/icon/blockD.png";
 import lanternIconB from "@/assets/icon/blockL.png";
 import goldIcon from "@/assets/icon/gold.png";
-import { OpenPlayerState } from "@/models/game/Game";
-import { PlayerData } from "@/models/game/Player";
+import type { OpenPlayerState } from "@/models/game/Game";
+import type { PlayerData } from "@/models/game/Player";
 import type React from "react";
 
 interface PlayerPanelProps {
