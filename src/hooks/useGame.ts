@@ -1,5 +1,6 @@
-import { Payload } from "@/models/common/Payload";
-import {
+import type { Payload } from "@/models/common/Payload";
+import type {
+	FieldState,
 	FieldUpdateOneRes,
 	GetGameStateReq,
 	GetGameStateRes,
@@ -10,7 +11,7 @@ import {
 	RoundStartRes,
 	TurnChangedRes,
 } from "@/models/game/Game";
-import {
+import type {
 	GetPlayerInfoReq,
 	GetPlayerInfoRes,
 	PlayerData,
@@ -24,7 +25,7 @@ import update from "immutability-helper";
 import { toast } from "sonner";
 
 const TIMEOUT = 5000;
-const CHANNEL: "game" = "game";
+const CHANNEL = "game" as const;
 
 const useGame = () => {
 	const token = useSessionToken();
@@ -83,11 +84,16 @@ const useGame = () => {
 	const fieldUpdateOne = (msg: FieldUpdateOneRes) => {
 		setGameData((prev) => {
 			if (!prev) return prev;
-			const newField: [number, number][][] = prev.field.map((rowArr, r) =>
+			const newField: FieldState[][] = prev.field.map((rowArr, r) =>
 				r === msg.payload.row
 					? rowArr.map((cell, c) =>
 							c === msg.payload.column
-								? [msg.payload.cardId, msg.payload.isFlipped ?? 0]
+								? [
+										msg.payload.cardId,
+										msg.payload.isRotated,
+										msg.payload.isFlipped,
+										cell[3],
+									]
 								: cell,
 						)
 					: rowArr,
@@ -283,7 +289,7 @@ const useGame = () => {
 			>;
 			type Res = Payload<
 				"Unicast: Rockfall-Card-Use",
-				{ field: [number, number][][] }
+				{ field: FieldState[][] }
 			>;
 			const result = await sendAndWaitForResponse<Req, Res>(
 				CHANNEL,

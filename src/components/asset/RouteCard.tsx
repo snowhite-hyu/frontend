@@ -2,10 +2,10 @@ import Card from "./Card";
 
 interface RouteCardProps {
 	id: string;
-	isHidden: boolean;
 	assetId: number;
 	isDraggable?: boolean;
-	flip?: number;
+	isRotated?: number;
+	isFlipped?: number;
 }
 
 const RouteMap: Record<string, string> = {
@@ -54,22 +54,22 @@ const RouteMap: Record<string, string> = {
 
 const RouteCard: React.FC<RouteCardProps> = ({
 	id,
-	isHidden,
 	assetId,
 	isDraggable = true,
-	flip = 0,
+	isRotated = false,
+	isFlipped = false,
 }) => {
-	if (isHidden) {
+	if (isFlipped) {
 		assetId = 0;
 	}
-	let imgName = "card/route" + RouteMap[assetId];
+	const imgName = `card/route${RouteMap[assetId]}`;
 
 	const containerClass = `
     [perspective:1000px]
     transition-transform
     duration-500
     [transform-style:preserve-3d]
-    ${flip === 1 ? "[transform:rotateX(180deg)_rotateY(180deg)]" : ""}
+    ${isRotated === 1 ? "[transform:rotateX(180deg)_rotateY(180deg)]" : ""}
   `;
 
 	return (
