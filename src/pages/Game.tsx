@@ -221,7 +221,7 @@ const GamePage: React.FC = () => {
 					/>
 				);
 		}
-	}, [roundReviews, game?.gameState]);
+	}, [roundReviews, game?.round, game?.gameState]);
 
 	return (
 		<div className="relative h-screen">

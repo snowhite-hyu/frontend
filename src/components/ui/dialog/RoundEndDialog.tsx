@@ -11,14 +11,16 @@ import { Button } from "../button";
 
 interface RoundEndDialogProps {
 	roundReview: RoundFinishedRes["payload"];
+	defaultOpen?: boolean;
 	onExit: () => void | Promise<void>;
 }
 
 const RoundEndDialog: React.FC<RoundEndDialogProps> = ({
 	roundReview,
+	defaultOpen = true,
 	onExit,
 }) => {
-	const [dialogStep, setDialogStep] = useState(1);
+	const [dialogStep, setDialogStep] = useState<number>(defaultOpen ? 1 : 0);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
