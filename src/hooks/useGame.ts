@@ -1,16 +1,17 @@
 import type { Payload } from "@/models/common/Payload";
-import type {
-	ErrorRes,
-	FieldState,
-	FieldUpdateOneRes,
-	GetGameStateReq,
-	GetGameStateRes,
-	JoinGameReq,
-	PlayerInfoChanged,
-	RoundFinishedRes,
-	RoundStartReq,
-	RoundStartRes,
-	TurnChangedRes,
+import {
+	GameFinishedRes,
+	type ErrorRes,
+	type FieldState,
+	type FieldUpdateOneRes,
+	type GetGameStateReq,
+	type GetGameStateRes,
+	type JoinGameReq,
+	type PlayerInfoChanged,
+	type RoundFinishedRes,
+	type RoundStartReq,
+	type RoundStartRes,
+	type TurnChangedRes,
 } from "@/models/game/Game";
 import type {
 	GetPlayerInfoReq,
@@ -137,6 +138,10 @@ const useGame = () => {
 		forceUpdate();
 	};
 
+	const checkGameFinished = () => {
+		setGameData((prev) => update(prev, { gameState: { $set: "FINISHED" } }));
+	};
+
 	const handleError = () => {
 		toast("행동 카드를 사용할 수 없습니다.");
 	};
@@ -157,6 +162,7 @@ const useGame = () => {
 			playerInfoUpdate,
 		);
 		register<RoundFinishedRes>(CHANNEL, "Round-Finished", checkRoundFinished);
+		register<GameFinishedRes>(CHANNEL, "Game-Finished", checkGameFinished);
 		register<ErrorRes>(CHANNEL, "error", handleError);
 	};
 
@@ -168,6 +174,7 @@ const useGame = () => {
 		unregister(CHANNEL, "Player-Info-Changed", playerInfoUpdate);
 		unregister(CHANNEL, "Changed-Public-Player-Info", playerInfoUpdate);
 		unregister(CHANNEL, "Round-Finished", checkRoundFinished);
+		unregister(CHANNEL, "Game-Finished", checkGameFinished);
 		unregister(CHANNEL, "error", handleError);
 	};
 

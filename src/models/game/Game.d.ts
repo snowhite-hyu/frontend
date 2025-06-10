@@ -94,3 +94,14 @@ export type TurnChangedRes = Payload<
 	"Turn-Changed",
 	{ nextTurnPlayerId: number }
 >;
+
+export type GameFinishedRes = Payload<
+	"Game-Finished",
+	{
+		playerId: number;
+		playerName: string;
+		handSize: number;
+		state: PlayerState[];
+		gold: number;
+	}
+>;
