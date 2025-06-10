@@ -15,6 +15,7 @@ import GameEndDialog from "@/components/ui/dialog/GameEndDialog";
 import RoundEndDialog from "@/components/ui/dialog/RoundEndDialog";
 import useGame from "@/hooks/useGame";
 import type { FieldState, OpenPlayerState } from "@/models/game/Game";
+import type { PlayerState } from "@/models/game/Player";
 import { useBackgroundActions } from "@/stores/common/BackgroundStore";
 import { useRoomInfoStore } from "@/stores/common/RoomInfoState";
 import {
@@ -76,6 +77,11 @@ const GamePage: React.FC = () => {
 	}, [game?.players]);
 
 	const [cardIdByMapCard, setCardIdByMapCard] = useState<number | null>(null);
+	const [twoActionOpen, setTwoActionOpen] = useState<boolean>(false);
+	// LEFT, RIGHT, PLAYER
+	const [twoActionIds, setTwoActionIds] = useState<
+		[number, number, number] | null
+	>(null);
 
 	const [isRotated, setIsRotated] = useState<number>(0);
 	const rotateInterval = useRef<NodeJS.Timeout | null>(null);
@@ -173,18 +179,28 @@ const GamePage: React.FC = () => {
 				// 플레이어에 드랍 (수리/부서짐카드)
 			} else if (overId?.startsWith(PLAYER_PREFIX)) {
 				const playerId = Number.parseInt(overId.slice(PLAYER_PREFIX.length));
-				if (cardId > 100 && cardId <= 104) {
+				if (cardId > 100 && cardId < 104) {
 					// 수리 카드별 대상 부위 매핑
-					const states: Record<
-						number,
-						"BROKEN_PICKAXE" | "BROKEN_LANTERN" | "BROKEN_MINECART"
-					> = {
+					const states: Record<number, PlayerState> = {
 						101: "BROKEN_PICKAXE",
 						102: "BROKEN_LANTERN",
 						103: "BROKEN_MINECART",
 					};
 					const targetState = states[cardId];
 					if (targetState) useRepairCard(cardId, playerId, targetState);
+				} else if (cardId >= 104 && cardId < 107) {
+					switch (cardId) {
+						case 104:
+							setTwoActionIds([102, 103, playerId]);
+							break;
+						case 105:
+							setTwoActionIds([101, 103, playerId]);
+							break;
+						case 106:
+							setTwoActionIds([101, 102, playerId]);
+							break;
+					}
+					setTwoActionOpen(true);
 				} else if (cardId >= 109 && cardId <= 111) {
 					useBrokenCard(cardId, playerId);
 				}
@@ -331,6 +347,57 @@ const GamePage: React.FC = () => {
 							isFlipped={0}
 						/>
 					)}
+				</div>
+			</Dialog>
+			<Dialog isOpen={twoActionOpen} setIsOpen={setTwoActionOpen}>
+				<div className="flex flex-col items-center gap-10">
+					<p className="text-red-600 text-xl font-holtwood font-bold">
+						둘중 하나를 골라주세요!
+					</p>
+					<div className="flex items-center gap-10">
+						{twoActionIds && (
+							<>
+								<div
+									onClick={() => {
+										setTwoActionOpen(false);
+										const states: Record<number, PlayerState> = {
+											101: "BROKEN_PICKAXE",
+											102: "BROKEN_LANTERN",
+											103: "BROKEN_MINECART",
+										};
+										const targetState = states[twoActionIds[0]];
+										if (targetState)
+											useRepairCard(
+												twoActionIds[0],
+												twoActionIds[2],
+												targetState,
+											);
+									}}
+								>
+									<ActionCard id="leftAction" assetId={twoActionIds[0]} />
+								</div>
+								<div
+									onClick={() => {
+										setTwoActionOpen(false);
+										const states: Record<number, PlayerState> = {
+											101: "BROKEN_PICKAXE",
+											102: "BROKEN_LANTERN",
+											103: "BROKEN_MINECART",
+										};
+										const targetState = states[twoActionIds[1]];
+										if (targetState)
+											useRepairCard(
+												twoActionIds[1],
+												twoActionIds[2],
+												targetState,
+											);
+									}}
+								>
+									<ActionCard id="rightAction" assetId={twoActionIds[1]} />
+								</div>
+							</>
+						)}
+					</div>
 				</div>
 			</Dialog>
 		</div>
