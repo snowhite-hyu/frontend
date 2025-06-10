@@ -318,7 +318,7 @@ const GamePage: React.FC = () => {
 			</DndContext>
 			{/* 라운드 및 게임 종료 다이얼로그 출력 */}
 			{endModal}
-			<Dialog isOpen={cardIdByMapCard !== null} setIsOpen={() => { }}>
+			<Dialog isOpen={cardIdByMapCard !== null} setIsOpen={() => {}}>
 				<div className="flex flex-col items-center gap-10">
 					<p className="text-red-600 text-xl font-holtwood font-bold">
 						3 초동안만 볼 수 있습니다 !
