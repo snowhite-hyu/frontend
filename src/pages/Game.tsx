@@ -138,7 +138,7 @@ const GamePage: React.FC = () => {
 		}
 
 		if (activeId.startsWith(CARD_PREFIX)) {
-			const cardId = Number.parseInt(activeId.slice(CARD_PREFIX.length));
+			const cardId = Number.parseInt(activeId.split(":")[1]);
 
 			// 내 카드 버리기에 드랍
 			if (overId === TRASHBIN && cardId) {
