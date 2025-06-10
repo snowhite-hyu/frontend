@@ -1,17 +1,17 @@
 import type { Payload } from "@/models/common/Payload";
-import {
+import type {
+	ErrorRes,
+	FieldState,
+	FieldUpdateOneRes,
 	GameFinishedRes,
-	type ErrorRes,
-	type FieldState,
-	type FieldUpdateOneRes,
-	type GetGameStateReq,
-	type GetGameStateRes,
-	type JoinGameReq,
-	type PlayerInfoChanged,
-	type RoundFinishedRes,
-	type RoundStartReq,
-	type RoundStartRes,
-	type TurnChangedRes,
+	GetGameStateReq,
+	GetGameStateRes,
+	JoinGameReq,
+	PlayerInfoChanged,
+	RoundFinishedRes,
+	RoundStartReq,
+	RoundStartRes,
+	TurnChangedRes,
 } from "@/models/game/Game";
 import type {
 	GetPlayerInfoReq,
