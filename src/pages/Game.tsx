@@ -323,7 +323,12 @@ const GamePage: React.FC = () => {
 						3 초동안만 볼 수 있습니다 !
 					</p>
 					{cardIdByMapCard && (
-						<GoalCard id={"destId"} assetId={cardIdByMapCard} />
+						<GoalCard
+							id={"destId"}
+							assetId={cardIdByMapCard}
+							isDraggable={false}
+							isFlipped={0}
+						/>
 					)}
 				</div>
 			</Dialog>
